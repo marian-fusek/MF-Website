@@ -443,7 +443,7 @@ function scaleHeroName(){
 
   const width    = wrap.scrollWidth;
   const viewport = window.innerWidth;
-  const scale    = (viewport * .99) / width;
+  const scale    = (viewport * .98) / width;  /* .98 = ~1% padding each side */
 
   wrap.style.transform = `scale(${scale})`;
 
@@ -773,42 +773,68 @@ window.addEventListener(
 
       const delay=index*(STEP+200);
 
-      const year=
-      item.querySelector(".mf-time-year");
+      const year=item.querySelector(".mf-time-year");
+      const dot=item.querySelector(".mf-time-dot");
+      const copy=item.querySelector(".mf-time-copy");
 
-      const dot=
-      item.querySelector(".mf-time-dot");
-
-      const copy=
-      item.querySelector(".mf-time-copy");
-
-      if(year){
-
-        setTimeout(()=>{
-          year.classList.add("show");
-        },delay);
-
-      }
-
-      if(dot){
-
-        setTimeout(()=>{
-          dot.classList.add("visible");
-        },delay+100);
-
-      }
-
-      if(copy){
-
-        setTimeout(()=>{
-          copy.classList.add("show");
-        },delay+200);
-
-      }
+      if(year){ setTimeout(()=>{ year.classList.add("show"); },delay); }
+      if(dot){  setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
+      if(copy){ setTimeout(()=>{ copy.classList.add("show"); },delay+200); }
 
     });
 
+    /* Center XP label vertically with first row's midpoint */
+    alignXPLabel();
+
   }
+
+  function alignXPLabel(){
+
+    const label=section.querySelector(".mf-timeline-label");
+    const firstItem=items[0];
+
+    if(!label || !firstItem) return;
+
+    const labelRect=label.getBoundingClientRect();
+    const itemRect=firstItem.getBoundingClientRect();
+    const itemMid=itemRect.top+itemRect.height/2;
+    const labelMid=labelRect.top+labelRect.height/2;
+    const offset=itemMid-labelMid;
+
+    label.style.transform=`translateY(${offset}px)`;
+    label.style.transition="transform .8s cubic-bezier(.16,1,.3,1)";
+
+  }
+
+  /* Re-align on resize */
+  window.addEventListener("resize",alignXPLabel,{passive:true});
+
+  /* Ripple blur on role title hover */
+  items.forEach(item=>{
+
+    item.addEventListener("mouseenter",()=>{
+
+      const chars=Array.from(
+        item.querySelectorAll(".mf-time-role-char")
+      );
+
+      chars.forEach((ch,i)=>{
+
+        setTimeout(()=>{
+
+          ch.classList.add("rippling");
+
+          setTimeout(()=>{
+            ch.classList.remove("rippling");
+          },280);
+
+        },i*35);  /* stagger: 35ms per character */
+
+      });
+
+    });
+
+  });
 
 })();
 
