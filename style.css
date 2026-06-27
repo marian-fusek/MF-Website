@@ -240,16 +240,7 @@ body {
    ============================================================ */
 
 .mf-noise {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  opacity: .014;
-  background-image:
-    radial-gradient(circle at 20% 30%, #fff 1px, transparent 1px),
-    radial-gradient(circle at 80% 70%, #fff 1px, transparent 1px);
-  background-size: 22px 22px;
-  mix-blend-mode: screen;
+  display: none;
 }
 
 /* ============================================================
@@ -265,14 +256,21 @@ body {
   z-index: 50;
   pointer-events: none;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 100%);
   mask-image: linear-gradient(to top, #000 0%, transparent 100%);
-  transition: opacity .5s var(--ease);
+  transition: opacity .35s var(--ease);
   opacity: 0;
+  will-change: opacity;
 }
 
-.mf-blur.is-on  { opacity: 1; }
-.mf-blur.is-off { opacity: 0; }
+.mf-blur.is-on {
+  opacity: 1;
+}
+
+.mf-blur.is-off {
+  opacity: 0;
+}
 
 /* ============================================================
    ASCII ambient text
