@@ -376,7 +376,6 @@ body {
   overflow: hidden;
 }
 
-/* Name — bold, viewport-scaled via JS */
 .mf-hero-name {
   position: absolute;
   left: 0;
@@ -385,7 +384,7 @@ body {
   z-index: 6;
   width: 100vw;
   overflow: visible;
-  line-height: .82;
+  line-height: .94;
   font-weight: 400;
   text-transform: uppercase;
   white-space: nowrap;
@@ -393,7 +392,7 @@ body {
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
-  font-size: var(--hero-name-size);
+  font-size: 200px;
   letter-spacing: -.065em;
 }
 
@@ -404,33 +403,40 @@ body {
 #nameWrap {
   display: inline-block;
   width: auto;
-  transform-origin: center bottom;
+  transform-origin: left bottom;
   will-change: transform;
 }
 
 .nc {
   display: inline;
-  transition: opacity .06s linear, filter .3s var(--ease), color .06s linear, text-shadow .2s var(--ease);
+  transition:
+    opacity .06s linear,
+    filter .3s var(--ease),
+    color .06s linear,
+    text-shadow .2s var(--ease);
 }
 
-.nc.fx-hide { opacity: 0; }
-.nc.fx-blur { filter: url(#motionBlur); }   /* horizontal motion blur */
+.nc.fx-hide {
+  opacity: 0;
+}
 
-/* Hero info block — aligned to F in FUSEK via JS */
+.nc.fx-blur {
+  filter: url(#motionBlur);
+}
+
 .mf-hero-info {
   position: absolute;
   z-index: 5;
-  /* JS sets left dynamically; fallback: */
-  left: 10%;
-  bottom: 0;
-  width: 34%;
+  left: 50vw;
+  bottom: 17.5vh;
+  width: 34vw;
   max-width: 560px;
 }
 
 .mf-hero-info h1 {
   margin: 0;
   color: #fff;
-  font-size: clamp(22px, 2.6vw, 46px);   /* 150% of old clamp(16px,1.85vw,32px) */
+  font-size: clamp(22px, 2.6vw, 46px);
   line-height: 1.06;
   letter-spacing: -.04em;
   font-weight: 400;
@@ -444,22 +450,22 @@ body {
   min-height: 1em;
   white-space: nowrap;
   font-family: "Geist Mono", monospace;
-  font-size: clamp(7px, 0.7vw, 12px);
+  font-size: clamp(7px, .7vw, 12px);
   letter-spacing: .07em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, .38);
+  color: rgba(255,255,255,.38);
 }
 
 .mf-meta-cursor,
 .mf-tw-cursor {
   display: inline;
-  color: rgba(255, 255, 255, .52);
+  color: rgba(255,255,255,.52);
   animation: twBlink .65s steps(1) infinite;
 }
 
 @keyframes twBlink {
-  0%, 49%  { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%,49% { opacity: 1; }
+  50%,100% { opacity: 0; }
 }
 
 /* ============================================================
@@ -713,7 +719,6 @@ body {
 
 /* ============================================================
    XP / TIMELINE
-   Content starts at 50% horizontally (years at center)
    ============================================================ */
 
 .mf-xp {
@@ -724,20 +729,21 @@ body {
 .mf-timeline {
   min-height: 94vh;
   display: grid;
-  grid-template-columns: 50% 1fr;  /* label in left half, items start at center */
-  gap: 48px;
-  align-items: stretch;
+  grid-template-columns: 50vw 1fr;
+  gap: 0;
+  align-items: start;
 }
 
 .mf-timeline-label {
   position: relative;
   align-self: start;
   font-size: var(--section-title);
-  line-height: .9;
+  line-height: 1;
   letter-spacing: -.055em;
   font-weight: 850;
   text-transform: uppercase;
   color: #fff;
+  padding-top: 0;
 }
 
 .mf-xp-plus {
@@ -747,7 +753,7 @@ body {
   font-family: "Geist Mono", monospace;
   font-size: var(--mono-small);
   letter-spacing: .06em;
-  color: rgba(255, 255, 255, .65);
+  color: rgba(255,255,255,.65);
   opacity: 0;
   transform: translateY(0);
   pointer-events: none;
@@ -758,50 +764,44 @@ body {
 }
 
 @keyframes xpPop {
-  0%   { opacity: 0; transform: translateY(0); }
-  10%  { opacity: 1; transform: translateY(0); }
-  45%  { opacity: .8; transform: translateY(-10px); }
-  70%  { opacity: .3; transform: translateY(-13px); }
+  0% { opacity: 0; transform: translateY(0); }
+  10% { opacity: 1; transform: translateY(0); }
+  45% { opacity: .8; transform: translateY(-10px); }
+  70% { opacity: .3; transform: translateY(-13px); }
   100% { opacity: 0; transform: translateY(-16px); }
 }
 
-/* Timeline items column */
 .mf-timeline-items {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 9vh;
 }
 
-/* No vertical line — dots only */
-
-/* Each row */
 .mf-time-item {
   position: relative;
   display: grid;
-  grid-template-columns: auto 24px 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: max-content 24px 1fr;
   column-gap: 28px;
-  row-gap: 12px;
+  row-gap: 0;
+  align-items: start;
   cursor: default;
   overflow: visible;
-  align-items: start;
 }
 
-/* Year — smaller, mono, extra horizontal padding around arrow */
 .mf-time-year {
-  font-family: "Geist Mono", monospace;
-  font-size: clamp(9px, 0.75vw, 13px);
-  line-height: 1;
-  letter-spacing: .04em;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity .7s var(--ease), transform .7s var(--ease);
-  white-space: nowrap;
   grid-column: 1;
   grid-row: 1;
   align-self: center;
-  padding-top: .15em;   /* optical alignment with role title */
+  font-family: "Geist Mono", monospace;
+  font-size: clamp(9px, .75vw, 13px);
+  line-height: 1;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .7s var(--ease), transform .7s var(--ease);
 }
 
 .mf-time-year.show {
@@ -809,25 +809,25 @@ body {
   transform: none;
 }
 
-/* Dot — pulse on hover (white ring expanding out) */
+.mf-time-year {
+  word-spacing: .55em;
+}
+
 .mf-time-dot {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: #fff;
-  margin-top: 0;
-  justify-self: center;
   position: relative;
-  left: -2.5px;
   z-index: 2;
   opacity: 0;
   animation: dotIdle 12s var(--ease) infinite;
   animation-play-state: paused;
   transition: opacity .4s var(--ease);
-  grid-column: 2;
-  grid-row: 1;
-  align-self: center;
-  margin-top: .1em;   /* optical center with role text cap height */
 }
 
 .mf-time-dot.visible {
@@ -835,42 +835,38 @@ body {
   animation-play-state: running;
 }
 
-/* Idle pulse animation (ambient) */
 @keyframes dotIdle {
-  0%, 72%, 100% { transform: scale(1); opacity: 1; }
-  76%, 80%       { transform: scale(1.7); opacity: .55; }
+  0%,72%,100% { transform: scale(1); opacity: 1; }
+  76%,80% { transform: scale(1.7); opacity: .55; }
 }
 
-/* Hover pulse — white ring expanding + fading */
 .mf-time-item:hover .mf-time-dot::after {
   content: "";
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, .7);
+  border: 1px solid rgba(255,255,255,.7);
   animation: dotRing .8s var(--ease) forwards;
 }
 
 @keyframes dotRing {
-  0%   { transform: scale(1); opacity: .7; }
+  0% { transform: scale(1); opacity: .7; }
   100% { transform: scale(3.5); opacity: 0; }
 }
 
-/* Stagger idle pulse delays */
 .mf-time-item:nth-child(1) .mf-time-dot { animation-delay: 0s; }
 .mf-time-item:nth-child(2) .mf-time-dot { animation-delay: 3s; }
 .mf-time-item:nth-child(3) .mf-time-dot { animation-delay: 6s; }
 .mf-time-item:nth-child(4) .mf-time-dot { animation-delay: 9s; }
 .mf-time-item:nth-child(5) .mf-time-dot { animation-delay: 12s; }
 
-/* Copy block — col 3, row 1 */
 .mf-time-copy {
   grid-column: 3;
   grid-row: 1;
+  align-self: center;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
-  align-self: center;
 }
 
 .mf-time-copy.show {
@@ -878,29 +874,25 @@ body {
   transform: none;
 }
 
-/* Role — semibold */
 .mf-time-role {
   font-size: var(--timeline-role);
-  line-height: .95;
+  line-height: 1;
   letter-spacing: -.05em;
   font-weight: 600;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0;
   flex-wrap: nowrap;
 }
 
-/* Main role text */
 .mf-time-role-main {
   display: inline;
 }
 
-/* Extra info — hidden, removed from layout */
 .mf-time-role-extra {
   display: none;
 }
 
-/* Letter-by-letter blur ripple on role title — triggered by JS */
 .mf-time-role-char {
   display: inline;
   transition: filter .3s var(--ease);
@@ -910,7 +902,6 @@ body {
   filter: blur(2px);
 }
 
-/* Meta — mono, muted */
 .mf-time-meta {
   margin-top: 10px;
   font-family: "Geist Mono", monospace;
@@ -921,7 +912,6 @@ body {
   color: var(--muted);
 }
 
-/* Detail — appears on hover, same size as strip desc */
 .mf-time-detail {
   margin-top: 14px;
   font-family: "Geist Mono", monospace;
@@ -929,13 +919,13 @@ body {
   line-height: 1.45;
   letter-spacing: .05em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, .36);
+  color: rgba(255,255,255,.36);
   opacity: 0;
   transition: opacity .5s var(--ease);
   max-width: 600px;
 }
 
-@media (hover: hover) {
+@media (hover:hover) {
   .mf-time-item:hover .mf-time-detail {
     opacity: 1;
   }
@@ -1117,39 +1107,36 @@ body {
   z-index: 2;
   width: 100%;
   display: grid;
-  grid-template-columns: 50% auto auto;   /* name+tw in left half | links | contact */
-  grid-template-rows: auto;
+  grid-template-columns: 42vw 1fr 1fr;
   align-items: start;
   padding: 0 var(--page-pad);
-  column-gap: 4vw;
+  column-gap: 6vw;
 }
 
-/* Name — half the old size, tighter line-height */
 .mf-footer-name {
   grid-column: 1;
   grid-row: 1;
   align-self: start;
-  white-space: nowrap;
   font-size: var(--footer-name);
-  line-height: .88;
+  line-height: .86;
   letter-spacing: -.06em;
   font-weight: 400;
   text-transform: uppercase;
-  display: inline-block;
 }
 
 .mf-footer-typewriter {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
   align-self: start;
-  margin-top: 1em;
+  margin-left: 24vw;
+  margin-top: calc(var(--footer-name) * 1.2);
   font-family: "Geist Mono", monospace;
   font-size: 10px;
   letter-spacing: .06em;
-  color: rgba(255, 255, 255, .52);
+  color: rgba(255,255,255,.52);
   height: 1.4em;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -1158,7 +1145,6 @@ body {
   display: inline;
 }
 
-/* Nav links column — TOP first, then Index, XP, BIO */
 .mf-footer-links {
   grid-column: 2;
   grid-row: 1;
@@ -1169,15 +1155,8 @@ body {
   font-family: "Geist Mono", monospace;
   font-size: 12px;
   text-transform: uppercase;
-}
-
-/* TOP link — scroll to top, above others */
-.mf-footer-top {
-  margin-bottom: 4px;   /* small extra gap before Index */
-}
-
-.mf-footer-links .mf-footer-top.mf-menu-item::after {
-  content: "↑";
+  justify-self: start;
+  padding-left: 4vw;
 }
 
 .mf-footer-contact {
@@ -1189,15 +1168,16 @@ body {
   gap: 8px;
   font-family: "Geist Mono", monospace;
   font-size: 12px;
-  text-align: right;
+  text-align: left;
   text-transform: uppercase;
+  justify-self: start;
 }
 
 .mf-footer-bottom {
   position: absolute;
   left: var(--page-pad);
   right: var(--page-pad);
-  bottom: var(--page-pad);
+  bottom: 8px;
   display: flex;
   justify-content: space-between;
   font-family: "Geist Mono", monospace;
