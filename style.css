@@ -63,7 +63,7 @@
 
   /* Typography scale */
   --hero-name-size: 200px;           /* JS overrides via scale() */
-  --section-title: clamp(28px, 4.2vw, 72px);   /* INDEX / XP / BIO */
+  --section-title: clamp(10px, 1.4vw, 24px);   /* INDEX / XP / BIO — 3x smaller */
   --project-title: clamp(14px, 1.15vw, 22px);  /* strip titles — semibold */
   --roll-size: clamp(54px, 11.5vw, 175px);      /* practice section */
   --timeline-year: clamp(11px, 0.9vw, 16px);   /* years — half of role */
@@ -84,6 +84,12 @@
 
 html {
   scroll-behavior: auto;
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE/Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none;                /* Chrome/Safari */
 }
 
 body {
@@ -381,14 +387,15 @@ body {
   overflow: visible;
   line-height: .82;
   letter-spacing: -.075em;
-  font-weight: 850;          /* BOLD — was 400 */
+  font-weight: 400;          /* REGULAR — JS scales to fill viewport */
   text-transform: uppercase;
   white-space: nowrap;
-  padding: 0;
+  padding: 0 .5%;               /* small edge padding */
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
   font-size: var(--hero-name-size);
+  letter-spacing: -.04em;        /* tighter than -.075em so letters sit naturally */
 }
 
 @keyframes mfNameIn {
@@ -408,7 +415,7 @@ body {
 }
 
 .nc.fx-hide { opacity: 0; }
-.nc.fx-blur { filter: blur(4px); }   /* slightly smaller blur than before */
+.nc.fx-blur { filter: url(#motionBlur); }   /* horizontal motion blur */
 
 /* Hero info block — aligned to F in FUSEK via JS */
 .mf-hero-info {
@@ -438,7 +445,7 @@ body {
   min-height: 1em;
   white-space: nowrap;
   font-family: "Geist Mono", monospace;
-  font-size: clamp(9px, 0.95vw, 16px);   /* 150% of old 7px */
+  font-size: clamp(7px, 0.7vw, 12px);
   letter-spacing: .07em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, .38);
@@ -552,7 +559,7 @@ body {
 /* Description — appears on hover */
 .mf-strip-desc {
   font-family: "Geist Mono", monospace;
-  font-size: var(--mono-small);
+  font-size: 11px;
   line-height: 1.45;
   letter-spacing: .04em;
   color: rgba(255, 255, 255, .44);
@@ -774,21 +781,22 @@ body {
   display: grid;
   grid-template-columns: auto 24px 1fr;  /* auto = year fits naturally */
   gap: 28px;
-  align-items: start;
+  align-items: center;   /* vertically center year, dot, and role */
   cursor: default;
 }
 
 /* Year — smaller, mono, extra horizontal padding around arrow */
 .mf-time-year {
   font-family: "Geist Mono", monospace;
-  font-size: var(--timeline-year);
+  font-size: clamp(9px, 0.75vw, 13px);   /* tiny bit smaller than before */
   line-height: 1;
-  letter-spacing: -.03em;
+  letter-spacing: -.02em;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
   white-space: nowrap;
-  padding: 0 10px;    /* extra space around the → arrow between years */
+  /* extra space around the arrow — matches other greys on site */
+  letter-spacing: .04em;
 }
 
 .mf-time-year.show {
@@ -858,19 +866,55 @@ body {
   transform: none;
 }
 
-/* Role — semibold, half the old size */
+/* Role — semibold */
 .mf-time-role {
   font-size: var(--timeline-role);
   line-height: .95;
   letter-spacing: -.05em;
   font-weight: 650;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  flex-wrap: nowrap;
+}
+
+/* Main role text */
+.mf-time-role-main {
+  display: inline;
+}
+
+/* Extra info — hidden by default, revealed on hover */
+.mf-time-role-extra {
+  font-size: .65em;
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity .5s var(--ease), transform .5s var(--ease);
+  white-space: nowrap;
+}
+
+.mf-time-item:hover .mf-time-role-extra {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Letter-by-letter blur ripple on role title — triggered by JS */
+.mf-time-role-char {
+  display: inline;
+  transition: filter .3s var(--ease);
+}
+
+.mf-time-role-char.rippling {
+  filter: blur(2px);
 }
 
 /* Meta — mono, muted */
 .mf-time-meta {
   margin-top: 10px;
   font-family: "Geist Mono", monospace;
-  font-size: var(--mono-small);
+  font-size: 11px;
   line-height: 1.4;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -881,7 +925,7 @@ body {
 .mf-time-detail {
   margin-top: 8px;
   font-family: "Geist Mono", monospace;
-  font-size: var(--mono-small);
+  font-size: 11px;
   line-height: 1.45;
   letter-spacing: .05em;
   text-transform: uppercase;
@@ -976,7 +1020,7 @@ body {
 }
 
 .mf-about-note {
-  margin-top: 42px;
+  margin-top: 72px;
   padding-top: 16px;
   border-top: 1px solid var(--line);
   font-family: "Geist Mono", monospace;
@@ -988,9 +1032,9 @@ body {
   max-width: 520px;
 }
 
-/* Photo — columns 5–7, row 1, right of text */
+/* Photo — columns 6–8, row 1, further right */
 .mf-photo-card {
-  grid-column: 5 / 7;
+  grid-column: 6 / 8;
   grid-row: 1;
   align-self: start;
   aspect-ratio: 3 / 4;
@@ -1073,8 +1117,8 @@ body {
   z-index: 2;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  grid-template-rows: auto auto;
+  grid-template-columns: auto 1fr auto auto;   /* name | typewriter | links | contact */
+  grid-template-rows: auto;
   align-items: start;
   padding: 0 var(--page-pad);
   column-gap: 6vw;
@@ -1085,25 +1129,26 @@ body {
   grid-column: 1;
   grid-row: 1;
   align-self: start;
+  white-space: nowrap;
   font-size: var(--footer-name);
   line-height: .88;      /* tighter than before */
   letter-spacing: -.06em;
-  font-weight: 850;
+  font-weight: 400;
   text-transform: uppercase;
 }
 
 .mf-footer-typewriter {
-  grid-column: 1;
-  grid-row: 2;
+  grid-column: 2;
+  grid-row: 1;
   align-self: start;
-  margin-top: 1.4em;
+  margin-top: 0;
   font-family: "Geist Mono", monospace;
   font-size: 10px;
   letter-spacing: .06em;
   color: rgba(255, 255, 255, .52);
   height: 1.4em;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -1114,8 +1159,8 @@ body {
 
 /* Nav links column — TOP first, then Index, XP, BIO */
 .mf-footer-links {
-  grid-column: 2;
-  grid-row: 1 / 3;
+  grid-column: 3;
+  grid-row: 1;
   align-self: start;
   display: flex;
   flex-direction: column;
@@ -1135,8 +1180,8 @@ body {
 }
 
 .mf-footer-contact {
-  grid-column: 3;
-  grid-row: 1 / 3;
+  grid-column: 4;
+  grid-row: 1;
   align-self: start;
   display: flex;
   flex-direction: column;
