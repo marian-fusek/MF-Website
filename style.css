@@ -390,12 +390,12 @@ body {
   font-weight: 400;          /* REGULAR — JS scales to fill viewport */
   text-transform: uppercase;
   white-space: nowrap;
-  padding: 0 .6%;               /* matched edge padding left and right */
+  padding: 0 .4%;               /* symmetric, tight edge padding */
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
   font-size: var(--hero-name-size);
-  letter-spacing: -.055em;       /* matches paragraph text kerning feel */
+  letter-spacing: -.065em;       /* tighter — fills width with less gap between letters */
 }
 
 @keyframes mfNameIn {
@@ -780,24 +780,27 @@ body {
 .mf-time-item {
   position: relative;
   display: grid;
-  grid-template-columns: auto 24px 1fr;  /* auto = year fits naturally */
-  gap: 28px;
-  align-items: center;   /* vertically center year, dot, and role */
+  grid-template-columns: auto 24px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 28px;
+  row-gap: 0;
   cursor: default;
+  overflow: visible;
 }
 
 /* Year — smaller, mono, extra horizontal padding around arrow */
 .mf-time-year {
   font-family: "Geist Mono", monospace;
-  font-size: clamp(9px, 0.75vw, 13px);   /* tiny bit smaller than before */
+  font-size: clamp(9px, 0.75vw, 13px);
   line-height: 1;
-  letter-spacing: -.02em;
+  letter-spacing: .04em;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
   white-space: nowrap;
-  /* extra space around the arrow — matches other greys on site */
-  letter-spacing: .04em;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
 }
 
 .mf-time-year.show {
@@ -820,6 +823,9 @@ body {
   animation: dotIdle 12s var(--ease) infinite;
   animation-play-state: paused;
   transition: opacity .4s var(--ease);
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
 }
 
 .mf-time-dot.visible {
@@ -855,8 +861,10 @@ body {
 .mf-time-item:nth-child(4) .mf-time-dot { animation-delay: 9s; }
 .mf-time-item:nth-child(5) .mf-time-dot { animation-delay: 12s; }
 
-/* Copy block */
+/* Copy block — col 3, spans both rows */
 .mf-time-copy {
+  grid-column: 3;
+  grid-row: 1 / 3;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
@@ -884,21 +892,26 @@ body {
   display: inline;
 }
 
-/* Extra info — hidden by default, revealed on hover */
+/* Extra info — far right, mono, revealed on hover */
 .mf-time-role-extra {
-  font-size: .65em;
+  position: absolute;
+  right: .6%;               /* mirrors hero name right padding */
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;          /* matches description size */
   font-weight: 400;
-  letter-spacing: -.02em;
+  letter-spacing: .04em;
   color: var(--muted);
   opacity: 0;
-  transform: translateX(-6px);
+  transform: translateX(6px);
   transition: opacity .5s var(--ease), transform .5s var(--ease);
   white-space: nowrap;
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
 }
 
 .mf-time-item:hover .mf-time-role-extra {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(-50%) translateX(0);
 }
 
 /* Letter-by-letter blur ripple on role title — triggered by JS */
