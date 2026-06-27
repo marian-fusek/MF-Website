@@ -1464,9 +1464,6 @@ body{
     gap:28px;
   }
 
-  .mf-timeline-label{
-    font-size:clamp(56px,16vw,140px);
-  }
 
   .mf-timeline-items:before{
     display:none;
