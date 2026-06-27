@@ -438,12 +438,12 @@ function scaleHeroName(){
 
   if(!hero || !wrap) return;
 
-  hero.style.fontSize = "200px";
+  hero.style.fontSize = "300px";   /* larger base = more natural scaling target */
   wrap.style.transform = "none";
 
   const width    = wrap.scrollWidth;
   const viewport = window.innerWidth;
-  const scale    = (viewport * .98) / width;  /* .98 = ~1% padding each side */
+  const scale    = (viewport * .992) / width;  /* symmetric ~0.4% each side */
 
   wrap.style.transform = `scale(${scale})`;
 
@@ -795,11 +795,21 @@ window.addEventListener(
 
     if(!label || !firstItem) return;
 
+    /* Align to the role title element specifically, not the whole copy block */
+    const roleEl=firstItem.querySelector(".mf-time-role");
+    const dotEl=firstItem.querySelector(".mf-time-dot");
+    const yearEl=firstItem.querySelector(".mf-time-year");
+
+    /* Use whichever is visible */
+    const refEl=roleEl || dotEl || yearEl;
+    if(!refEl) return;
+
     const labelRect=label.getBoundingClientRect();
-    const itemRect=firstItem.getBoundingClientRect();
-    const itemMid=itemRect.top+itemRect.height/2;
+    const refRect=refEl.getBoundingClientRect();
+
+    const refMid=refRect.top+refRect.height/2;
     const labelMid=labelRect.top+labelRect.height/2;
-    const offset=itemMid-labelMid;
+    const offset=refMid-labelMid;
 
     label.style.transform=`translateY(${offset}px)`;
     label.style.transition="transform .8s cubic-bezier(.16,1,.3,1)";
