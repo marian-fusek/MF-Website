@@ -453,7 +453,7 @@ function scaleHeroName(){
     if(fChar){
       const fRect = fChar.getBoundingClientRect();
       /* Position info so its left edge lines up with F */
-      info.style.left   = fRect.left + "px";
+      info.style.left   = (fRect.left + 20) + "px";
       info.style.right  = "auto";
       info.style.width  = Math.min(560, (window.innerWidth - fRect.left) * 0.55) + "px";
       info.style.top    = "22%";
@@ -1010,7 +1010,7 @@ function typewriter(id,list,startDelay){
 
     while(true){
 
-      await wait(1300);
+      await wait(2300);   /* +1s pause before each new line */
 
       const text=list[index++%list.length];
 
