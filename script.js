@@ -432,32 +432,48 @@ function closeOverlay(){
 
 function scaleHeroName(){
 
-  const hero =
-    document.getElementById("heroName");
-
-  const wrap =
-    document.getElementById("nameWrap");
+  const hero   = document.getElementById("heroName");
+  const wrap   = document.getElementById("nameWrap");
+  const info   = document.querySelector(".mf-hero-info");
 
   if(!hero || !wrap) return;
 
-  hero.style.fontSize = "200px";
+  hero.style.fontSize = "300px";
   wrap.style.transform = "none";
+
+  const width    = wrap.scrollWidth;
+  const viewport = window.innerWidth;
+  const padding  = viewport * 0.008;
+  const scale    = (viewport - padding * 2) / width;
+
+  /* After scaling, the wrap is still anchored left:0.
+     Center it by offsetting: (viewport - scaledWidth) / 2 */
+  const scaledWidth = width * scale;
+  const offset = (viewport - scaledWidth) / 2;
+
+  wrap.style.transform = `translateX(${offset}px) scale(${scale})`;
   wrap.style.transformOrigin = "left bottom";
 
-  const width =
-    wrap.scrollWidth;
-
-  const viewport =
-    window.innerWidth;
-
-  const sidePadding =
-    viewport * .008;
-
-  const scale =
-    (viewport - sidePadding * 2) / width;
-
-  wrap.style.transform =
-    `translateX(${sidePadding}px) scale(${scale})`;
+  /* Align info block with the left edge of F in FUSEK (desktop only) */
+  if(info && window.innerWidth > 1000){
+    const fChar = hero.querySelector(".n-f");
+    if(fChar){
+      const fRect = fChar.getBoundingClientRect();
+      /* Position info so its left edge lines up with F */
+      info.style.left   = (fRect.left + 20) + "px";
+      info.style.right  = "auto";
+      info.style.width  = Math.min(560, (window.innerWidth - fRect.left) * 0.55) + "px";
+      info.style.top    = "22%";
+      info.style.bottom = "auto";
+    }
+  } else if(info && window.innerWidth <= 1000){
+    /* Reset to CSS defaults on mobile */
+    info.style.left   = "";
+    info.style.right  = "";
+    info.style.width  = "";
+    info.style.bottom = "";
+    info.style.top    = "";
+  }
 
 }
 
