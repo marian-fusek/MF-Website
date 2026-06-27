@@ -9,9 +9,19 @@ document.addEventListener("visibilitychange", () => {
 const loader = document.getElementById("mfLoader");
 
 if (loader) {
-  setTimeout(() => {
-    loader.classList.add("done");
-  }, 1600);
+  /* Force spans visible before CSS animation runs.
+     Without a double-rAF the browser may skip the
+     initial translateY(0) state and nothing shows. */
+  const spans = loader.querySelectorAll("span");
+  spans.forEach(s => { s.style.transform = "translateY(0)"; });
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      spans.forEach(s => { s.style.transform = ""; });
+    });
+  });
+
+  setTimeout(() => { loader.classList.add("done"); }, 1800);
 }
 
 /* -------------------------------------------------- */
@@ -178,6 +188,23 @@ document
 });
 
 /* -------------------------------------------------- */
+/* FOOTER TOP LINK */
+/* -------------------------------------------------- */
+
+const footerTop = document.getElementById("footerTop");
+
+if(footerTop){
+  footerTop.addEventListener("click", (e) => {
+    e.preventDefault();
+    if(window._mfScroll){
+      window._mfScroll(0);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
+}
+
+/* -------------------------------------------------- */
 /* GRID + BLUR */
 /* -------------------------------------------------- */
 
@@ -200,7 +227,7 @@ window.addEventListener("scroll",()=>{
   const workTop =
     work ? work.offsetTop : 0;
 
-  const footerTop =
+  const footerOffsetTop =
     footer ? footer.offsetTop : 0;
 
   if(y < workTop - window.innerHeight * .8){
@@ -223,7 +250,7 @@ window.addEventListener("scroll",()=>{
   }
 
   const onFooter =
-    y > footerTop - window.innerHeight * .5;
+    y > footerOffsetTop - window.innerHeight * .5;
 
   const onHero =
     y < 50;
@@ -302,34 +329,23 @@ for(let i=0;i<8;i++){
 /* ASCII */
 /* -------------------------------------------------- */
 
-const ascii =
-Array.from(
-  document.querySelectorAll(".mf-ascii")
-);
+const ascii = Array.from(document.querySelectorAll(".mf-ascii"));
 
 let asciiIndex = 0;
 
-setInterval(()=>{
-
-  ascii.forEach(el=>{
-    el.classList.remove("show");
-  });
-
-  ascii[
-    asciiIndex % ascii.length
-  ].classList.add("show");
-
-  setTimeout(()=>{
-
-    ascii[
-      asciiIndex % ascii.length
-    ].classList.remove("show");
-
-  },1000);
-
+/* 1.5s visible → 3s dark gap → next */
+function cycleAscii() {
+  ascii.forEach(el => el.classList.remove("show"));
+  const current = ascii[asciiIndex % ascii.length];
+  current.classList.add("show");
   asciiIndex++;
+  setTimeout(() => {
+    current.classList.remove("show");
+    setTimeout(cycleAscii, 3000);
+  }, 1500);
+}
 
-},3000);
+setTimeout(cycleAscii, 1200);
 
 /* -------------------------------------------------- */
 /* INDEX XX */
@@ -416,28 +432,41 @@ function closeOverlay(){
 
 function scaleHeroName(){
 
-  const hero =
-    document.getElementById("heroName");
-
-  const wrap =
-    document.getElementById("nameWrap");
+  const hero   = document.getElementById("heroName");
+  const wrap   = document.getElementById("nameWrap");
+  const info   = document.querySelector(".mf-hero-info");
 
   if(!hero || !wrap) return;
 
   hero.style.fontSize = "200px";
   wrap.style.transform = "none";
 
-  const width =
-    wrap.scrollWidth;
+  const width    = wrap.scrollWidth;
+  const viewport = window.innerWidth;
+  const scale    = (viewport * .99) / width;
 
-  const viewport =
-    window.innerWidth;
+  wrap.style.transform = `scale(${scale})`;
 
-  const scale =
-    (viewport * .99) / width;
-
-  wrap.style.transform =
-    `scale(${scale})`;
+  /* Align info block with the left edge of F in FUSEK (desktop only) */
+  if(info && window.innerWidth > 1000){
+    const fChar = hero.querySelector(".n-f");
+    if(fChar){
+      const fRect = fChar.getBoundingClientRect();
+      /* Position info so its left edge lines up with F */
+      info.style.left   = fRect.left + "px";
+      info.style.right  = "auto";
+      info.style.width  = Math.min(560, (window.innerWidth - fRect.left) * 0.55) + "px";
+      info.style.top    = "22%";
+      info.style.bottom = "auto";
+    }
+  } else if(info && window.innerWidth <= 1000){
+    /* Reset to CSS defaults on mobile */
+    info.style.left   = "";
+    info.style.right  = "";
+    info.style.width  = "";
+    info.style.bottom = "";
+    info.style.top    = "";
+  }
 
 }
 
@@ -614,34 +643,35 @@ window.addEventListener(
   async function blur(){
 
     const all=chars();
+    const ease="cubic-bezier(.16,1,.3,1)";
+    const steps=[
+      {v:"blur(3px)", d:.5},
+      {v:"blur(3px)", d:.7},   /* hold at peak */
+      {v:"blur(0)",   d:.8},
+    ];
 
+    /* ramp up */
     all.forEach(el=>{
-
-      el.style.transition=
-      "filter .45s cubic-bezier(.16,1,.3,1)";
-
-      el.style.filter="blur(5px)";
-
+      el.style.transition=`filter ${steps[0].d}s ${ease}`;
+      el.style.filter=steps[0].v;
     });
 
-    await wait(460);
+    await wait(steps[0].d*1000+100);
 
+    /* hold — no transition change needed, filter stays */
+    await wait(steps[1].d*1000);
+
+    /* ramp down */
     all.forEach(el=>{
-
-      el.style.transition=
-      "filter .55s cubic-bezier(.16,1,.3,1)";
-
-      el.style.filter="blur(0)";
-
+      el.style.transition=`filter ${steps[2].d}s ${ease}`;
+      el.style.filter=steps[2].v;
     });
 
-    await wait(580);
+    await wait(steps[2].d*1000+100);
 
     all.forEach(el=>{
-
       el.style.transition="";
       el.style.filter="";
-
     });
 
   }
