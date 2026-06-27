@@ -390,12 +390,12 @@ body {
   font-weight: 400;          /* REGULAR — JS scales to fill viewport */
   text-transform: uppercase;
   white-space: nowrap;
-  padding: 0 .5%;               /* small edge padding */
+  padding: 0 .6%;               /* matched edge padding left and right */
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
   font-size: var(--hero-name-size);
-  letter-spacing: -.04em;        /* tighter than -.075em so letters sit naturally */
+  letter-spacing: -.055em;       /* matches paragraph text kerning feel */
 }
 
 @keyframes mfNameIn {
@@ -547,16 +547,16 @@ body {
   transition: transform .5s var(--ease);
 }
 
-/* Title — semibold, same size family as old but semibold */
+/* Title — semibold */
 .mf-strip-title {
   font-size: var(--project-title);
   line-height: 1;
   letter-spacing: -.045em;
-  font-weight: 650;
+  font-weight: 600;
   transition: transform .5s var(--ease);
 }
 
-/* Description — appears on hover */
+/* Description — appears on hover, starts at ~50% horizontal */
 .mf-strip-desc {
   font-family: "Geist Mono", monospace;
   font-size: 11px;
@@ -566,6 +566,7 @@ body {
   opacity: 0;
   transform: translateY(0);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
+  padding-left: 12%;   /* pushes start point to ~50% of screen */
 }
 
 .mf-strip:hover .mf-strip-desc {
@@ -810,7 +811,7 @@ body {
   height: 5px;
   border-radius: 50%;
   background: #fff;
-  margin-top: .55em;
+  margin-top: 0;
   justify-self: center;
   position: relative;
   left: -2.5px;
@@ -871,7 +872,7 @@ body {
   font-size: var(--timeline-role);
   line-height: .95;
   letter-spacing: -.05em;
-  font-weight: 650;
+  font-weight: 600;
   display: flex;
   align-items: baseline;
   gap: 0;
@@ -923,7 +924,7 @@ body {
 
 /* Detail — appears on hover, same size as strip desc */
 .mf-time-detail {
-  margin-top: 8px;
+  margin-top: 14px;
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   line-height: 1.45;
@@ -1021,7 +1022,7 @@ body {
 
 .mf-about-note {
   margin-top: 72px;
-  padding-top: 16px;
+  padding-top: 28px;
   border-top: 1px solid var(--line);
   font-family: "Geist Mono", monospace;
   font-size: var(--mono-tiny);
