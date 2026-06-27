@@ -250,7 +250,7 @@ window.addEventListener("scroll",()=>{
   }
 
   const onFooter =
-    y > footerOffsetTop - window.innerHeight * .5;
+    y > footerOffsetTop - window.innerHeight * .8;  /* earlier cutoff = no fog edge */
 
   const onHero =
     y < 50;
@@ -438,14 +438,21 @@ function scaleHeroName(){
 
   if(!hero || !wrap) return;
 
-  hero.style.fontSize = "300px";   /* larger base = more natural scaling target */
+  hero.style.fontSize = "300px";
   wrap.style.transform = "none";
 
   const width    = wrap.scrollWidth;
   const viewport = window.innerWidth;
-  const scale    = (viewport * .992) / width;  /* symmetric ~0.4% each side */
+  const padding  = viewport * 0.008;
+  const scale    = (viewport - padding * 2) / width;
 
-  wrap.style.transform = `scale(${scale})`;
+  /* After scaling, the wrap is still anchored left:0.
+     Center it by offsetting: (viewport - scaledWidth) / 2 */
+  const scaledWidth = width * scale;
+  const offset = (viewport - scaledWidth) / 2;
+
+  wrap.style.transform = `translateX(${offset}px) scale(${scale})`;
+  wrap.style.transformOrigin = "left bottom";
 
   /* Align info block with the left edge of F in FUSEK (desktop only) */
   if(info && window.innerWidth > 1000){

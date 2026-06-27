@@ -386,16 +386,15 @@ body {
   width: 100vw;
   overflow: visible;
   line-height: .82;
-  letter-spacing: -.075em;
-  font-weight: 400;          /* REGULAR — JS scales to fill viewport */
+  font-weight: 400;
   text-transform: uppercase;
   white-space: nowrap;
-  padding: 0 .4%;               /* symmetric, tight edge padding */
+  padding: 0;
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
   font-size: var(--hero-name-size);
-  letter-spacing: -.065em;       /* tighter — fills width with less gap between letters */
+  letter-spacing: -.065em;
 }
 
 @keyframes mfNameIn {
@@ -405,7 +404,7 @@ body {
 #nameWrap {
   display: inline-block;
   width: auto;
-  transform-origin: left bottom;
+  transform-origin: center bottom;
   will-change: transform;
 }
 
@@ -783,9 +782,10 @@ body {
   grid-template-columns: auto 24px 1fr;
   grid-template-rows: auto auto;
   column-gap: 28px;
-  row-gap: 0;
+  row-gap: 12px;
   cursor: default;
   overflow: visible;
+  align-items: start;
 }
 
 /* Year — smaller, mono, extra horizontal padding around arrow */
@@ -801,6 +801,7 @@ body {
   grid-column: 1;
   grid-row: 1;
   align-self: center;
+  padding-top: .15em;   /* optical alignment with role title */
 }
 
 .mf-time-year.show {
@@ -826,6 +827,7 @@ body {
   grid-column: 2;
   grid-row: 1;
   align-self: center;
+  margin-top: .1em;   /* optical center with role text cap height */
 }
 
 .mf-time-dot.visible {
@@ -861,13 +863,14 @@ body {
 .mf-time-item:nth-child(4) .mf-time-dot { animation-delay: 9s; }
 .mf-time-item:nth-child(5) .mf-time-dot { animation-delay: 12s; }
 
-/* Copy block — col 3, spans both rows */
+/* Copy block — col 3, row 1 */
 .mf-time-copy {
   grid-column: 3;
-  grid-row: 1 / 3;
+  grid-row: 1;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
+  align-self: center;
 }
 
 .mf-time-copy.show {
@@ -892,26 +895,9 @@ body {
   display: inline;
 }
 
-/* Extra info — far right, mono, revealed on hover */
+/* Extra info — hidden, removed from layout */
 .mf-time-role-extra {
-  position: absolute;
-  right: .6%;               /* mirrors hero name right padding */
-  font-family: "Geist Mono", monospace;
-  font-size: 11px;          /* matches description size */
-  font-weight: 400;
-  letter-spacing: .04em;
-  color: var(--muted);
-  opacity: 0;
-  transform: translateX(6px);
-  transition: opacity .5s var(--ease), transform .5s var(--ease);
-  white-space: nowrap;
-  top: 50%;
-  transform: translateY(-50%) translateX(6px);
-}
-
-.mf-time-item:hover .mf-time-role-extra {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  display: none;
 }
 
 /* Letter-by-letter blur ripple on role title — triggered by JS */
@@ -1131,11 +1117,11 @@ body {
   z-index: 2;
   width: 100%;
   display: grid;
-  grid-template-columns: auto 1fr auto auto;   /* name | typewriter | links | contact */
+  grid-template-columns: 50% auto auto;   /* name+tw in left half | links | contact */
   grid-template-rows: auto;
   align-items: start;
   padding: 0 var(--page-pad);
-  column-gap: 6vw;
+  column-gap: 4vw;
 }
 
 /* Name — half the old size, tighter line-height */
@@ -1145,17 +1131,18 @@ body {
   align-self: start;
   white-space: nowrap;
   font-size: var(--footer-name);
-  line-height: .88;      /* tighter than before */
+  line-height: .88;
   letter-spacing: -.06em;
   font-weight: 400;
   text-transform: uppercase;
+  display: inline-block;
 }
 
 .mf-footer-typewriter {
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: 1;
+  grid-row: 2;
   align-self: start;
-  margin-top: 0;
+  margin-top: 1em;
   font-family: "Geist Mono", monospace;
   font-size: 10px;
   letter-spacing: .06em;
@@ -1173,7 +1160,7 @@ body {
 
 /* Nav links column — TOP first, then Index, XP, BIO */
 .mf-footer-links {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   align-self: start;
   display: flex;
@@ -1194,7 +1181,7 @@ body {
 }
 
 .mf-footer-contact {
-  grid-column: 4;
+  grid-column: 3;
   grid-row: 1;
   align-self: start;
   display: flex;
