@@ -1,1075 +1,239 @@
-const originalTitle = document.title || "MF";
+/* =========================================================================
+   MARIAN FUSEK PORTFOLIO - ENGINE
+   ========================================================================= */
 
-document.addEventListener("visibilitychange", () => {
-  document.title = document.hidden
-    ? "💭 MF — Still here"
-    : originalTitle;
+document.addEventListener('DOMContentLoaded', () => {
+  initAmbientNoise();
+  initCustomScroll();
+  initAutoscaleTitle();
+  initAsciiCycler();
+  initTypewriter();
+  initScrollPaint();
+  initGlitchEffects();
 });
 
-const loader = document.getElementById("mfLoader");
-
-if (loader) {
-  /* Force spans visible before CSS animation runs.
-     Without a double-rAF the browser may skip the
-     initial translateY(0) state and nothing shows. */
-  const spans = loader.querySelectorAll("span");
-  spans.forEach(s => { s.style.transform = "translateY(0)"; });
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      spans.forEach(s => { s.style.transform = ""; });
-    });
+/* 1. AMBIENT NOISE OVERLAY COMPONENT */
+function initAmbientNoise() {
+  const canvas = document.getElementById('mf-noise-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  let resizeTimeout;
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resize, 150);
   });
-
-  setTimeout(() => { loader.classList.add("done"); }, 1800);
-}
-
-/* -------------------------------------------------- */
-/* SMOOTH SCROLL */
-/* -------------------------------------------------- */
-
-(function () {
-
-  let targetY = window.scrollY;
-  let currentY = window.scrollY;
-  let ticking = false;
-
-  const ease = 0.065;
-
-  function tick() {
-
-    const delta = targetY - currentY;
-
-    if (Math.abs(delta) < 0.35) {
-      currentY = targetY;
-      window.scrollTo(0, currentY);
-      ticking = false;
-      return;
-    }
-
-    currentY += delta * ease;
-
-    window.scrollTo(0, currentY);
-
-    requestAnimationFrame(tick);
-
-  }
-
-  window.addEventListener("wheel", (e) => {
-
-    e.preventDefault();
-
-    targetY += e.deltaY * 1.4;
-
-    targetY = Math.max(
-      0,
-      Math.min(
-        targetY,
-        document.body.scrollHeight - window.innerHeight
-      )
-    );
-
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(tick);
-    }
-
-  }, { passive:false });
-
-  let touchStart = 0;
-  let lastTouch = 0;
-  let lastTime = 0;
-  let velocity = 0;
-
-  window.addEventListener("touchstart",(e)=>{
-
-    touchStart = lastTouch = e.touches[0].clientY;
-    lastTime = Date.now();
-    velocity = 0;
-
-  },{passive:true});
-
-  window.addEventListener("touchmove",(e)=>{
-
-    const y = e.touches[0].clientY;
-    const dt = Date.now() - lastTime || 1;
-
-    velocity = ((lastTouch - y) / dt) * 16;
-
-    lastTouch = y;
-    lastTime = Date.now();
-
-    targetY += touchStart - y;
-    touchStart = y;
-
-    targetY = Math.max(
-      0,
-      Math.min(
-        targetY,
-        document.body.scrollHeight - window.innerHeight
-      )
-    );
-
-    if(!ticking){
-      ticking = true;
-      requestAnimationFrame(tick);
-    }
-
-  },{passive:true});
-
-  window.addEventListener("touchend",()=>{
-
-    targetY += velocity * 200;
-
-    targetY = Math.max(
-      0,
-      Math.min(
-        targetY,
-        document.body.scrollHeight - window.innerHeight
-      )
-    );
-
-    if(!ticking){
-      ticking = true;
-      requestAnimationFrame(tick);
-    }
-
-  },{passive:true});
-
-  window._mfScroll = function(y){
-
-    targetY = y;
-    currentY = window.scrollY;
-
-    if(!ticking){
-      ticking = true;
-      requestAnimationFrame(tick);
-    }
-
-  };
-
-})();
-
-/* -------------------------------------------------- */
-/* NAV LINKS */
-/* -------------------------------------------------- */
-
-document
-.querySelectorAll('a[href^="#"]')
-.forEach(link=>{
-
-  link.addEventListener("click",(e)=>{
-
-    const id = link
-      .getAttribute("href")
-      .slice(1);
-
-    const target = document.getElementById(id);
-
-    if(!target) return;
-
-    e.preventDefault();
-
-    const y =
-      target.getBoundingClientRect().top +
-      window.scrollY;
-
-    if(window._mfScroll){
-      window._mfScroll(y);
-    }else{
-      window.scrollTo({
-        top:y,
-        behavior:"smooth"
-      });
-    }
-
-  });
-
-});
-
-/* -------------------------------------------------- */
-/* FOOTER TOP LINK */
-/* -------------------------------------------------- */
-
-const footerTop = document.getElementById("footerTop");
-
-if(footerTop){
-  footerTop.addEventListener("click", (e) => {
-    e.preventDefault();
-    if(window._mfScroll){
-      window._mfScroll(0);
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  });
-}
-
-/* -------------------------------------------------- */
-/* GRID + BLUR */
-/* -------------------------------------------------- */
-
-const grid =
-document.getElementById("mfGrid");
-
-const blur =
-document.getElementById("mfBlur");
-
-const footer =
-document.querySelector(".mf-footer");
-
-window.addEventListener("scroll",()=>{
-
-  const y = window.scrollY;
-
-  const work =
-    document.getElementById("work");
-
-  const workTop =
-    work ? work.offsetTop : 0;
-
-  const footerOffsetTop =
-    footer ? footer.offsetTop : 0;
-
-  if(y < workTop - window.innerHeight * .8){
-
-    grid.classList.remove(
-      "is-soft",
-      "is-gone"
-    );
-
-  }else if(y < workTop){
-
-    grid.classList.add("is-soft");
-    grid.classList.remove("is-gone");
-
-  }else{
-
-    grid.classList.remove("is-soft");
-    grid.classList.add("is-gone");
-
-  }
-
-  const onFooter =
-    y > footerOffsetTop - window.innerHeight * .8;  /* earlier cutoff = no fog edge */
-
-  const onHero =
-    y < 50;
-
-  if(onHero || onFooter){
-
-    blur.classList.remove("is-on");
-    blur.classList.add("is-off");
-
-  }else{
-
-    blur.classList.add("is-on");
-    blur.classList.remove("is-off");
-
-  }
-
-},{passive:true});
-
-/* -------------------------------------------------- */
-/* REVEALS */
-/* -------------------------------------------------- */
-
-const revealObserver =
-new IntersectionObserver(entries=>{
-
-  entries.forEach(entry=>{
-
-    if(entry.isIntersecting){
-      entry.target.classList.add("visible");
-    }
-
-  });
-
-},{
-  threshold:.1
-});
-
-document
-.querySelectorAll(".mf-reveal")
-.forEach(el=>revealObserver.observe(el));
-
-/* -------------------------------------------------- */
-/* INTERSECTION MARKERS */
-/* -------------------------------------------------- */
-
-const marksWrap =
-document.querySelector(".mf-intersections");
-
-for(let i=0;i<8;i++){
-
-  const mark =
-  document.createElement("div");
-
-  mark.className =
-    "mf-mark " +
-    ["dot","dot","dot","star","diamond"][
-      Math.floor(Math.random()*5)
-    ];
-
-  mark.style.left =
-    [10,20,30,40,50,60,70,80,90][
-      Math.floor(Math.random()*9)
-    ] + "%";
-
-  mark.style.top =
-    [33.333,66.666][i%2] + "%";
-
-  mark.style.animationDelay =
-    (Math.random()*24).toFixed(2) + "s";
-
-  marksWrap.appendChild(mark);
-
-}
-
-/* -------------------------------------------------- */
-/* ASCII */
-/* -------------------------------------------------- */
-
-const ascii = Array.from(document.querySelectorAll(".mf-ascii"));
-
-let asciiIndex = 0;
-
-/* 1.5s visible → 3s dark gap → next */
-function cycleAscii() {
-  ascii.forEach(el => el.classList.remove("show"));
-  const current = ascii[asciiIndex % ascii.length];
-  current.classList.add("show");
-  asciiIndex++;
-  setTimeout(() => {
-    current.classList.remove("show");
-    setTimeout(cycleAscii, 3000);
-  }, 1500);
-}
-
-setTimeout(cycleAscii, 1200);
-
-/* -------------------------------------------------- */
-/* INDEX XX */
-/* -------------------------------------------------- */
-
-const indexExtra =
-document.getElementById("indexExtra");
-
-if(indexExtra){
-
-  setInterval(()=>{
-
-    indexExtra.textContent =
-      indexExtra.textContent==="X"
-      ? "XX"
-      : "X";
-
-  },2800);
-
-}
-
-/* -------------------------------------------------- */
-/* OVERLAY */
-/* -------------------------------------------------- */
-
-const overlay =
-document.getElementById("mfOverlay");
-
-const overlayImage =
-overlay.querySelector(".mf-overlay-img");
-
-const overlayTitle =
-overlay.querySelector(".mf-overlay-top-left");
-
-const overlayIndex =
-overlay.querySelector(".mf-overlay-top-right");
-
-const overlayClose =
-overlay.querySelector(".mf-close");
-
-document
-.querySelectorAll(".mf-strip")
-.forEach(strip=>{
-
-  strip.addEventListener("click",()=>{
-
-    overlayImage.style.backgroundImage =
-      `url('${strip.dataset.img}')`;
-
-    overlayTitle.textContent =
-      strip.dataset.title;
-
-    overlayIndex.textContent =
-      `Project ${strip.dataset.index}`;
-
-    overlay.classList.add("active");
-
-    document.body.style.overflow="hidden";
-
-  });
-
-});
-
-overlayClose.addEventListener("click",closeOverlay);
-
-document.addEventListener("keydown",e=>{
-
-  if(e.key==="Escape"){
-    closeOverlay();
-  }
-
-});
-
-function closeOverlay(){
-
-  overlay.classList.remove("active");
-  document.body.style.overflow="";
-
-}
-
-/* -------------------------------------------------- */
-/* HERO SCALE */
-/* -------------------------------------------------- */
-
-function scaleHeroName(){
-
-  const hero   = document.getElementById("heroName");
-  const wrap   = document.getElementById("nameWrap");
-  const info   = document.querySelector(".mf-hero-info");
-
-  if(!hero || !wrap) return;
-
-  hero.style.fontSize = "300px";
-  wrap.style.transform = "none";
-
-  const width    = wrap.scrollWidth;
-  const viewport = window.innerWidth;
-  const padding  = viewport * 0.008;
-  const scale    = (viewport - padding * 2) / width;
-
-  /* After scaling, the wrap is still anchored left:0.
-     Center it by offsetting: (viewport - scaledWidth) / 2 */
-  const scaledWidth = width * scale;
-  const offset = (viewport - scaledWidth) / 2;
-
-  wrap.style.transform = `translateX(${offset}px) scale(${scale})`;
-  wrap.style.transformOrigin = "left bottom";
-
-  /* Align info block with the left edge of F in FUSEK (desktop only) */
-  if(info && window.innerWidth > 1000){
-    const fChar = hero.querySelector(".n-f");
-    if(fChar){
-      const fRect = fChar.getBoundingClientRect();
-      /* Position info so its left edge lines up with F */
-      info.style.left   = (fRect.left + 20) + "px";
-      info.style.right  = "auto";
-      info.style.width  = Math.min(560, (window.innerWidth - fRect.left) * 0.55) + "px";
-      info.style.top    = "22%";
-      info.style.bottom = "auto";
-    }
-  } else if(info && window.innerWidth <= 1000){
-    /* Reset to CSS defaults on mobile */
-    info.style.left   = "";
-    info.style.right  = "";
-    info.style.width  = "";
-    info.style.bottom = "";
-    info.style.top    = "";
-  }
-
-}
-
-if(document.fonts && document.fonts.ready){
-
-  document.fonts.ready.then(scaleHeroName);
-
-}else{
-
-  setTimeout(scaleHeroName,200);
-
-}
-
-scaleHeroName();
-
-window.addEventListener(
-  "resize",
-  scaleHeroName
-);
-
-/* -------------------------------------------------- */
-/* HERO GLITCH EFFECTS */
-/* -------------------------------------------------- */
-
-(function(){
-
-  const hero =
-  document.getElementById("heroName");
-
-  if(!hero) return;
-
-  const wait =
-  ms=>new Promise(r=>setTimeout(r,ms));
-
-  const chars=()=>
-    Array.from(
-      hero.querySelectorAll(".nc")
-    ).filter(c=>!c.classList.contains("n-sp"));
-
-  function fadeOut(list,ms=100){
-
-    list.forEach(el=>{
-      el.style.transition=`opacity ${ms}ms linear`;
-      el.style.opacity="0";
-    });
-
-  }
-
-  function fadeIn(list,ms=350){
-
-    list.forEach(el=>{
-      el.style.transition=`opacity ${ms}ms linear`;
-      el.style.opacity="";
-    });
-
-    setTimeout(()=>{
-      list.forEach(el=>{
-        el.style.transition="";
-      });
-    },ms+50);
-
-  }
-
-  async function accentA(){
-
-    const a=
-    hero.querySelector(".n-a2");
-
-    if(!a) return;
-
-    a.textContent="Á";
-
-    await wait(600);
-
-    a.textContent="A";
-
-  }
-
-  async function accentU(){
-
-    const u=
-    hero.querySelector(".n-u");
-
-    if(!u) return;
-
-    u.textContent="Ů";
-
-    await wait(600);
-
-    u.textContent="U";
-
-  }
-
-  async function disappear(){
-
-    const list=[
-      "n-a1",
-      "n-r",
-      "n-i",
-      "n-a2",
-      "n-n",
-      "n-u",
-      "n-s",
-      "n-e",
-      "n-k"
-    ]
-    .map(c=>hero.querySelector("."+c))
-    .filter(Boolean);
-
-    fadeOut(list,100);
-
-    await wait(2100);
-
-    fadeIn(list,350);
-
-    await wait(400);
-
-  }
-
-  async function rgb(){
-
-    const all=chars();
-
-    const picks=
-    [...all]
-    .sort(()=>Math.random()-.5)
-    .slice(0,3);
-
-    let frame=0;
-
-    const total=120;
-
-    const timer=
-    setInterval(()=>{
-
-      frame++;
-
-      const t=frame/total;
-
-      const amp=Math.sin(t*Math.PI)*4;
-
-      const j=(Math.random()-.5)*.8;
-
-      const x=(amp+j).toFixed(2);
-
-      const nx=(-(amp+j*.7)).toFixed(2);
-
-      picks.forEach(el=>{
-
-        el.style.textShadow=
-        `${x}px 0 3px rgba(226,27,22,.8),
-         ${nx}px 0 3px rgba(0,167,255,.8)`;
-
-      });
-
-      if(frame>=total){
-
-        clearInterval(timer);
-
+  resize();
+
+  function noise() {
+    const w = canvas.width;
+    const h = canvas.height;
+    if (w === 0 || h === 0) return;
+    
+    const imgData = ctx.createImageData(w, h);
+    const buffer = new Uint32Array(imgData.data.buffer);
+    const len = buffer.length;
+    
+    for (let i = 0; i < len; i++) {
+      if (Math.random() > 0.5) {
+        buffer[i] = 0xff000000;
       }
-
-    },16);
-
-    await wait(2050);
-
-    picks.forEach(el=>{
-
-      el.style.textShadow="";
-
-    });
-
+    }
+    
+    ctx.putImageData(imgData, 0, 0);
+    requestAnimationFrame(noise);
   }
+  noise();
+}
 
-  async function blur(){
+/* 2. CUSTOM INTERPOLATED LERPER SCROLL (SMOOTH KINETIC) */
+let scrollYTarget = 0;
+let scrollYCurrent = 0;
+const scrollEase = 0.08;
 
-    const all=chars();
-    const ease="cubic-bezier(.16,1,.3,1)";
-    const steps=[
-      {v:"blur(3px)", d:.5},
-      {v:"blur(3px)", d:.7},   /* hold at peak */
-      {v:"blur(0)",   d:.8},
-    ];
+function initCustomScroll() {
+  const container = document.getElementById('mf-scroll-container');
+  if (!container) return;
 
-    /* ramp up */
-    all.forEach(el=>{
-      el.style.transition=`filter ${steps[0].d}s ${ease}`;
-      el.style.filter=steps[0].v;
-    });
-
-    await wait(steps[0].d*1000+100);
-
-    /* hold — no transition change needed, filter stays */
-    await wait(steps[1].d*1000);
-
-    /* ramp down */
-    all.forEach(el=>{
-      el.style.transition=`filter ${steps[2].d}s ${ease}`;
-      el.style.filter=steps[2].v;
-    });
-
-    await wait(steps[2].d*1000+100);
-
-    all.forEach(el=>{
-      el.style.transition="";
-      el.style.filter="";
-    });
-
+  function updateScrollBounds() {
+    document.body.style.height = `${container.getBoundingClientRect().height}px`;
   }
+  
+  window.addEventListener('resize', updateScrollBounds);
+  // Initial structural run plus slight delay to offset media loads
+  updateScrollBounds();
+  setTimeout(updateScrollBounds, 500);
 
-  const effects=[
-    accentA,
-    accentU,
-    disappear,
-    rgb,
-    blur
+  window.addEventListener('scroll', () => {
+    scrollYTarget = window.scrollY;
+  });
+
+  function renderScroll() {
+    scrollYCurrent += (scrollYTarget - scrollYCurrent) * scrollEase;
+    
+    // Prevent fractional rounding float sub-pixels
+    if (Math.abs(scrollYTarget - scrollYCurrent) < 0.01) {
+      scrollYCurrent = scrollYTarget;
+    }
+    
+    container.style.transform = `translate3d(0, ${-scrollYCurrent}px, 0)`;
+    
+    // Connect dynamic painting calculations directly to current frame interpolation
+    triggerPaintScrollUpdate(scrollYCurrent);
+    
+    requestAnimationFrame(renderScroll);
+  }
+  requestAnimationFrame(renderScroll);
+}
+
+/* 3. HERO SCALER ENGINE (FITS VIEWPORT EXACTLY) */
+function initAutoscaleTitle() {
+  const title = document.getElementById('mf-autoscale-title');
+  if (!title) return;
+
+  function rescale() {
+    const width = window.innerWidth;
+    // Dynamic fractional tuning based on string metrics width
+    const calculatedFontSize = width / 7.6; 
+    title.style.fontSize = `${calculatedFontSize}px`;
+  }
+  
+  window.addEventListener('resize', rescale);
+  rescale();
+}
+
+/* 4. RANDOM ASCII ART CYCLER GRAPHIC */
+function initAsciiCycler() {
+  const pre = document.getElementById('mf-ascii-cycler');
+  if (!pre) return;
+
+  const variations = [
+    `   _ __ ___  \n  | '_ \` _ \\ \n  | | | | | |\n  |_| |_| |_|`,
+    `   /\`\\_/\`\\    \n  |  _ _  |  \n  | | | | |  \n  |_| |_| |_|`,
+    `   __    __  \n  /  \\  /  \\ \n | |\\ \\/ /| |\n |_| \\__/ |_|`,
+    `   .---. .---.\n  / .-. .-. \\\n  | | | | | |\n  \`-\` \`-\` \`-\``
   ];
 
-  function shuffle(arr){
-
-    const a=[...arr];
-
-    for(let i=a.length-1;i>0;i--){
-
-      const j=
-      Math.floor(Math.random()*(i+1));
-
-      [a[i],a[j]]=[a[j],a[i]];
-
-    }
-
-    return a;
-
-  }
-
-  let queue=[];
-
-  async function run(){
-
-    await wait(2500);
-
-    while(true){
-
-      if(!queue.length){
-
-        queue=shuffle(effects);
-
-      }
-
-      await queue.shift()();
-
-      await wait(2500);
-
-    }
-
-  }
-
-  run();
-
-})();
-
-/* -------------------------------------------------- */
-/* XP */
-/* -------------------------------------------------- */
-
-(function(){
-
-  const section  = document.getElementById("xp");
-  const timeline = document.getElementById("timelineItems");
-
-  if(!section || !timeline) return;
-
-  const items = [...timeline.querySelectorAll(".mf-time-item")];
-
-  let started = false;
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(!entry.isIntersecting || started) return;
-      started = true;
-      animateTimeline();
-    });
-  }, { threshold: .1 });
-
-  observer.observe(section);
-
-  function animateTimeline(){
-
-    const STEP = 700;
-
-    items.forEach((item, index) => {
-
-      const delay = index * (STEP + 200);
-      const year  = item.querySelector(".mf-time-year");
-      const dot   = item.querySelector(".mf-time-dot");
-      const copy  = item.querySelector(".mf-time-copy");
-
-      if(year) setTimeout(() => year.classList.add("show"),    delay);
-      if(dot)  setTimeout(() => dot.classList.add("visible"),  delay + 100);
-      if(copy) setTimeout(() => copy.classList.add("show"),    delay + 200);
-
-    });
-
-    /* Align XP/TRACK label center to first role title center */
-    setTimeout(alignXPLabel, 400);
-
-  }
-
-  function alignXPLabel(){
-
-    const label  = section.querySelector(".mf-timeline-label");
-    const roleEl = items[0] && items[0].querySelector(".mf-time-role");
-
-    if(!label || !roleEl) return;
-
-    const labelRect = label.getBoundingClientRect();
-    const roleRect  = roleEl.getBoundingClientRect();
-
-    const roleMid  = roleRect.top  + roleRect.height  / 2;
-    const labelMid = labelRect.top + labelRect.height / 2;
-    const offset   = roleMid - labelMid;
-
-    label.style.transform  = `translateY(${offset}px)`;
-    label.style.transition = "transform .8s cubic-bezier(.16,1,.3,1)";
-
-  }
-
-  window.addEventListener("resize", alignXPLabel, { passive: true });
-
-  /* Ripple blur on role title hover */
-  items.forEach(item => {
-    item.addEventListener("mouseenter", () => {
-      const chars = Array.from(item.querySelectorAll(".mf-time-role-char"));
-      chars.forEach((ch, i) => {
-        setTimeout(() => {
-          ch.classList.add("rippling");
-          setTimeout(() => ch.classList.remove("rippling"), 280);
-        }, i * 35);
-      });
-    });
-  });
-
-})();
-
-/* -------------------------------------------------- */
-/* XP +1 */
-/* -------------------------------------------------- */
-
-const xpPlus =
-document.getElementById("xpPlus");
-
-if(xpPlus){
-
-  function popXP(){
-
-    xpPlus.classList.remove("pop");
-
-    void xpPlus.offsetWidth;
-
-    xpPlus.classList.add("pop");
-
-  }
-
-  setInterval(popXP,4000);
-
+  let frame = 0;
+  setInterval(() => {
+    frame = (frame + 1) % variations.length;
+    pre.textContent = variations[frame];
+  }, 900);
 }
 
-/* -------------------------------------------------- */
-/* BIO PAINT */
-/* -------------------------------------------------- */
+/* 5. HERO TYPEWRITER MATRICES HOOK */
+function initTypewriter() {
+  const element = document.getElementById('mf-typewriter-text');
+  if (!element) return;
 
-(function(){
+  const sequences = [
+    "DIGITAL PRODUCT DESIGNER & CREATIVE DIRECTOR",
+    "REDUCING EMOTIONAL DECORATION TO SYSTEMATIC ZERO",
+    "ENGINEERING INTEGRITY ACROSS INTERACTIVE SYSTEMS"
+  ];
 
-  const paragraphs =
-  document.querySelectorAll(".mf-about-text p");
+  let seqIndex = 0;
+  let charIndex = 0;
+  let currentString = "";
+  let isDeleting = false;
 
-  if(!paragraphs.length) return;
-
-  function paint(){
-
-    const vh=window.innerHeight;
-
-    paragraphs.forEach(p=>{
-
-      const rect=p.getBoundingClientRect();
-
-      if(rect.top < vh*.70){
-
-        p.classList.add("painted");
-        p.classList.remove("unpainted");
-
-      }else{
-
-        p.classList.remove("painted");
-        p.classList.add("unpainted");
-
-      }
-
-    });
-
-  }
-
-  window.addEventListener("scroll",paint,{passive:true});
-
-  paint();
-
-})();
-
-/* -------------------------------------------------- */
-/* BIO LETTERS */
-/* -------------------------------------------------- */
-
-(function(){
-
-  const b=document.querySelector(".bio-b");
-  const i=document.querySelector(".bio-i");
-  const o=document.querySelector(".bio-o");
-
-  if(!b || !i || !o) return;
-
-  setInterval(()=>{
-
-    b.classList.add("is-off");
-    i.classList.remove("is-off");
-    o.classList.add("is-off");
-
-    setTimeout(()=>{
-
-      i.classList.add("is-off");
-      o.classList.remove("is-off");
-
-    },900);
-
-    setTimeout(()=>{
-
-      b.classList.remove("is-off");
-      i.classList.remove("is-off");
-      o.classList.remove("is-off");
-
-    },1900);
-
-  },5000);
-
-})();
-
-/* -------------------------------------------------- */
-/* TYPEWRITERS */
-/* -------------------------------------------------- */
-
-typewriter(
-  "metaText",
-  [
-    "20+ YEARS OF XP",
-    "COACHED 70+ 1–ON–1S",
-    "LED LEADERS",
-    "LED TEAMS",
-    "LED DESIGNERS",
-    "LED GROUP TALKS",
-    "LED MEANS \"ICE\" IN MY NATIVE LANGUAGE"
-  ],
-  2000
-);
-
-typewriter(
-  "twText",
-  [
-    "“You met me at a very strange time in my life.”",
-    "“There is no spoon.”",
-    "“Just be a rock.”",
-    "“Devour feculence.”",
-    "“Majestical.”"
-  ],
-  2800
-);
-
-function typewriter(id,list,startDelay){
-
-  const el=document.getElementById(id);
-
-  if(!el) return;
-
-  const wait=
-  ms=>new Promise(r=>setTimeout(r,ms));
-
-  async function type(text){
-
-    for(const c of text){
-
-      el.textContent+=c;
-
-      await wait(55+Math.random()*30);
-
+  function tick() {
+    const fullTarget = sequences[seqIndex];
+    
+    if (!isDeleting) {
+      currentString = fullTarget.substring(0, charIndex + 1);
+      charIndex++;
+    } else {
+      currentString = fullTarget.substring(0, charIndex - 1);
+      charIndex--;
     }
 
-  }
+    element.textContent = currentString;
 
-  async function erase(text){
+    let delay = isDeleting ? 25 : 50;
 
-    for(let i=text.length;i>0;i--){
-
-      el.textContent=text.slice(0,i-1);
-
-      await wait(30);
-
+    if (!isDeleting && currentString === fullTarget) {
+      delay = 3000; // Hold full statement frame
+      isDeleting = true;
+    } else if (isDeleting && currentString === "") {
+      isDeleting = false;
+      seqIndex = (seqIndex + 1) % sequences.length;
+      delay = 500;
     }
 
+    setTimeout(tick, delay);
   }
-
-  (async()=>{
-
-    let index=0;
-
-    await wait(startDelay);
-
-    while(true){
-
-      await wait(2300);   /* +1s pause before each new line */
-
-      const text=list[index++%list.length];
-
-      await type(text);
-
-      await wait(1200);
-
-      await erase(text);
-
-      await wait(250);
-
-    }
-
-  })();
-
+  
+  setTimeout(tick, 1000);
 }
 
-/* -------------------------------------------------- */
-/* PRACTICE COPY POSITION */
-/* -------------------------------------------------- */
-
-function positionRollCopies(){
-
-  document
-  .querySelectorAll(".mf-roll")
-  .forEach(row=>{
-
-    const left=
-    row.querySelector(".mf-roll-left");
-
-    const right=
-    row.querySelector(".mf-roll-right");
-
-    if(!left || !right) return;
-
-    const rowRect=
-    row.getBoundingClientRect();
-
-    const leftRect=
-    left.getBoundingClientRect();
-
-    const rightRect=
-    right.getBoundingClientRect();
-
-    const center=
-    ((leftRect.right+rightRect.left)/2)
-    -rowRect.left;
-
-    row.style.setProperty(
-      "--copy-x",
-      center+"px"
-    );
-
-  });
-
+/* 6. MANIFESTO TEXT-PAINTING LAYER CONTROLLER */
+let paintElement = null;
+function initScrollPaint() {
+  paintElement = document.querySelector('.mf-paint-text');
 }
 
-positionRollCopies();
+function triggerPaintScrollUpdate(currentScrollY) {
+  if (!paintElement) return;
+  
+  const rect = paintElement.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  
+  // Calculate element position relative to target scroll plane
+  const elementTopGlobal = rect.top + currentScrollY;
+  const triggerPointStart = elementTopGlobal - windowHeight + 100;
+  const triggerPointEnd = elementTopGlobal + rect.height - 200;
+  
+  if (currentScrollY < triggerPointStart) {
+    paintElement.style.color = '#111';
+    return;
+  }
+  if (currentScrollY > triggerPointEnd) {
+    paintElement.style.color = '#fff';
+    return;
+  }
+  
+  const progress = (currentScrollY - triggerPointStart) / (triggerPointEnd - triggerPointStart);
+  
+  // Clean hex value interpolation conversion logic loop
+  const minVal = 17;  // #111
+  const maxVal = 255; // #fff
+  const currentHexVal = Math.floor(minVal + (maxVal - minVal) * progress);
+  const finalHexStr = currentHexVal.toString(16).padStart(2, '0');
+  
+  paintElement.style.color = `#${finalHexStr}${finalHexStr}${finalHexStr}`;
+}
 
-window.addEventListener(
-  "resize",
-  positionRollCopies
-);
-
-document
-.querySelectorAll(".mf-roll")
-.forEach(row=>{
-
-  ["mouseenter","mouseleave"]
-  .forEach(event=>{
-
-    row.addEventListener(event,()=>{
-
-      requestAnimationFrame(positionRollCopies);
-
-      setTimeout(positionRollCopies,450);
-      setTimeout(positionRollCopies,920);
-
+/* 7. SECURE INTERFACES CRYPTO GLITCH INTERACTION */
+function initGlitchEffects() {
+  const textElements = document.querySelectorAll('.mf-glitch-text');
+  
+  textElements.forEach(el => {
+    const original = el.getAttribute('data-text');
+    const matrixChars = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789_#@*&";
+    
+    el.addEventListener('mouseenter', () => {
+      let iteration = 0;
+      const interval = setInterval(() => {
+        el.textContent = original.split("")
+          .map((char, index) => {
+            if (index < iteration) return original[index];
+            if (char === " ") return " ";
+            return matrixChars[Math.floor(Math.random() * matrixChars.length)];
+          })
+          .join("");
+          
+        if (iteration >= original.length) {
+          clearInterval(interval);
+          el.textContent = original;
+        }
+        iteration += 1.5; // Controls glitch reveal speed
+      }, 30);
     });
-
   });
-
-});
+}
