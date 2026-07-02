@@ -782,13 +782,11 @@ window.addEventListener(
 
       const year=item.querySelector(".mf-time-year");
       const dot=item.querySelector(".mf-time-dot");
-      const roleCell=item.querySelector(".mf-time-role-cell");
-      const subCell=item.querySelector(".mf-time-sub-cell");
+      const copy=item.querySelector(".mf-time-copy");
 
-      if(year){     setTimeout(()=>{ year.classList.add("show"); },delay); }
-      if(dot){      setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
-      if(roleCell){ setTimeout(()=>{ roleCell.classList.add("show"); },delay+200); }
-      if(subCell){  setTimeout(()=>{ subCell.classList.add("show"); },delay+300); }
+      if(year){ setTimeout(()=>{ year.classList.add("show"); },delay); }
+      if(dot){  setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
+      if(copy){ setTimeout(()=>{ copy.classList.add("show"); },delay+200); }
 
     });
 
@@ -835,7 +833,7 @@ window.addEventListener(
 
       const chars=Array.from(
         item.querySelectorAll(".mf-time-role-char")
-      ); /* still works — role-char is inside role-cell */
+      );
 
       chars.forEach((ch,i)=>{
 
