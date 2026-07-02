@@ -1,66 +1,93 @@
-/* XP / TRACK spacing fix
-   Paste this at the bottom of your existing style.css, or replace the previous XP fix. */
+/* XP / TRACK FIX — paste this at the VERY BOTTOM of your existing style.css.
+   Do not replace the whole file with this.
 
-/* Keep the first XP row aligned with the section heading */
-.mf-timeline-label,
-.mf-timeline-items {
-  padding-top: 0;
-  margin-top: 0;
+   This keeps the first row alignment locked:
+   XP / TRACK heading = year = dot = role title.
+
+   The meta + hover detail are positioned under the role title only,
+   so they do NOT become part of the vertically centered title group.
+*/
+
+#mf .mf-timeline {
+  align-items: start;
 }
 
-/* Keep year / dot / title on the same baseline */
-.mf-time-item {
-  grid-template-columns: auto 24px minmax(0, 1fr);
+#mf .mf-timeline-label {
+  align-self: start;
+}
+
+#mf .mf-timeline-items {
+  align-self: start;
+  gap: 48px;
+}
+
+#mf .mf-time-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 24px 1fr;
   grid-template-rows: auto;
   column-gap: 28px;
   row-gap: 0;
   align-items: start;
+  overflow: visible;
+  min-height: 112px;
 }
 
-.mf-time-year,
-.mf-time-dot,
-.mf-time-copy {
+/* Keep these three locked to the same top/title line. */
+#mf .mf-time-year,
+#mf .mf-time-dot,
+#mf .mf-time-copy {
   grid-row: 1;
-}
-
-.mf-time-year,
-.mf-time-dot {
-  align-self: center;
-}
-
-.mf-time-copy {
   align-self: start;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Title stays first; meta sits underneath with clean vertical spacing */
-.mf-time-role {
+#mf .mf-time-year {
+  grid-column: 1;
+  padding-top: .18em;
+}
+
+#mf .mf-time-dot {
+  grid-column: 2;
+  margin-top: .42em;
+}
+
+/* Critical: this block must only size itself by the title.
+   Meta/detail are absolutely placed, so they cannot pull the title down. */
+#mf .mf-time-copy {
+  grid-column: 3;
+  position: relative;
+  min-height: 0;
+  overflow: visible;
+  transform-origin: top left;
+}
+
+#mf .mf-time-role {
   margin: 0;
+  padding: 0;
   line-height: .95;
 }
 
-.mf-time-meta {
-  margin-top: 16px;
+/* Description directly under the title, but outside title alignment math. */
+#mf .mf-time-meta {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 12px);
+  margin-top: 0;
+  max-width: 620px;
 }
 
-/* Hover/detail text sits under meta with equal vertical spacing */
-.mf-time-detail {
-  margin-top: 16px;
+/* Hover line directly under the description, with equal optical spacing. */
+#mf .mf-time-detail {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 12px + 1.4em + 12px);
+  margin-top: 0;
+  max-width: 620px;
   opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transform: translateY(-4px);
-  transition:
-    opacity .45s var(--ease),
-    max-height .45s var(--ease),
-    transform .45s var(--ease);
 }
 
 @media (hover: hover) {
-  .mf-time-item:hover .mf-time-detail {
+  #mf .mf-time-item:hover .mf-time-detail {
     opacity: 1;
-    max-height: 120px;
-    transform: translateY(0);
   }
 }
