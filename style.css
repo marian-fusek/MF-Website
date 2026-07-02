@@ -770,7 +770,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 52px;
+  gap: 48px;
 }
 
 /* No vertical line — dots only */
