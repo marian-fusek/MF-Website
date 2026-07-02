@@ -1,704 +1,482 @@
-/* =========================================================================
-   MARIAN FUSEK PORTFOLIO - MAIN ARCHITECTURE
-   ========================================================================= */
-
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-
-:root {
-  --color-bg: #000000;
-  --color-text: #ffffff;
-  --color-accent: #ff3e3e;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-mono: 'Space Mono', monospace;
-  --site-padding: 60px;
-  --max-width: 1600px;
-}
-
-@media (max-width: 768px) {
-  :root {
-    --site-padding: 24px;
-  }
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-display);
-  overflow-x: hidden;
-  width: 100%;
-}
-
-/* Base Body settings for clean custom scroll calculations */
-body {
-  position: relative;
-}
-
-/* Ambient Canvas Overlay */
-#mf-noise-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.04;
-}
-
-/* Custom Scroll Container */
-#mf-scroll-container {
-  position: relative;
-  width: 100%;
-  z-index: 2;
-  will-change: transform;
-}
-
-/* Generic Utilities */
-.mf-section {
-  width: 100%;
-  position: relative;
-}
-
-.mf-section-title {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* =========================================================================
-   HERO / INTRO DESIGN
-   ========================================================================= */
-.mf-hero {
-  height: 100vh;
-  min-height: 650px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 40px var(--site-padding);
-  border-bottom: 1px solid #111;
-}
-
-.mf-hero-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.mf-hero-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.mf-meta-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #555;
-  letter-spacing: 0.1em;
-}
-
-.mf-meta-value {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.mf-hero-title-wrap {
-  width: 100%;
-  text-align: center;
-  overflow: hidden;
-  margin: auto 0;
-}
-
-.mf-hero-title {
-  font-family: var(--font-display);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 0.85;
-  white-space: nowrap;
-  display: inline-block;
-  transform: scaleY(1.1);
-}
-
-.mf-hero-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-}
-
-.mf-hero-ascii-box pre {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  line-height: 1.2;
-  color: #444;
-}
-
-.mf-hero-subtext {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  max-width: 400px;
-  text-align: right;
-}
-
-#mf-typewriter-text {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  color: #aaa;
-  min-height: 1.2em;
-}
-
-.mf-scroll-indicator {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #444;
-  letter-spacing: 0.05em;
-}
-
-/* Glitch Typography Utility */
-.mf-glitch-text {
-  position: relative;
-}
-.mf-glitch-text::before,
-.mf-glitch-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--color-bg);
-  clip: rect(0,0,0,0);
-}
-
-/* =========================================================================
-   STATEMENT / MANIFESTO DESIGN
-   ========================================================================= */
-.mf-statement {
-  padding: 160px var(--site-padding);
-  border-bottom: 1px solid #111;
-}
-
-.mf-statement-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
-
-.mf-statement-paragraph {
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #222; /* Painted dynamically by JS scroll */
-}
-
-@media (max-width: 1024px) {
-  .mf-statement-paragraph {
-    font-size: 2.2rem;
-  }
-}
-
-/* =========================================================================
-   WORK INDEX / GRID SECTION
-   ========================================================================= */
-.mf-work {
-  padding: 120px var(--site-padding);
-  border-bottom: 1px solid #111;
-}
-
-.mf-work-header {
-  max-width: var(--max-width);
-  margin: 0 auto 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.mf-work-count {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  color: #555;
-}
-
-.mf-work-grid {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px 40px;
-}
-
-@media (max-width: 768px) {
-  .mf-work-grid {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-}
-
-.mf-work-card {
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-}
-
-.mf-card-image-wrap {
-  position: relative;
-  width: 100%;
-  padding-top: 65%; /* Editorial Aspect Ratio */
-  background-color: #111;
-  overflow: hidden;
-}
-
-.mf-card-overlay {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.4);
-  z-index: 2;
-  transition: background-color 0.4s ease;
-}
-
-.mf-card-img {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.1);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
-  z-index: 1;
-}
-
-.mf-card-hover-details {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 3;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  background-color: var(--color-text);
-  color: var(--color-bg);
-  padding: 6px 12px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Editorial Hover Drift */
-.mf-work-card:hover .mf-card-img {
-  transform: scale(1.03) rotate(0.5deg);
-  filter: grayscale(0) contrast(1);
-}
-
-.mf-work-card:hover .mf-card-overlay {
-  background-color: rgba(0,0,0,0);
-}
-
-.mf-work-card:hover .mf-card-hover-details {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.mf-card-meta {
-  margin-top: 20px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.mf-project-num {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #555;
-}
-
-.mf-project-title {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.mf-project-tag {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #777;
-  letter-spacing: 0.05em;
-  text-align: right;
-}
-
-/* =========================================================================
-   PRACTICE COMPETENCIES SECTION
-   ========================================================================= */
-.mf-competencies {
-  padding: 120px var(--site-padding);
-  border-bottom: 1px solid #111;
-}
-
-.mf-comp-layout {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 4fr 8fr;
-  gap: 40px;
-}
-
-@media (max-width: 992px) {
-  .mf-comp-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.mf-comp-right {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid #222;
-}
-
-.mf-comp-item {
-  display: grid;
-  grid-template-columns: 1fr 11fr;
-  padding: 40px 0;
-  border-bottom: 1px solid #222;
-  transition: background-color 0.3s ease;
-}
-
-.mf-comp-item:hover {
-  background-color: #050505;
-}
-
-.mf-comp-num {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-accent);
-  margin-top: 6px;
-}
-
-.mf-comp-content h3 {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  letter-spacing: -0.01em;
-}
-
-.mf-comp-content p {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  line-height: 1.5;
-  color: #888;
-  max-width: 750px;
-}
-
-/* =========================================================================
-   TIMELINE SECTION (GRID COUPLING BUG FIX)
-   ========================================================================= */
-.mf-timeline {
-  padding: 120px var(--site-padding) 80px;
-  background-color: var(--color-bg);
-  position: relative;
-  z-index: 2;
-}
-
-.mf-timeline-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 80px; /* Space between complete blocks */
-}
-
-/* Master Grid setup containing two strict vertical rows per timeline block */
-.mf-timeline-row {
-  display: grid;
-  grid-template-columns: 2.5fr 2fr 0.5fr 7fr;
-  grid-template-rows: auto auto; /* Explicitly splits baseline and text content */
-}
-
-/* Row 1 Content: Locked completely to center alignment lines */
-.mf-time-axis,
-.mf-time-year,
-.mf-time-dot-wrapper,
-.mf-time-title {
-  grid-row: 1; 
-  align-self: center; /* Forces total center vertical matching across column tracks */
-}
-
-.mf-time-axis {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.03em;
-  color: var(--color-text);
-}
-
-.mf-time-year {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-text);
-  letter-spacing: 0.05em;
-}
-
-.mf-time-dot-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.mf-time-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #333;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-}
-
-.mf-time-dot.active {
-  background-color: #fff;
-  box-shadow: 0 0 12px #fff;
-}
-
-.mf-time-dot.active::after {
-  content: '';
-  position: absolute;
-  top: -4px; left: -4px; right: -4px; bottom: -4px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  animation: mf-pulse 2s infinite;
-}
-
-.mf-time-dot.active-grey {
-  background-color: #888;
-}
-
-.mf-time-title {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-  margin: 0;
-  line-height: 1.1;
-}
-
-/* Row 2 Content: Pushed entirely beneath the title column space */
-.mf-time-body {
-  grid-row: 2;
-  grid-column: 4; /* Spans explicitly beneath the title track cell only */
-  margin-top: 24px; /* Bigger gap layout adjustment as requested */
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.mf-time-desc {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #888;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.mf-time-hover {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #555;
-  letter-spacing: 0.08em;
-  line-height: 1.5;
-  margin: 0;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.4s ease, transform 0.4s ease, color 0.4s ease;
-}
-
-/* Hover state interaction updates */
-.mf-timeline-row:hover .mf-time-hover {
-  opacity: 1;
-  transform: translateY(0);
-  color: var(--color-accent);
-}
-
-@keyframes mf-pulse {
-  0% { transform: scale(0.9); opacity: 1; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
-
-/* Responsive Mobile Handling */
-@media (max-width: 992px) {
-  .mf-timeline-container {
-    gap: 40px;
-  }
-  
-  .mf-timeline-row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    border-bottom: 1px solid #111;
-    padding-bottom: 30px;
-  }
-  
-  .mf-time-axis,
-  .mf-time-year,
-  .mf-time-dot-wrapper,
-  .mf-time-title,
-  .mf-time-body {
-    grid-row: auto;
-    grid-column: auto;
-    align-self: flex-start;
-  }
-  
-  .mf-time-axis {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-  }
-  
-  .mf-time-axis:empty {
-    display: none;
-  }
-  
-  .mf-time-year {
-    margin-bottom: 10px;
-  }
-  
-  .mf-time-dot-wrapper {
-    margin-bottom: 15px;
-  }
-  
-  .mf-time-title {
-    font-size: 1.8rem;
-  }
-  
-  .mf-time-body {
-    margin-top: 14px;
-  }
-  
-  .mf-time-hover {
-    opacity: 1;
-    transform: none;
-    color: #666;
-  }
-}
-
-/* =========================================================================
-   FOOTER / BIO / INQUIRY DESIGN
-   ========================================================================= */
-.mf-footer {
-  padding: 140px var(--site-padding) 60px;
-  background-color: #030303;
-}
-
-.mf-footer-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 7fr 5fr;
-  gap: 80px;
-}
-
-@media (max-width: 992px) {
-  .mf-footer-container {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-}
-
-.mf-footer-heading {
-  font-family: var(--font-display);
-  font-size: 4rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-  .mf-footer-heading {
-    font-size: 2.5rem;
-  }
-}
-
-.mf-footer-bio {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  line-height: 1.5;
-  color: #777;
-  max-width: 600px;
-  margin-bottom: 40px;
-}
-
-.mf-email-link {
-  font-family: var(--font-mono);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-decoration: none;
-  border-bottom: 2px solid var(--color-text);
-  padding-bottom: 4px;
-  transition: color 0.3s ease, border-color 0.3s ease;
-}
-
-.mf-email-link:hover {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.mf-footer-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 40px;
-}
-
-.mf-link-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.mf-group-label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #444;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-}
-
-.mf-nav-link {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #aaa;
-  text-decoration: none;
-  transition: color 0.3s ease, transform 0.3s ease;
-  display: inline-block;
-  width: fit-content;
-}
-
-.mf-nav-link:hover {
-  color: var(--color-text);
-  transform: translateX(4px);
-}
-
-.mf-footer-copy {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #333;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Marian Fusek — Hmm</title>
+
+
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <filter id="motionBlur" x="-20%" width="140%" y="0%" height="100%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6 0" />
+    </filter>
+  </defs>
+</svg>
+
+<div id="mf">
+
+<div class="mf-loader" id="mfLoader">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<div class="mf-grid" id="mfGrid"></div>
+<div class="mf-intersections"></div>
+<div class="mf-noise"></div>
+<div class="mf-blur" id="mfBlur"></div>
+
+<div class="mf-ascii mf-a1">++ MF / 2026</div>
+<div class="mf-ascii mf-a2">signal_lost()</div>
+<div class="mf-ascii mf-a3">DESIGN ≠ DECOR</div>
+<div class="mf-ascii mf-a4">Are we simulated?</div>
+<div class="mf-ascii mf-a5">1 3 5 7 ? ODD</div>
+<div class="mf-ascii mf-a6">C-19</div>
+<div class="mf-ascii mf-a7">5 A.M.</div>
+
+<nav class="mf-nav">
+
+<div class="mf-nav-logo">MF</div>
+
+<a class="mf-menu-item mf-nav-index" href="#work">
+Index
+</a>
+
+<a class="mf-menu-item mf-nav-xp" href="#xp">
+XP
+</a>
+
+<a class="mf-menu-item mf-nav-bio" href="#about">
+BIO
+</a>
+
+<a class="mf-menu-item mf-nav-contact" href="#connect">
+Attack Me
+</a>
+
+</nav>
+
+<section class="mf-hero" id="heroSection">
+
+<div class="mf-hero-info mf-reveal">
+
+<h1>
+Brand, UI &amp; Visual Designer · Creative Director · Mindset Coach for Digital Creatives
+</h1>
+
+<div class="mf-meta-row">
+<span class="mf-meta-text" id="metaText"></span>
+<span class="mf-meta-cursor">_</span>
+</div>
+
+</div>
+
+<div class="mf-hero-name" id="heroName">
+
+<span id="nameWrap">
+
+<span class="nc n-m">M</span>
+<span class="nc n-a1">A</span>
+<span class="nc n-r">R</span>
+<span class="nc n-i">I</span>
+<span class="nc n-a2">A</span>
+<span class="nc n-n">N</span>
+<span class="nc n-sp">&nbsp;</span>
+<span class="nc n-f">F</span>
+<span class="nc n-u">U</span>
+<span class="nc n-s">S</span>
+<span class="nc n-e">E</span>
+<span class="nc n-k">K</span>
+
+</span>
+
+</div>
+
+</section>
+<section class="mf-section mf-work" id="work">
+
+<div class="mf-index-title mf-reveal">
+IN<span class="dex">DEX</span><span id="indexExtra">X</span>
+</div>
+
+<div class="mf-strips">
+
+<div class="mf-strip mf-reveal"
+data-title="MIUNĀE"
+data-index="01"
+data-img="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">01</div>
+
+<div class="mf-strip-title">
+MIUNĀE
+</div>
+
+<div class="mf-strip-desc">
+A skincare brand system built around time, tactility and restraint.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="STRV Systems"
+data-index="02"
+data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">02</div>
+
+<div class="mf-strip-title">
+STRV Systems
+</div>
+
+<div class="mf-strip-desc">
+Product, UI and leadership work across digital product teams at scale.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Coaching Practice"
+data-index="03"
+data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">03</div>
+
+<div class="mf-strip-title">
+Coaching Practice
+</div>
+
+<div class="mf-strip-desc">
+Mental and career coaching for digital creatives and technical leaders.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Experimental UI"
+data-index="04"
+data-img="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">04</div>
+
+<div class="mf-strip-title">
+Experimental UI
+</div>
+
+<div class="mf-strip-desc">
+Typography-led interfaces with attitude and exacting restraint.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Visual Direction"
+data-index="05"
+data-img="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">05</div>
+
+<div class="mf-strip-title">
+Visual Direction
+</div>
+
+<div class="mf-strip-desc">
+Campaigns, brand atmospheres, image systems and launch expression.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="mf-section mf-practice">
+
+<div class="mf-roll-list mf-reveal">
+
+<div class="mf-roll">
+<span class="mf-roll-left">BRAND</span>
+<span class="mf-roll-copy">
+I uncover a brand's one unmistakable thing, then build everything from it.
+</span>
+<span class="mf-roll-right">IDENTITY</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">VISUAL</span>
+<span class="mf-roll-copy">
+Typography-driven, minimal, and deliberately off-meta.
+</span>
+<span class="mf-roll-right">DESIGN</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">CREATIVE</span>
+<span class="mf-roll-copy">
+I set the vision, hold the standard, and make sure the work stays true from first sketch to final output.
+</span>
+<span class="mf-roll-right">DIRECTION</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">AI</span>
+<span class="mf-roll-copy">
+I treat AI like a studio. Direction, generation, retouching, animation — start to finish.
+</span>
+<span class="mf-roll-right">PRODUCTION</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">MINDSET</span>
+<span class="mf-roll-copy">
+For designers, leaders, and founders who want clarity over noise — real conversations, not frameworks.
+</span>
+<span class="mf-roll-right">COACHING</span>
+</div>
+
+</div>
+
+</section>
+<section class="mf-section mf-xp" id="xp">
+
+<div class="mf-timeline">
+
+<div class="mf-timeline-label">
+<span class="mf-xp-plus" id="xpPlus">+1</span>
+XP / TRACK
+</div>
+
+<div class="mf-timeline-items" id="timelineItems">
+
+<div class="mf-time-item">
+<div class="mf-time-year">2022 → NOW</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">I</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">d</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">p</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">d</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">t</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Brand, UI, AI &amp; Visual Designer · Creative Director</div>
+<div class="mf-time-detail">CURRENTLY: MIUNĀE.COM [BOTTLES, BOXES, PRINT, WEB, SOCIALS, VIDS, TONS OF AI... GEE]</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2020 → NOW</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">C</span><span class="mf-time-role-char">o</span><span class="mf-time-role-char">a</span><span class="mf-time-role-char">c</span><span class="mf-time-role-char">h</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Coach for digital creatives</div>
+<div class="mf-time-detail">A CERTIFIED COACH HANDLING THE DEEP MENTAL STUFF, WITH A STRONG GRIP ON DIGITAL.</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2015 → 2022</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">S</span><span class="mf-time-role-char">T</span><span class="mf-time-role-char">R</span><span class="mf-time-role-char">V</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Chief Design &amp; Engineering Officer · Design Team Lead · Product Designer</div>
+<div class="mf-time-detail">&amp; ALSO SOME HR, RSS MNGMNT, PUBLIC TALKS, WHINING THAT I'M BUSY...</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2011 → 2015</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">S</span><span class="mf-time-role-char">Y</span><span class="mf-time-role-char">M</span><span class="mf-time-role-char">B</span><span class="mf-time-role-char">I</span><span class="mf-time-role-char">O</span><span class="mf-time-role-char"> </span><span class="mf-time-role-char">D</span><span class="mf-time-role-char">i</span><span class="mf-time-role-char">g</span><span class="mf-time-role-char">i</span><span class="mf-time-role-char">t</span><span class="mf-time-role-char">a</span><span class="mf-time-role-char">l</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Graphic Designer</div>
+<div class="mf-time-detail">IF THERE WAS A CORPORATE IN CZECHIA, I PROBABLY MESSED WITH IT.</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2009 → 2010</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">F</span><span class="mf-time-role-char">G</span><span class="mf-time-role-char"> </span><span class="mf-time-role-char">F</span><span class="mf-time-role-char">o</span><span class="mf-time-role-char">r</span><span class="mf-time-role-char">r</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">s</span><span class="mf-time-role-char">t</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Graphic Designer</div>
+<div class="mf-time-detail">GOT IN WITH "ZERO" XP. GOT TO EDIT PRESIDENT'S OFFICE WEBSITE GRAPHICS ON THE FIRST DAY.</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="mf-section mf-about" id="about">
+
+<div class="mf-about-title mf-reveal">
+<span class="bio-letter bio-b">B</span><span class="bio-letter bio-i">I</span><span class="bio-letter bio-o">O</span>
+</div>
+
+<div class="mf-about-layout">
+
+<div class="mf-about-text mf-reveal">
+
+<p>To be real with you — I don't do any of this out of pure passion. My process is a battle. With the brief, the obvious, and whatever comes too easy. That restlessness — that's where everything I do comes from. Design, leadership, coaching. All of it.</p>
+
+<p>Under the performance, the noise, and the safe choices — there's something worth finding. When those layers finally break, something real and beautiful comes alive.</p>
+
+<p>The brief doesn't own the outcome. The work answers to your vision — and comes out MF-stamped.</p>
+
+<p>Having fun drawing rectangles or giving ten tips for a better life might work for some. But if you just need something raw, let's talk.</p>
+
+<div class="mf-about-note">
+My words, not AI. Been em-dashing since before it was a red flag.
+</div>
+
+</div>
+
+<div class="mf-photo-card mf-reveal"></div>
+
+<div class="mf-art-card mf-reveal">
+<div class="mf-art-top">
+<span>MF "ART"?</span>
+<span>+</span>
+</div>
+
+<div class="mf-art-hidden">
+I made big art. It's giving... Eh? Wha? The F...?
+</div>
+</div>
+
+</div>
+
+</section>
+
+<footer class="mf-footer mf-reveal" id="connect">
+
+<div class="mf-footer-inner">
+
+<div class="mf-footer-name" id="footerName">
+Marian<br>Fusek
+</div>
+
+<div class="mf-footer-typewriter" id="twContainer">
+<span class="mf-tw-text" id="twText"></span>
+<span class="mf-tw-cursor" id="twCursor">_</span>
+</div>
+
+<div class="mf-footer-links">
+<a class="mf-menu-item mf-footer-top" href="#" id="footerTop">Top</a>
+<a class="mf-menu-item" href="#work">Index</a>
+<a class="mf-menu-item" href="#xp">XP</a>
+<a class="mf-menu-item" href="#about">BIO</a>
+</div>
+
+<div class="mf-footer-contact">
+
+<a
+class="mf-menu-item"
+href="mailto:email@marianfusek.com"
+target="_blank"
+rel="noopener">
+email@marianfusek.com
+</a>
+
+<a
+class="mf-menu-item"
+href="https://www.linkedin.com/in/marianfusek/"
+target="_blank"
+rel="noopener">
+LinkedIn
+</a>
+
+<a
+class="mf-menu-item"
+href="https://www.instagram.com/da_marian/"
+target="_blank"
+rel="noopener">
+Instagram
+</a>
+
+</div>
+
+</div>
+
+<div class="mf-footer-bottom">
+<div>©MF 2026</div>
+<div>Still here.</div>
+</div>
+
+</footer>
+
+<div class="mf-overlay" id="mfOverlay">
+
+<div class="mf-overlay-img"></div>
+
+<div class="mf-overlay-top-left"></div>
+
+<div class="mf-overlay-top-right">
+Selected Work
+</div>
+
+<div class="mf-overlay-mini">
+Brand · UI · Visual Direction
+</div>
+
+<div class="mf-overlay-text">
+
+<p>
+This is placeholder project copy. Replace with a sharp summary of the work, what Marian led, and why the project needed its own visual behavior.
+</p>
+
+<p>
+Scope, outcome, materials, interface logic, creative direction, collaborators — anything that gives the work weight without turning it into a case study essay.
+</p>
+
+</div>
+
+<button class="mf-close" type="button" aria-label="Close"></button>
+
+</div>
+
+<script src="script.js"></script>
+
+</div>
+
+</body>
+</html>
