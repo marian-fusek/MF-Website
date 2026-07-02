@@ -802,21 +802,17 @@ window.addEventListener(
 
     if(!label || !firstItem) return;
 
-    /* Align to the role title element specifically, not the whole copy block */
+    /* Use the role title — it's what's vertically centered with year+dot */
     const roleEl=firstItem.querySelector(".mf-time-role");
-    const dotEl=firstItem.querySelector(".mf-time-dot");
-    const yearEl=firstItem.querySelector(".mf-time-year");
-
-    /* Use whichever is visible */
-    const refEl=roleEl || dotEl || yearEl;
-    if(!refEl) return;
+    if(!roleEl) return;
 
     const labelRect=label.getBoundingClientRect();
-    const refRect=refEl.getBoundingClientRect();
+    const roleRect=roleEl.getBoundingClientRect();
 
-    const refMid=refRect.top+refRect.height/2;
-    const labelMid=labelRect.top+labelRect.height/2;
-    const offset=refMid-labelMid;
+    /* Align label center to role title center */
+    const roleMid=roleRect.top + roleRect.height/2;
+    const labelMid=labelRect.top + labelRect.height/2;
+    const offset=roleMid - labelMid;
 
     label.style.transform=`translateY(${offset}px)`;
     label.style.transition="transform .8s cubic-bezier(.16,1,.3,1)";
