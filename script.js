@@ -740,117 +740,79 @@ window.addEventListener(
 
 (function(){
 
-  const section =
-  document.getElementById("xp");
-
-  const timeline =
-  document.getElementById("timelineItems");
+  const section  = document.getElementById("xp");
+  const timeline = document.getElementById("timelineItems");
 
   if(!section || !timeline) return;
 
-  const items =
-  [...timeline.querySelectorAll(".mf-time-item")];
+  const items = [...timeline.querySelectorAll(".mf-time-item")];
 
-  let started=false;
+  let started = false;
 
-  const observer =
-  new IntersectionObserver(entries=>{
-
-    entries.forEach(entry=>{
-
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
       if(!entry.isIntersecting || started) return;
-
-      started=true;
-
-      section.classList.add("visible");
-
+      started = true;
       animateTimeline();
-
     });
-
-  },{threshold:.1});
+  }, { threshold: .1 });
 
   observer.observe(section);
 
   function animateTimeline(){
 
-    const STEP=700;
+    const STEP = 700;
 
-    items.forEach((item,index)=>{
+    items.forEach((item, index) => {
 
-      const delay=index*(STEP+200);
+      const delay = index * (STEP + 200);
+      const year  = item.querySelector(".mf-time-year");
+      const dot   = item.querySelector(".mf-time-dot");
+      const copy  = item.querySelector(".mf-time-copy");
 
-      const year=item.querySelector(".mf-time-year");
-      const dot=item.querySelector(".mf-time-dot");
-      const copy=item.querySelector(".mf-time-copy");
-
-      if(year){ setTimeout(()=>{ year.classList.add("show"); },delay); }
-      if(dot){  setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
-      if(copy){ setTimeout(()=>{ copy.classList.add("show"); },delay+200); }
+      if(year) setTimeout(() => year.classList.add("show"),    delay);
+      if(dot)  setTimeout(() => dot.classList.add("visible"),  delay + 100);
+      if(copy) setTimeout(() => copy.classList.add("show"),    delay + 200);
 
     });
 
-    /* Center XP label vertically with first row's midpoint */
-    alignXPLabel();
+    /* Align XP/TRACK label center to first role title center */
+    setTimeout(alignXPLabel, 400);
 
   }
 
   function alignXPLabel(){
 
-    const label=section.querySelector(".mf-timeline-label");
-    const firstItem=items[0];
+    const label  = section.querySelector(".mf-timeline-label");
+    const roleEl = items[0] && items[0].querySelector(".mf-time-role");
 
-    if(!label || !firstItem) return;
+    if(!label || !roleEl) return;
 
-    /* Align to the role title element specifically, not the whole copy block */
-    const roleEl=firstItem.querySelector(".mf-time-role");
-    const dotEl=firstItem.querySelector(".mf-time-dot");
-    const yearEl=firstItem.querySelector(".mf-time-year");
+    const labelRect = label.getBoundingClientRect();
+    const roleRect  = roleEl.getBoundingClientRect();
 
-    /* Use whichever is visible */
-    const refEl=roleEl || dotEl || yearEl;
-    if(!refEl) return;
+    const roleMid  = roleRect.top  + roleRect.height  / 2;
+    const labelMid = labelRect.top + labelRect.height / 2;
+    const offset   = roleMid - labelMid;
 
-    const labelRect=label.getBoundingClientRect();
-    const refRect=refEl.getBoundingClientRect();
-
-    const refMid=refRect.top+refRect.height/2;
-    const labelMid=labelRect.top+labelRect.height/2;
-    const offset=refMid-labelMid;
-
-    label.style.transform=`translateY(${offset}px)`;
-    label.style.transition="transform .8s cubic-bezier(.16,1,.3,1)";
+    label.style.transform  = `translateY(${offset}px)`;
+    label.style.transition = "transform .8s cubic-bezier(.16,1,.3,1)";
 
   }
 
-  /* Re-align on resize */
-  window.addEventListener("resize",alignXPLabel,{passive:true});
+  window.addEventListener("resize", alignXPLabel, { passive: true });
 
   /* Ripple blur on role title hover */
-  items.forEach(item=>{
-
-    item.addEventListener("mouseenter",()=>{
-
-      const chars=Array.from(
-        item.querySelectorAll(".mf-time-role-char")
-      );
-
-      chars.forEach((ch,i)=>{
-
-        setTimeout(()=>{
-
+  items.forEach(item => {
+    item.addEventListener("mouseenter", () => {
+      const chars = Array.from(item.querySelectorAll(".mf-time-role-char"));
+      chars.forEach((ch, i) => {
+        setTimeout(() => {
           ch.classList.add("rippling");
-
-          setTimeout(()=>{
-            ch.classList.remove("rippling");
-          },280);
-
-        },i*35);  /* stagger: 35ms per character */
-
+          setTimeout(() => ch.classList.remove("rippling"), 280);
+        }, i * 35);
       });
-
     });
-
   });
 
 })();
