@@ -1,281 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Marian Fusek &mdash; Portfolio</title>
-  <link rel="stylesheet" href="style.css" />
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Marian Fusek — Hmm</title>
+
+
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-  <!-- AMBIENT CANVAS BACKGROUND -->
-  <canvas id="mf-noise-canvas"></canvas>
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <filter id="motionBlur" x="-20%" width="140%" y="0%" height="100%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6 0" />
+    </filter>
+  </defs>
+</svg>
 
-  <!-- CUSTOM SMOOTH SCROLL WRAPPER -->
-  <div id="mf-scroll-container">
+<div id="mf">
 
-    <!-- =========================================================================
-         SECTION: HERO / INTRO
-    ========================================================================= -->
-    <section class="mf-section mf-hero">
-      <div class="mf-hero-top">
-        <div class="mf-hero-meta">
-          <span class="mf-meta-label">STATUS</span>
-          <span class="mf-meta-value mf-glitch-text" data-text="AVAILABLE FOR DESIGN DIRECTING">AVAILABLE FOR DESIGN DIRECTING</span>
-        </div>
-        <div class="mf-hero-meta">
-          <span class="mf-meta-label">LOCATION</span>
-          <span class="mf-meta-value">50.0755° N, 14.4378° E</span>
-        </div>
-      </div>
+<div class="mf-loader" id="mfLoader">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
 
-      <div class="mf-hero-title-wrap">
-        <h1 id="mf-autoscale-title" class="mf-hero-title">MARIAN FUSEK</h1>
-      </div>
+<div class="mf-grid" id="mfGrid"></div>
+<div class="mf-intersections"></div>
+<div class="mf-noise"></div>
+<div class="mf-blur" id="mfBlur"></div>
 
-      <div class="mf-hero-bottom">
-        <div class="mf-hero-ascii-box">
-          <pre id="mf-ascii-cycler">             
-  _ __ ___  
- | '_ ` _ \ 
- | | | | | |
- |_| |_| |_|
-            </pre>
-        </div>
-        <div class="mf-hero-subtext">
-          <p id="mf-typewriter-text">DIGITAL PRODUCT DESIGNER &amp; CREATIVE DIRECTOR</p>
-          <span class="mf-scroll-indicator">SCROLL TO DISCOVER / ↓</span>
-        </div>
-      </div>
-    </section>
+<div class="mf-ascii mf-a1">++ MF / 2026</div>
+<div class="mf-ascii mf-a2">signal_lost()</div>
+<div class="mf-ascii mf-a3">DESIGN ≠ DECOR</div>
+<div class="mf-ascii mf-a4">Are we simulated?</div>
+<div class="mf-ascii mf-a5">1 3 5 7 ? ODD</div>
+<div class="mf-ascii mf-a6">C-19</div>
+<div class="mf-ascii mf-a7">5 A.M.</div>
 
-    <!-- =========================================================================
-         SECTION: STATEMENT / MANIFESTO
-    ========================================================================= -->
-    <section class="mf-section mf-statement">
-      <div class="mf-statement-container">
-        <p class="mf-statement-paragraph mf-paint-text">
-          I shape digital ecosystems by blending raw aesthetic utility with sharp, metric-driven engineering. No fluff. No corporate decoration. Just brutal clarity and relentless execution.
-        </p>
-      </div>
-    </section>
+<nav class="mf-nav">
 
-    <!-- =========================================================================
-         SECTION: WORK INDEX (THE GALLERY)
-    ========================================================================= -->
-    <section class="mf-section mf-work">
-      <div class="mf-work-header">
-        <h2 class="mf-section-title">SELECTED WORKS INDEX</h2>
-        <span class="mf-work-count">[04]</span>
-      </div>
+<div class="mf-nav-logo">MF</div>
 
-      <div class="mf-work-grid">
-        <!-- Project 1 -->
-        <div class="mf-work-card">
-          <div class="mf-card-image-wrap">
-            <div class="mf-card-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop" alt="Project Zero" class="mf-card-img" />
-            <div class="mf-card-hover-details">
-              <span>VIEW CASE STUDY &nearr;</span>
-            </div>
-          </div>
-          <div class="mf-card-meta">
-            <span class="mf-project-num">01/</span>
-            <h3 class="mf-project-title">VIRTUAL ARCHIVE</h3>
-            <span class="mf-project-tag">WEB3 / CORE ARCHITECTURE</span>
-          </div>
-        </div>
+<a class="mf-menu-item mf-nav-index" href="#work">
+Index
+</a>
 
-        <!-- Project 2 -->
-        <div class="mf-work-card">
-          <div class="mf-card-image-wrap">
-            <div class="mf-card-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop" alt="Project One" class="mf-card-img" />
-            <div class="mf-card-hover-details">
-              <span>VIEW CASE STUDY &nearr;</span>
-            </div>
-          </div>
-          <div class="mf-card-meta">
-            <span class="mf-project-num">02/</span>
-            <h3 class="mf-project-title">KINETIC INTERFACE</h3>
-            <span class="mf-project-tag">DESIGN SYSTEM / AUTOMOTIVE</span>
-          </div>
-        </div>
+<a class="mf-menu-item mf-nav-xp" href="#xp">
+XP
+</a>
 
-        <!-- Project 3 -->
-        <div class="mf-work-card">
-          <div class="mf-card-image-wrap">
-            <div class="mf-card-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop" alt="Project Two" class="mf-card-img" />
-            <div class="mf-card-hover-details">
-              <span>VIEW CASE STUDY &nearr;</span>
-            </div>
-          </div>
-          <div class="mf-card-meta">
-            <span class="mf-project-num">03/</span>
-            <h3 class="mf-project-title">SYNAPSE AI</h3>
-            <span class="mf-project-tag">PRODUCT STRATEGY / B2B</span>
-          </div>
-        </div>
+<a class="mf-menu-item mf-nav-bio" href="#about">
+BIO
+</a>
 
-        <!-- Project 4 -->
-        <div class="mf-work-card">
-          <div class="mf-card-image-wrap">
-            <div class="mf-card-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1200&auto=format&fit=crop" alt="Project Three" class="mf-card-img" />
-            <div class="mf-card-hover-details">
-              <span>VIEW CASE STUDY &nearr;</span>
-            </div>
-          </div>
-          <div class="mf-card-meta">
-            <span class="mf-project-num">04/</span>
-            <h3 class="mf-project-title">ECHO BRANDING</h3>
-            <span class="mf-project-tag">VISUAL IDENTITY / BRUTALIST</span>
-          </div>
-        </div>
-      </div>
-    </section>
+<a class="mf-menu-item mf-nav-contact" href="#connect">
+Attack Me
+</a>
 
-    <!-- =========================================================================
-         SECTION: CORE COMPETENCIES / SKILLS
-    ========================================================================= -->
-    <section class="mf-section mf-competencies">
-      <div class="mf-comp-layout">
-        <div class="mf-comp-left">
-          <h2 class="mf-section-title">PRACTICE COMPETENCIES</h2>
-        </div>
-        <div class="mf-comp-right">
-          <div class="mf-comp-item">
-            <span class="mf-comp-num">A/</span>
-            <div class="mf-comp-content">
-              <h3>Creative Direction</h3>
-              <p>Leading multi-disciplinary design teams, aligning complex business roadmaps with stark, cohesive visual languages that disrupt saturated markets.</p>
-            </div>
-          </div>
-          <div class="mf-comp-item">
-            <span class="mf-comp-num">B/</span>
-            <div class="mf-comp-content">
-              <h3>Product Architecture</h3>
-              <p>Structuring high-fidelity user flows, extensive logic matrices, and component-driven Figma systems engineered for rapid React development deployments.</p>
-            </div>
-          </div>
-          <div class="mf-comp-item">
-            <span class="mf-comp-num">C/</span>
-            <div class="mf-comp-content">
-              <h3>AI Orchestration</h3>
-              <p>Embedding neural generation logic inside live functional products, optimizing creative pipelines via modern automation matrices and structural prompt engines.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+</nav>
 
-<!-- =========================================================================
-         SECTION: TIMELINE / TRACK
-    ========================================================================= -->
-    <section class="mf-section mf-timeline">
-      <div class="mf-timeline-container">
-        
-        <!-- Row 1: Independent -->
-        <div class="mf-timeline-row">
-          <div class="mf-time-axis">XP / TRACK</div>
-          <div class="mf-time-year">2022 &rarr; NOW</div>
-          <div class="mf-time-dot-wrapper"><span class="mf-time-dot active"></span></div>
-          <h3 class="mf-time-title">Independent</h3>
-          
-          <!-- This div maps directly into the grid row below the title -->
-          <div class="mf-time-body">
-            <p class="mf-time-desc">BRAND, UI, AI &amp; VISUAL DESIGNER &middot; CREATIVE DIRECTOR</p>
-            <p class="mf-time-hover">CURRENTLY: MIUNĀE.COM [BOTTLES, BOXES, PRINT, WEB, SOCIALS, VIDS, TONS OF AI... GEE]</p>
-          </div>
-        </div>
+<section class="mf-hero" id="heroSection">
 
-        <!-- Row 2: Coach -->
-        <div class="mf-timeline-row">
-          <div class="mf-time-axis"></div>
-          <div class="mf-time-year">2020 &rarr; NOW</div>
-          <div class="mf-time-dot-wrapper"><span class="mf-time-dot active-grey"></span></div>
-          <h3 class="mf-time-title">Coach</h3>
-          
-          <div class="mf-time-body">
-            <p class="mf-time-desc">COACH FOR DIGITAL CREATIVES</p>
-            <p class="mf-time-hover">HELPING DESIGNERS SCALE THEIR CAREERS, SYSTEMIZE WORKFLOWS, AND MASTER BUSINESS THINKING.</p>
-          </div>
-        </div>
+<div class="mf-hero-info mf-reveal">
 
-        <!-- Row 3: STRV -->
-        <div class="mf-timeline-row">
-          <div class="mf-time-axis"></div>
-          <div class="mf-time-year">2015 &rarr; 2022</div>
-          <div class="mf-time-dot-wrapper"><span class="mf-time-dot"></span></div>
-          <h3 class="mf-time-title">STRV</h3>
-          
-          <div class="mf-time-body">
-            <p class="mf-time-desc">CHIEF DESIGN &amp; ENGINEERING OFFICER &middot; DESIGN TEAM LEAD &middot; PRODUCT DESIGNER</p>
-            <p class="mf-time-hover">MANAGED A TEAM OF 35+ CREATIVES. SHAPED DESIGN STRATEGY FOR TOP-TIER SILICON VALLEY STARTUPS.</p>
-          </div>
-        </div>
+<h1>
+Brand, UI &amp; Visual Designer · Creative Director · Mindset Coach for Digital Creatives
+</h1>
 
-        <!-- Row 4: SYMBIO Digital -->
-        <div class="mf-timeline-row">
-          <div class="mf-time-axis"></div>
-          <div class="mf-time-year">2011 &rarr; 2015</div>
-          <div class="mf-time-dot-wrapper"><span class="mf-time-dot"></span></div>
-          <h3 class="mf-time-title">SYMBIO Digital</h3>
-          
-          <div class="mf-time-body">
-            <p class="mf-time-desc">GRAPHIC DESIGNER</p>
-            <p class="mf-time-hover">CRAFTED DIGITAL EXPERIENCES, INTERACTIVE CAMPAIGNS, AND CORPORATE IDENTITIES FOR GLOBAL BRANDS.</p>
-          </div>
-        </div>
+<div class="mf-meta-row">
+<span class="mf-meta-text" id="metaText"></span>
+<span class="mf-meta-cursor">_</span>
+</div>
 
-        <!-- Row 5: FG Forrest -->
-        <div class="mf-timeline-row">
-          <div class="mf-time-axis"></div>
-          <div class="mf-time-year">2009 &rarr; 2010</div>
-          <div class="mf-time-dot-wrapper"><span class="mf-time-dot"></span></div>
-          <h3 class="mf-time-title">FG Forrest</h3>
-          
-          <div class="mf-time-body">
-            <p class="mf-time-desc">GRAPHIC DESIGNER</p>
-            <p class="mf-time-hover">STARTED THE PROFESSIONAL JOURNEY. FOCUSED ON WEB INTERFACES, E-COMMERCE LAYOUTS, AND PIXEL-PERFECT EXECUTION.</p>
-          </div>
-        </div>
+</div>
 
-      </div>
-    </section>
+<div class="mf-hero-name" id="heroName">
 
-    <!-- =========================================================================
-         SECTION: FOOTER / BIO / INQUIRY
-    ========================================================================= -->
-    <footer class="mf-section mf-footer">
-      <div class="mf-footer-container">
-        <div class="mf-footer-left">
-          <h2 class="mf-footer-heading">LET'S BUILD INTEGRITY.</h2>
-          <p class="mf-footer-bio">
-            Currently accepting elite consulting mandates, comprehensive product redesign strategies, and guest engineering masterclasses worldwide. 
-          </p>
-          <a href="mailto:hello@marianfusek.com" class="mf-email-link">HELLO@MARIANFUSEK.COM &rarr;</a>
-        </div>
-        <div class="mf-footer-right">
-          <div class="mf-link-group">
-            <span class="mf-group-label">NETWORKS</span>
-            <a href="#" class="mf-nav-link">LINKEDIN</a>
-            <a href="#" class="mf-nav-link">TWITTER / X</a>
-            <a href="#" class="mf-nav-link">READ.CV</a>
-            <a href="#" class="mf-nav-link">INSTAGRAM</a>
-          </div>
-          <div class="mf-link-group">
-            <span class="mf-group-label">LEGAL ENGINE</span>
-            <span class="mf-footer-copy">&copy; 2026 MF. ALL RIGHTS RESERVED.</span>
-            <span class="mf-footer-copy">BRUTALIST PROTOCOL V2.4</span>
-          </div>
-        </div>
-      </div>
-    </footer>
+<span id="nameWrap">
 
-  </div> <!-- /#mf-scroll-container -->
+<span class="nc n-m">M</span>
+<span class="nc n-a1">A</span>
+<span class="nc n-r">R</span>
+<span class="nc n-i">I</span>
+<span class="nc n-a2">A</span>
+<span class="nc n-n">N</span>
+<span class="nc n-sp">&nbsp;</span>
+<span class="nc n-f">F</span>
+<span class="nc n-u">U</span>
+<span class="nc n-s">S</span>
+<span class="nc n-e">E</span>
+<span class="nc n-k">K</span>
 
-  <script src="script.js"></script>
+</span>
+
+</div>
+
+</section>
+<section class="mf-section mf-work" id="work">
+
+<div class="mf-index-title mf-reveal">
+IN<span class="dex">DEX</span><span id="indexExtra">X</span>
+</div>
+
+<div class="mf-strips">
+
+<div class="mf-strip mf-reveal"
+data-title="MIUNĀE"
+data-index="01"
+data-img="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">01</div>
+
+<div class="mf-strip-title">
+MIUNĀE
+</div>
+
+<div class="mf-strip-desc">
+A skincare brand system built around time, tactility and restraint.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="STRV Systems"
+data-index="02"
+data-img="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">02</div>
+
+<div class="mf-strip-title">
+STRV Systems
+</div>
+
+<div class="mf-strip-desc">
+Product, UI and leadership work across digital product teams at scale.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Coaching Practice"
+data-index="03"
+data-img="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">03</div>
+
+<div class="mf-strip-title">
+Coaching Practice
+</div>
+
+<div class="mf-strip-desc">
+Mental and career coaching for digital creatives and technical leaders.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Experimental UI"
+data-index="04"
+data-img="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">04</div>
+
+<div class="mf-strip-title">
+Experimental UI
+</div>
+
+<div class="mf-strip-desc">
+Typography-led interfaces with attitude and exacting restraint.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+
+<div class="mf-strip mf-reveal"
+data-title="Visual Direction"
+data-index="05"
+data-img="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80">
+
+<div class="mf-strip-num">05</div>
+
+<div class="mf-strip-title">
+Visual Direction
+</div>
+
+<div class="mf-strip-desc">
+Campaigns, brand atmospheres, image systems and launch expression.
+</div>
+
+<div class="mf-strip-plus">+</div>
+
+<div class="mf-strip-img"
+style="background-image:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80')">
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="mf-section mf-practice">
+
+<div class="mf-roll-list mf-reveal">
+
+<div class="mf-roll">
+<span class="mf-roll-left">BRAND</span>
+<span class="mf-roll-copy">
+I uncover a brand's one unmistakable thing, then build everything from it.
+</span>
+<span class="mf-roll-right">IDENTITY</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">VISUAL</span>
+<span class="mf-roll-copy">
+Typography-driven, minimal, and deliberately off-meta.
+</span>
+<span class="mf-roll-right">DESIGN</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">CREATIVE</span>
+<span class="mf-roll-copy">
+I set the vision, hold the standard, and make sure the work stays true from first sketch to final output.
+</span>
+<span class="mf-roll-right">DIRECTION</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">AI</span>
+<span class="mf-roll-copy">
+I treat AI like a studio. Direction, generation, retouching, animation — start to finish.
+</span>
+<span class="mf-roll-right">PRODUCTION</span>
+</div>
+
+<div class="mf-roll">
+<span class="mf-roll-left">MINDSET</span>
+<span class="mf-roll-copy">
+For designers, leaders, and founders who want clarity over noise — real conversations, not frameworks.
+</span>
+<span class="mf-roll-right">COACHING</span>
+</div>
+
+</div>
+
+</section>
+<section class="mf-section mf-xp" id="xp">
+
+<div class="mf-timeline">
+
+<div class="mf-timeline-label">
+<span class="mf-xp-plus" id="xpPlus">+1</span>
+XP / TRACK
+</div>
+
+<div class="mf-timeline-items" id="timelineItems">
+
+<div class="mf-time-item">
+<div class="mf-time-year">2022 → NOW</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">I</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">d</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">p</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">d</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">n</span><span class="mf-time-role-char">t</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Brand, UI, AI &amp; Visual Designer · Creative Director</div>
+<div class="mf-time-detail">CURRENTLY: MIUNĀE.COM [BOTTLES, BOXES, PRINT, WEB, SOCIALS, VIDS, TONS OF AI... GEE]</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2020 → NOW</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">C</span><span class="mf-time-role-char">o</span><span class="mf-time-role-char">a</span><span class="mf-time-role-char">c</span><span class="mf-time-role-char">h</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Coach for digital creatives</div>
+<div class="mf-time-detail">A CERTIFIED COACH HANDLING THE DEEP MENTAL STUFF, WITH A STRONG GRIP ON DIGITAL.</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2015 → 2022</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">S</span><span class="mf-time-role-char">T</span><span class="mf-time-role-char">R</span><span class="mf-time-role-char">V</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Chief Design &amp; Engineering Officer · Design Team Lead · Product Designer</div>
+<div class="mf-time-detail">&amp; ALSO SOME HR, RSS MNGMNT, PUBLIC TALKS, WHINING THAT I'M BUSY...</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2011 → 2015</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">S</span><span class="mf-time-role-char">Y</span><span class="mf-time-role-char">M</span><span class="mf-time-role-char">B</span><span class="mf-time-role-char">I</span><span class="mf-time-role-char">O</span><span class="mf-time-role-char"> </span><span class="mf-time-role-char">D</span><span class="mf-time-role-char">i</span><span class="mf-time-role-char">g</span><span class="mf-time-role-char">i</span><span class="mf-time-role-char">t</span><span class="mf-time-role-char">a</span><span class="mf-time-role-char">l</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Graphic Designer</div>
+<div class="mf-time-detail">IF THERE WAS A CORPORATE IN CZECHIA, I PROBABLY MESSED WITH IT.</div>
+</div>
+</div>
+
+<div class="mf-time-item">
+<div class="mf-time-year">2009 → 2010</div>
+<div class="mf-time-dot"></div>
+<div class="mf-time-role"><span class="mf-time-role-main"><span class="mf-time-role-char">F</span><span class="mf-time-role-char">G</span><span class="mf-time-role-char"> </span><span class="mf-time-role-char">F</span><span class="mf-time-role-char">o</span><span class="mf-time-role-char">r</span><span class="mf-time-role-char">r</span><span class="mf-time-role-char">e</span><span class="mf-time-role-char">s</span><span class="mf-time-role-char">t</span></span></div>
+<div class="mf-time-copy">
+<div class="mf-time-meta">Graphic Designer</div>
+<div class="mf-time-detail">GOT IN WITH "ZERO" XP. GOT TO EDIT PRESIDENT'S OFFICE WEBSITE GRAPHICS ON THE FIRST DAY.</div>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="mf-section mf-about" id="about">
+
+<div class="mf-about-title mf-reveal">
+<span class="bio-letter bio-b">B</span><span class="bio-letter bio-i">I</span><span class="bio-letter bio-o">O</span>
+</div>
+
+<div class="mf-about-layout">
+
+<div class="mf-about-text mf-reveal">
+
+<p>To be real with you — I don't do any of this out of pure passion. My process is a battle. With the brief, the obvious, and whatever comes too easy. That restlessness — that's where everything I do comes from. Design, leadership, coaching. All of it.</p>
+
+<p>Under the performance, the noise, and the safe choices — there's something worth finding. When those layers finally break, something real and beautiful comes alive.</p>
+
+<p>The brief doesn't own the outcome. The work answers to your vision — and comes out MF-stamped.</p>
+
+<p>Having fun drawing rectangles or giving ten tips for a better life might work for some. But if you just need something raw, let's talk.</p>
+
+<div class="mf-about-note">
+My words, not AI. Been em-dashing since before it was a red flag.
+</div>
+
+</div>
+
+<div class="mf-photo-card mf-reveal"></div>
+
+<div class="mf-art-card mf-reveal">
+<div class="mf-art-top">
+<span>MF "ART"?</span>
+<span>+</span>
+</div>
+
+<div class="mf-art-hidden">
+I made big art. It's giving... Eh? Wha? The F...?
+</div>
+</div>
+
+</div>
+
+</section>
+
+<footer class="mf-footer mf-reveal" id="connect">
+
+<div class="mf-footer-inner">
+
+<div class="mf-footer-name" id="footerName">
+Marian<br>Fusek
+</div>
+
+<div class="mf-footer-typewriter" id="twContainer">
+<span class="mf-tw-text" id="twText"></span>
+<span class="mf-tw-cursor" id="twCursor">_</span>
+</div>
+
+<div class="mf-footer-links">
+<a class="mf-menu-item mf-footer-top" href="#" id="footerTop">Top</a>
+<a class="mf-menu-item" href="#work">Index</a>
+<a class="mf-menu-item" href="#xp">XP</a>
+<a class="mf-menu-item" href="#about">BIO</a>
+</div>
+
+<div class="mf-footer-contact">
+
+<a
+class="mf-menu-item"
+href="mailto:email@marianfusek.com"
+target="_blank"
+rel="noopener">
+email@marianfusek.com
+</a>
+
+<a
+class="mf-menu-item"
+href="https://www.linkedin.com/in/marianfusek/"
+target="_blank"
+rel="noopener">
+LinkedIn
+</a>
+
+<a
+class="mf-menu-item"
+href="https://www.instagram.com/da_marian/"
+target="_blank"
+rel="noopener">
+Instagram
+</a>
+
+</div>
+
+</div>
+
+<div class="mf-footer-bottom">
+<div>©MF 2026</div>
+<div>Still here.</div>
+</div>
+
+</footer>
+
+<div class="mf-overlay" id="mfOverlay">
+
+<div class="mf-overlay-img"></div>
+
+<div class="mf-overlay-top-left"></div>
+
+<div class="mf-overlay-top-right">
+Selected Work
+</div>
+
+<div class="mf-overlay-mini">
+Brand · UI · Visual Direction
+</div>
+
+<div class="mf-overlay-text">
+
+<p>
+This is placeholder project copy. Replace with a sharp summary of the work, what Marian led, and why the project needed its own visual behavior.
+</p>
+
+<p>
+Scope, outcome, materials, interface logic, creative direction, collaborators — anything that gives the work weight without turning it into a case study essay.
+</p>
+
+</div>
+
+<button class="mf-close" type="button" aria-label="Close"></button>
+
+</div>
+
+<script src="script.js"></script>
+
+</div>
+
 </body>
 </html>
