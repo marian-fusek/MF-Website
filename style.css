@@ -1,93 +1,160 @@
-/* XP / TRACK FIX — paste this at the VERY BOTTOM of your existing style.css.
-   Do not replace the whole file with this.
+/* ============================================================
+   XP / TRACK — NEW STRUCTURE OVERRIDE
+   Add this block at the VERY BOTTOM of the existing style.css.
 
-   This keeps the first row alignment locked:
-   XP / TRACK heading = year = dot = role title.
+   Structure:
+   1) XP / TRACK headline sits alone on its own line.
+   2) Timeline rows begin below it.
+   3) Each row starts at 40vw from the viewport left.
+   4) Year + dot + role title share ONE top-aligned line.
+   5) Meta + hover text flow under the role title only.
+   ============================================================ */
 
-   The meta + hover detail are positioned under the role title only,
-   so they do NOT become part of the vertically centered title group.
-*/
+#mf .mf-xp {
+  min-height: 120vh;
+  padding: var(--section-v) 6vw;
+}
 
+/* Headline alone — no side-by-side grid with the timeline. */
 #mf .mf-timeline {
-  align-items: start;
+  min-height: 94vh;
+  display: block;
 }
 
 #mf .mf-timeline-label {
-  align-self: start;
+  position: relative;
+  display: block;
+  width: max-content;
+  margin: 0 0 9vh 0;
+  padding: 0;
+  font-size: var(--section-title);
+  line-height: .9;
+  letter-spacing: -.055em;
+  font-weight: 850;
+  text-transform: uppercase;
+  color: #fff;
 }
 
+#mf .mf-timeline-line {
+  display: none;
+}
+
+/* Because .mf-xp already has 6vw left padding, this makes the actual
+   timeline start at 40vw from the viewport, not 40% of the padded area. */
 #mf .mf-timeline-items {
-  align-self: start;
-  gap: 48px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 9vh;
+  margin-left: calc(40vw - 6vw);
+  width: calc(100vw - 40vw - 6vw);
 }
 
+/* Each row: year / dot / copy. Top-aligned. No vertical centering. */
 #mf .mf-time-item {
   position: relative;
   display: grid;
-  grid-template-columns: auto 24px 1fr;
-  grid-template-rows: auto;
+  grid-template-columns: max-content 24px minmax(0, 1fr);
   column-gap: 28px;
   row-gap: 0;
   align-items: start;
+  cursor: default;
   overflow: visible;
   min-height: 112px;
 }
 
-/* Keep these three locked to the same top/title line. */
-#mf .mf-time-year,
-#mf .mf-time-dot,
-#mf .mf-time-copy {
-  grid-row: 1;
-  align-self: start;
-}
-
 #mf .mf-time-year {
   grid-column: 1;
+  grid-row: 1;
+  align-self: start;
   padding-top: .18em;
+  margin: 0;
+  font-family: "Geist Mono", monospace;
+  font-size: clamp(9px, .75vw, 13px);
+  line-height: 1;
+  letter-spacing: .04em;
+  word-spacing: .55em;
+  white-space: nowrap;
 }
 
 #mf .mf-time-dot {
   grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  justify-self: center;
   margin-top: .42em;
+  left: 0;
 }
 
-/* Critical: this block must only size itself by the title.
-   Meta/detail are absolutely placed, so they cannot pull the title down. */
+/* IMPORTANT: this copy block is NOT vertically centered.
+   The title determines the alignment line; meta + detail simply follow below. */
 #mf .mf-time-copy {
   grid-column: 3;
-  position: relative;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  padding: 0;
   min-height: 0;
-  overflow: visible;
-  transform-origin: top left;
 }
 
 #mf .mf-time-role {
   margin: 0;
   padding: 0;
+  font-size: var(--timeline-role);
   line-height: .95;
+  letter-spacing: -.05em;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  flex-wrap: nowrap;
 }
 
-/* Description directly under the title, but outside title alignment math. */
 #mf .mf-time-meta {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 12px);
-  margin-top: 0;
+  display: block;
+  margin-top: 12px;
   max-width: 620px;
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-/* Hover line directly under the description, with equal optical spacing. */
 #mf .mf-time-detail {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 12px + 1.4em + 12px);
-  margin-top: 0;
+  display: block;
+  margin-top: 12px;
   max-width: 620px;
+  font-family: "Geist Mono", monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .36);
   opacity: 0;
+  transition: opacity .5s var(--ease);
 }
 
 @media (hover: hover) {
   #mf .mf-time-item:hover .mf-time-detail {
     opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  #mf .mf-timeline-label {
+    margin-bottom: 7vh;
+  }
+
+  #mf .mf-timeline-items {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  #mf .mf-time-item {
+    grid-template-columns: max-content 18px minmax(0, 1fr);
+    column-gap: 16px;
   }
 }
