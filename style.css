@@ -731,24 +731,13 @@ body {
 
 .mf-timeline-label {
   position: relative;
-  align-self: center;   /* label center aligns to item row center */
+  align-self: start;
   font-size: var(--section-title);
-  line-height: 1;
+  line-height: .9;
   letter-spacing: -.055em;
   font-weight: 850;
   text-transform: uppercase;
   color: #fff;
-}
-
-/* Line through label center, extending right to items */
-.mf-timeline-line {
-  display: none;  /* JS positions and shows this */
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 1px;
-  background: var(--line-strong);
-  pointer-events: none;
 }
 
 .mf-xp-plus {
@@ -781,7 +770,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 52px;
 }
 
 /* No vertical line — dots only */
@@ -791,13 +780,15 @@ body {
   position: relative;
   display: grid;
   grid-template-columns: auto 24px 1fr;
+  grid-template-rows: auto auto;
   column-gap: 28px;
+  row-gap: 12px;
   cursor: default;
   overflow: visible;
-  align-items: center;
+  align-items: start;
 }
 
-/* Year */
+/* Year — smaller, mono, extra horizontal padding around arrow */
 .mf-time-year {
   font-family: "Geist Mono", monospace;
   font-size: clamp(9px, 0.75vw, 13px);
@@ -807,7 +798,10 @@ body {
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
   white-space: nowrap;
+  grid-column: 1;
+  grid-row: 1;
   align-self: center;
+  padding-top: .15em;   /* optical alignment with role title */
 }
 
 .mf-time-year.show {
@@ -815,12 +809,13 @@ body {
   transform: none;
 }
 
-/* Dot */
+/* Dot — pulse on hover (white ring expanding out) */
 .mf-time-dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: #fff;
+  margin-top: 0;
   justify-self: center;
   position: relative;
   left: -2.5px;
@@ -829,7 +824,10 @@ body {
   animation: dotIdle 12s var(--ease) infinite;
   animation-play-state: paused;
   transition: opacity .4s var(--ease);
+  grid-column: 2;
+  grid-row: 1;
   align-self: center;
+  margin-top: .1em;   /* optical center with role text cap height */
 }
 
 .mf-time-dot.visible {
@@ -865,16 +863,14 @@ body {
 .mf-time-item:nth-child(4) .mf-time-dot { animation-delay: 9s; }
 .mf-time-item:nth-child(5) .mf-time-dot { animation-delay: 12s; }
 
-/* Copy block — col 3. align-self:start so role title sits at top.
-   The item uses align-items:center so the whole copy block centers.
-   To move the role title to the center line, we make detail position:absolute
-   so it doesn't affect the copy block's height in the grid. */
+/* Copy block — col 3, row 1 */
 .mf-time-copy {
+  grid-column: 3;
+  grid-row: 1;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
-  align-self: start;
-  position: relative;
+  align-self: center;
 }
 
 .mf-time-copy.show {
@@ -916,7 +912,7 @@ body {
 
 /* Meta — mono, muted */
 .mf-time-meta {
-  margin-top: 18px;
+  margin-top: 10px;
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   line-height: 1.4;
@@ -927,7 +923,7 @@ body {
 
 /* Detail — appears on hover, same size as strip desc */
 .mf-time-detail {
-  margin-top: 8px;
+  margin-top: 14px;
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   line-height: 1.45;
