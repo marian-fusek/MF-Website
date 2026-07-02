@@ -404,7 +404,7 @@ body {
 }
 
 /* =========================================================================
-   TIMELINE SECTION (CSS GRID ALIGNMENT FIXED)
+   TIMELINE SECTION (GRID COUPLING BUG FIX)
    ========================================================================= */
 .mf-timeline {
   padding: 120px var(--site-padding) 80px;
@@ -418,14 +418,23 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 60px; /* Space between rows */
+  gap: 80px; /* Space between complete blocks */
 }
 
-/* 4-Column Layout tracking your exact design requirement */
+/* Master Grid setup containing two strict vertical rows per timeline block */
 .mf-timeline-row {
   display: grid;
   grid-template-columns: 2.5fr 2fr 0.5fr 7fr;
-  align-items: center; /* Strict horizontal center alignment for track 1 */
+  grid-template-rows: auto auto; /* Explicitly splits baseline and text content */
+}
+
+/* Row 1 Content: Locked completely to center alignment lines */
+.mf-time-axis,
+.mf-time-year,
+.mf-time-dot-wrapper,
+.mf-time-title {
+  grid-row: 1; 
+  align-self: center; /* Forces total center vertical matching across column tracks */
 }
 
 .mf-time-axis {
@@ -444,7 +453,6 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* Explicit dot containment to prevent layout jumping */
 .mf-time-dot-wrapper {
   display: flex;
   align-items: center;
@@ -468,10 +476,7 @@ body {
 .mf-time-dot.active::after {
   content: '';
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   animation: mf-pulse 2s infinite;
@@ -479,12 +484,6 @@ body {
 
 .mf-time-dot.active-grey {
   background-color: #888;
-}
-
-/* Content Column breaks down internally without affecting row alignment */
-.mf-time-content {
-  display: flex;
-  flex-direction: column;
 }
 
 .mf-time-title {
@@ -497,11 +496,14 @@ body {
   line-height: 1.1;
 }
 
+/* Row 2 Content: Pushed entirely beneath the title column space */
 .mf-time-body {
-  margin-top: 18px; /* Increased gap under Title as requested */
+  grid-row: 2;
+  grid-column: 4; /* Spans explicitly beneath the title track cell only */
+  margin-top: 24px; /* Bigger gap layout adjustment as requested */
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Gap between description and hover text */
+  gap: 12px;
 }
 
 .mf-time-desc {
@@ -525,7 +527,7 @@ body {
   transition: opacity 0.4s ease, transform 0.4s ease, color 0.4s ease;
 }
 
-/* Hover triggers */
+/* Hover state interaction updates */
 .mf-timeline-row:hover .mf-time-hover {
   opacity: 1;
   transform: translateY(0);
@@ -551,6 +553,16 @@ body {
     padding-bottom: 30px;
   }
   
+  .mf-time-axis,
+  .mf-time-year,
+  .mf-time-dot-wrapper,
+  .mf-time-title,
+  .mf-time-body {
+    grid-row: auto;
+    grid-column: auto;
+    align-self: flex-start;
+  }
+  
   .mf-time-axis {
     font-size: 1.8rem;
     margin-bottom: 20px;
@@ -570,6 +582,10 @@ body {
   
   .mf-time-title {
     font-size: 1.8rem;
+  }
+  
+  .mf-time-body {
+    margin-top: 14px;
   }
   
   .mf-time-hover {
