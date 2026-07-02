@@ -782,10 +782,10 @@ body {
   grid-template-columns: auto 24px 1fr;
   grid-template-rows: auto auto;
   column-gap: 28px;
-  row-gap: 0;
+  row-gap: 12px;
   cursor: default;
   overflow: visible;
-  align-items: center;   /* centers year, dot, and role title on same line */
+  align-items: start;
 }
 
 /* Year — smaller, mono, extra horizontal padding around arrow */
@@ -800,6 +800,8 @@ body {
   white-space: nowrap;
   grid-column: 1;
   grid-row: 1;
+  align-self: center;
+  padding-top: .15em;   /* optical alignment with role title */
 }
 
 .mf-time-year.show {
@@ -824,6 +826,8 @@ body {
   transition: opacity .4s var(--ease);
   grid-column: 2;
   grid-row: 1;
+  align-self: center;
+  margin-top: .1em;   /* optical center with role text cap height */
 }
 
 .mf-time-dot.visible {
@@ -859,19 +863,14 @@ body {
 .mf-time-item:nth-child(4) .mf-time-dot { animation-delay: 9s; }
 .mf-time-item:nth-child(5) .mf-time-dot { animation-delay: 12s; }
 
-/* Copy block — col 3, row 1, top-aligned so only role title is in the center row */
+/* Copy block — col 3, row 1 */
 .mf-time-copy {
   grid-column: 3;
   grid-row: 1;
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .7s var(--ease), transform .7s var(--ease);
-  align-self: center;   /* aligns the role title center with year and dot */
-}
-
-/* Role is display:flex — make it single line, no wrapping */
-.mf-time-role {
-  line-height: 1;
+  align-self: center;
 }
 
 .mf-time-copy.show {
@@ -913,7 +912,7 @@ body {
 
 /* Meta — mono, muted */
 .mf-time-meta {
-  margin-top: 16px;
+  margin-top: 10px;
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   line-height: 1.4;
@@ -924,7 +923,7 @@ body {
 
 /* Detail — appears on hover, same size as strip desc */
 .mf-time-detail {
-  margin-top: 16px;
+  margin-top: 14px;
   font-family: "Geist Mono", monospace;
   font-size: 11px;
   line-height: 1.45;

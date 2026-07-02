@@ -782,11 +782,13 @@ window.addEventListener(
 
       const year=item.querySelector(".mf-time-year");
       const dot=item.querySelector(".mf-time-dot");
-      const copy=item.querySelector(".mf-time-copy");
+      const roleCell=item.querySelector(".mf-time-role-cell");
+      const subCell=item.querySelector(".mf-time-sub-cell");
 
-      if(year){ setTimeout(()=>{ year.classList.add("show"); },delay); }
-      if(dot){  setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
-      if(copy){ setTimeout(()=>{ copy.classList.add("show"); },delay+200); }
+      if(year){     setTimeout(()=>{ year.classList.add("show"); },delay); }
+      if(dot){      setTimeout(()=>{ dot.classList.add("visible"); },delay+100); }
+      if(roleCell){ setTimeout(()=>{ roleCell.classList.add("show"); },delay+200); }
+      if(subCell){  setTimeout(()=>{ subCell.classList.add("show"); },delay+300); }
 
     });
 
@@ -802,17 +804,21 @@ window.addEventListener(
 
     if(!label || !firstItem) return;
 
-    /* Use the role title — it's what's vertically centered with year+dot */
+    /* Align to the role title element specifically, not the whole copy block */
     const roleEl=firstItem.querySelector(".mf-time-role");
-    if(!roleEl) return;
+    const dotEl=firstItem.querySelector(".mf-time-dot");
+    const yearEl=firstItem.querySelector(".mf-time-year");
+
+    /* Use whichever is visible */
+    const refEl=roleEl || dotEl || yearEl;
+    if(!refEl) return;
 
     const labelRect=label.getBoundingClientRect();
-    const roleRect=roleEl.getBoundingClientRect();
+    const refRect=refEl.getBoundingClientRect();
 
-    /* Align label center to role title center */
-    const roleMid=roleRect.top + roleRect.height/2;
-    const labelMid=labelRect.top + labelRect.height/2;
-    const offset=roleMid - labelMid;
+    const refMid=refRect.top+refRect.height/2;
+    const labelMid=labelRect.top+labelRect.height/2;
+    const offset=refMid-labelMid;
 
     label.style.transform=`translateY(${offset}px)`;
     label.style.transition="transform .8s cubic-bezier(.16,1,.3,1)";
@@ -829,7 +835,7 @@ window.addEventListener(
 
       const chars=Array.from(
         item.querySelectorAll(".mf-time-role-char")
-      );
+      ); /* still works — role-char is inside role-cell */
 
       chars.forEach((ch,i)=>{
 
