@@ -506,7 +506,7 @@ body {
 
 .mf-roll {
   --gap: 6vw;
-  --gap-hover: 22vw;
+  --gap-hover: 18vw;
   position: relative;
   width: 100%;
   display: flex;
@@ -535,7 +535,7 @@ body {
 .mf-roll-copy {
   position: absolute;
   top: 50%;
-  left: var(--copy-x, 50%);
+  left: 50%;
   width: min(460px, 34vw);
   transform: translate(-50%, -50%);
   font-family: "Geist Mono", monospace;
@@ -545,11 +545,9 @@ body {
   font-weight: 400;
   text-transform: none;
   text-align: center;
-  color: rgba(255, 255, 255, .42);
   opacity: 0;
   transition: opacity 0.28s var(--ease);
   pointer-events: none;
-  z-index: 2;
 }
 
 .mf-roll:hover .mf-roll-copy {
