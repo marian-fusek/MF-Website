@@ -89,3 +89,25 @@ return ()=>{killed=true;clearAll();resetTitle(title);};}
 const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlus.classList.remove("pop");void xpPlus.offsetWidth;xpPlus.classList.add("pop")}setInterval(popXP,4000)}
 
 (function(){const paragraphs=document.querySelectorAll(".mf-about-text p");if(!paragraphs.length)return;function paint(){const vh=window.innerHeight;paragraphs.forEach(p=>{const rect=p.getBoundingClientRect();if(rect.top<vh*.70)p.style.color="#fff";else p.style.color="rgba(255,255,255,.22)";});}window.addEventListener("scroll",paint,{passive:true});paint();})();
+
+
+/* PRACTICE ROLL — keep copy centered between left and right words */
+function positionRollCopies(){
+  document.querySelectorAll(".mf-roll").forEach(row=>{
+    const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");
+    if(!left||!right)return;
+    const rowRect=row.getBoundingClientRect(),leftRect=left.getBoundingClientRect(),rightRect=right.getBoundingClientRect();
+    const center=((leftRect.right+rightRect.left)/2)-rowRect.left;
+    row.style.setProperty("--copy-x",center+"px");
+  });
+}
+positionRollCopies();
+window.addEventListener("resize",positionRollCopies);
+document.querySelectorAll(".mf-roll").forEach(row=>{
+  ["mouseenter","mouseleave"].forEach(event=>{
+    row.addEventListener(event,()=>{
+      requestAnimationFrame(positionRollCopies);
+      [100,200,300,400,500,600,700].forEach(ms=>setTimeout(positionRollCopies,ms));
+    });
+  });
+});
