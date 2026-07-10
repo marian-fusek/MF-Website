@@ -121,7 +121,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   if(!target)return;
   const lines=[
     "20+ YEARS OF XP",
-    "DESIGN, LEADERSHIP, COACHING, EMPATHY",
+    "DESIGN, LEADERSHIP, COACHING",
     "SUPERPOWER: FINDING YOUR SUPERPOWER"
   ];
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -205,7 +205,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const wght=400+(850-400)*n;
       char.style.fontVariationSettings=`'wght' ${wght}, 'opsz' ${9+(40-9)*n}`;
       char.style.fontWeight=String(Math.round(wght));
-      char.style.opacity=String(.8+(.2*n));
+      char.style.opacity=String(.5+(.5*n));
     });
   }
   container.addEventListener("pointermove",e=>{inside=true;mouse={x:e.clientX,y:e.clientY};if(!raf)raf=requestAnimationFrame(update);});
@@ -222,8 +222,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=680;
-  const SHAPE_MAP={independent:"triangle",coach:"star",strv:"heart",symbio:"circle",fg:"arrow"};
+  const COUNT=760;
+  const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"letterS",symbio:"wave",fg:"sharpWave"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
 
@@ -311,7 +311,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       morphFrom=currentShape;
       targetShape=shape;
       morphStarted=p.millis();
-      morphDuration=hovering?2000:850;
+      morphDuration=hovering?900:650;
       isMorphing=true;
     };
   };
@@ -331,19 +331,34 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         const a=((angle-p.PI/2)%p.TWO_PI+p.TWO_PI)%p.TWO_PI,side=Math.floor(a/(p.TWO_PI/3)),t=(a%(p.TWO_PI/3))/(p.TWO_PI/3);
         return p5.Vector.lerp(p.createVector(p.cos(side*p.TWO_PI/3-p.PI/2)*r,p.sin(side*p.TWO_PI/3-p.PI/2)*r),p.createVector(p.cos((side+1)*p.TWO_PI/3-p.PI/2)*r,p.sin((side+1)*p.TWO_PI/3-p.PI/2)*r),t);
       }
-      case"star":{
-        const step=p.TWO_PI/10,a=((angle-p.PI/2)%p.TWO_PI+p.TWO_PI)%p.TWO_PI,seg=Math.floor(a/step),t=(a-seg*step)/step;
-        const r1=seg%2===0?r:r*.45,r2=seg%2===0?r*.45:r;
-        return p5.Vector.lerp(p.createVector(p.cos(seg*step-p.PI/2)*r1,p.sin(seg*step-p.PI/2)*r1),p.createVector(p.cos((seg+1)*step-p.PI/2)*r2,p.sin((seg+1)*step-p.PI/2)*r2),t);
-      }
       case"heart":{
-        const t=angle-p.PI/2,sc=r/17,x=16*Math.pow(Math.sin(t),3),y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-        return p.createVector(x*sc,y*sc);
+        const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
+        const pts=[
+          p.createVector(0,r*.68),p.createVector(-r*.78,r*.08),p.createVector(-r*.82,-r*.42),
+          p.createVector(-r*.48,-r*.72),p.createVector(0,-r*.38),p.createVector(r*.48,-r*.72),
+          p.createVector(r*.82,-r*.42),p.createVector(r*.78,r*.08)
+        ];
+        const pos=u*pts.length,seg=Math.floor(pos)%pts.length,t=pos-Math.floor(pos);
+        return p5.Vector.lerp(pts[seg],pts[(seg+1)%pts.length],t);
       }
-      case"arrow":{
-        const a=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI,pts=[p.createVector(0,-r),p.createVector(r*.55,-r*.25),p.createVector(r*.25,-r*.25),p.createVector(r*.25,r*.75),p.createVector(-r*.25,r*.75),p.createVector(-r*.25,-r*.25),p.createVector(-r*.55,-r*.25)];
-        const len=p.TWO_PI/pts.length,seg=Math.floor(a/len),t=(a-seg*len)/len;
-        return p5.Vector.lerp(pts[seg%pts.length],pts[(seg+1)%pts.length],t);
+      case"letterS":{
+        const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
+        const y=(u-.5)*2*r;
+        const x=Math.sin((u*2.2-1.1)*Math.PI)*r*.58;
+        return p.createVector(x,y);
+      }
+      case"wave":{
+        const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
+        return p.createVector((u-.5)*2*r,Math.sin(u*Math.PI*3)*r*.34);
+      }
+      case"sharpWave":{
+        const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
+        const pts=[
+          p.createVector(-r,0),p.createVector(-r*.66,-r*.38),p.createVector(-r*.33,r*.38),
+          p.createVector(0,-r*.38),p.createVector(r*.33,r*.38),p.createVector(r*.66,-r*.38),p.createVector(r,0)
+        ];
+        const pos=u*(pts.length-1),seg=Math.min(pts.length-2,Math.floor(pos)),t=pos-seg;
+        return p5.Vector.lerp(pts[seg],pts[seg+1],t);
       }
       default:return p.createVector(0,0);
     }

@@ -1505,3 +1505,20 @@ body {
     margin-bottom: 2px;
   }
 }
+
+
+/* V7 refinements */
+.mf-xp-shape {
+  top: 3.5vh;
+  height: 74vh;
+}
+.mf-about-text p,
+.mf-about-note {
+  color: rgba(255,255,255,.5);
+}
+.mf-about-note {
+  margin-top: 56px;
+}
+.mf-footer-name {
+  font-size: clamp(15px, 1.15vw, 20px);
+}
