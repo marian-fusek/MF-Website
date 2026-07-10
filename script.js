@@ -18,7 +18,30 @@ const marksWrap=document.querySelector(".mf-intersections");if(marksWrap){for(le
 
 const ascii=Array.from(document.querySelectorAll(".mf-ascii"));let asciiIndex=0;function cycleAscii(){if(!ascii.length)return;ascii.forEach(el=>el.classList.remove("show"));const current=ascii[asciiIndex%ascii.length];current.classList.add("show");asciiIndex++;setTimeout(()=>{current.classList.remove("show");setTimeout(cycleAscii,3000)},1500)}setTimeout(cycleAscii,1200);
 
-const indexExtra=document.getElementById("indexExtra");if(indexExtra){setInterval(()=>{indexExtra.textContent=indexExtra.textContent==="X"?"XX":"X"},2800)}
+const indexExtra=document.getElementById("indexExtra");
+if(indexExtra){
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function runIndexLoop(){
+    while(true){
+      indexExtra.textContent="";
+      await wait(1300);
+      indexExtra.textContent="X";
+      await wait(420);
+      indexExtra.textContent="XX";
+      await wait(520);
+      for(let i=0;i<3;i++){
+        indexExtra.style.opacity="0";
+        await wait(180);
+        indexExtra.style.opacity="1";
+        await wait(180);
+      }
+      await wait(260);
+      indexExtra.textContent="";
+      await wait(900);
+    }
+  }
+  runIndexLoop();
+}
 
 const overlay=document.getElementById("mfOverlay");if(overlay){const overlayImage=overlay.querySelector(".mf-overlay-img"),overlayTitle=overlay.querySelector(".mf-overlay-top-left"),overlayIndex=overlay.querySelector(".mf-overlay-top-right"),overlayClose=overlay.querySelector(".mf-close");document.querySelectorAll(".mf-strip").forEach(strip=>{strip.addEventListener("click",()=>{if(overlayImage)overlayImage.style.backgroundImage=`url('${strip.dataset.img}')`;if(overlayTitle)overlayTitle.textContent=strip.dataset.title||"";if(overlayIndex)overlayIndex.textContent=`Project ${strip.dataset.index||""}`;overlay.classList.add("active");document.body.style.overflow="hidden";});});function closeOverlay(){overlay.classList.remove("active");document.body.style.overflow=""}if(overlayClose)overlayClose.addEventListener("click",closeOverlay);document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOverlay()});}
 
@@ -34,26 +57,52 @@ const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(!en
 cards.forEach(card=>{const title=card.querySelector(".mf-xp-title");if(!title)return;title.dataset.original=title.dataset.title||title.textContent;wrapTitle(title);let cleanup=null;card.addEventListener("mouseenter",()=>{if(cleanup)cleanup();cleanup=runTitleEffect(card,title);});card.addEventListener("mouseleave",()=>{if(cleanup)cleanup();cleanup=null;resetTitle(title);});});
 
 function wrapTitle(title){const text=title.dataset.original;title.innerHTML="";for(const ch of text){const span=document.createElement("span");span.className="xp-char";span.textContent=ch===" "?"\u00A0":ch;title.appendChild(span);}}
-function resetTitle(title){title.classList.remove("is-blood","is-symbio","xp-strv-red");title.style.opacity="";title.style.filter="";title.style.textShadow="";title.style.color="";title.innerHTML="";title.textContent=title.dataset.original;wrapTitle(title);}
+function resetTitle(title){title.classList.remove("is-blood","is-symbio","xp-strv-red");title.style.opacity="";title.style.filter="";title.style.textShadow="";title.style.color="";title.style.width="";title.style.minWidth="";title.style.display="";title.style.alignItems="";title.innerHTML="";title.textContent=title.dataset.original;wrapTitle(title);}
 function setPlain(title,text){title.classList.remove("is-blood","is-symbio","xp-strv-red");title.style.color="";title.style.textShadow="";title.innerHTML="";title.textContent=text;}
 function setCursorText(title,text){title.innerHTML="";title.append(document.createTextNode(text));const cursor=document.createElement("span");cursor.className="xp-cursor";cursor.textContent="_";title.appendChild(cursor);}
 
 function runTitleEffect(card,title){const type=card.dataset.xpEffect;const timers=[];let killed=false;const t=(fn,ms)=>{const id=setTimeout(()=>{if(!killed)fn()},ms);timers.push(id);return id};const clearAll=()=>timers.forEach(clearTimeout);resetTitle(title);
 
-if(type==="independent"){setCursorText(title,"Independent");const steps=["Independen","Independe","Independ","Indepen","Indepe","Indep","Inde","Ind","In"];steps.forEach((txt,i)=>t(()=>setCursorText(title,txt),520+i*95));const phrase="In depths";[...phrase].forEach((_,i)=>t(()=>setCursorText(title,phrase.slice(0,i+1)),1520+i*85));t(()=>clearAll(),2350);}
+if(type==="independent"){setCursorText(title,"Independent");const steps=["Independen","Independe","Independ","Indepen","Indepe","Indep","Inde","Ind","In"];steps.forEach((txt,i)=>t(()=>setCursorText(title,txt),520+i*95));const phrase="In depth";[...phrase].forEach((_,i)=>t(()=>setCursorText(title,phrase.slice(0,i+1)),1520+i*85));t(()=>clearAll(),2350);}
 
 if(type==="coach"){title.innerHTML='Coach <span class="xp-heart">♥</span>';}
 
 if(type==="strv"){title.classList.add("xp-strv-red");}
 
 if(type==="symbio"){
+  const originalWidth=title.getBoundingClientRect().width;
+  title.style.width=originalWidth+"px";
+  title.style.minWidth=originalWidth+"px";
+  title.style.display="inline-flex";
+  title.style.alignItems="baseline";
   title.innerHTML="";
-  "SYMBIO".split("").forEach(ch=>{const s=document.createElement("span");s.className="xp-char";s.textContent=ch;s.style.display="inline-block";title.appendChild(s);});
-  const sp=document.createElement("span");sp.textContent="\u00A0";title.appendChild(sp);
-  const dig=document.createElement("span");dig.textContent="Digital";title.appendChild(dig);
-  const symChars=[...title.querySelectorAll(".xp-char")].reverse();
-  symChars.forEach((ch,i)=>t(()=>{ch.style.transition="opacity .1s linear,width .1s linear";ch.style.opacity="0";ch.style.width="0";ch.style.overflow="hidden";},i*65));
-  t(()=>{if(killed)return;sp.remove();symChars.forEach(c=>c.remove());const sym=document.createElement("span");sym.style.cssText="display:inline-block;transform:rotate(45deg);margin-right:.2em;opacity:0;transition:opacity .3s linear;";sym.textContent="☯";title.insertBefore(sym,dig);requestAnimationFrame(()=>requestAnimationFrame(()=>{sym.style.opacity="1";}));},symChars.length*65+80);
+  const sym=document.createElement("span");
+  sym.className="xp-symbio-word";
+  sym.textContent="SYMBIO";
+  const gap=document.createElement("span");
+  gap.className="xp-symbio-gap";
+  gap.textContent=" ";
+  const dig=document.createElement("span");
+  dig.className="xp-symbio-digital";
+  dig.textContent="Digital";
+  title.append(sym,gap,dig);
+  const letters=[...sym.textContent].map(ch=>{const s=document.createElement("span");s.className="xp-char";s.textContent=ch;return s;});
+  sym.replaceChildren(...letters);
+  [...letters].reverse().forEach((ch,i)=>t(()=>{
+    ch.style.transition="opacity .1s linear, transform .1s linear";
+    ch.style.opacity="0";
+    ch.style.transform="scaleX(0)";
+  },i*65));
+  t(()=>{
+    if(killed)return;
+    sym.replaceChildren();
+    sym.style.width="1.15em";
+    sym.style.flex="0 0 1.15em";
+    sym.style.textAlign="left";
+    sym.style.transform="rotate(45deg)";
+    sym.style.transformOrigin="center";
+    sym.textContent="☯";
+  },letters.length*65+80);
 }
 
 if(type==="fg"){t(()=>setPlain(title,"FG 1"),300);t(()=>setPlain(title,"FG 2"),700);t(()=>setPlain(title,"FG 3"),1100);t(()=>setPlain(title,"FG 4"),1500);t(()=>{setPlain(title,"FG 4rest");clearAll();},1900);}
@@ -63,7 +112,99 @@ return ()=>{killed=true;clearAll();resetTitle(title);};}
 
 const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlus.classList.remove("pop");void xpPlus.offsetWidth;xpPlus.classList.add("pop")}setInterval(popXP,4000)}
 
-(function(){const paragraphs=document.querySelectorAll(".mf-about-text p");if(!paragraphs.length)return;function paint(){const vh=window.innerHeight;paragraphs.forEach(p=>{const rect=p.getBoundingClientRect();if(rect.top<vh*.70)p.style.color="#fff";else p.style.color="rgba(255,255,255,.22)";});}window.addEventListener("scroll",paint,{passive:true});paint();})();
+
+
+
+/* HERO EXPERIENCE TYPEWRITER */
+(function(){
+  const target=document.getElementById("metaText");
+  if(!target)return;
+  const lines=[
+    "18+ YEARS IN DIGITAL",
+    "LED DESIGN & ENGINEERING TEAMS",
+    "BUILT BRANDS, PRODUCTS & PEOPLE"
+  ];
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function loop(){
+    while(true){
+      for(const line of lines){
+        target.textContent="";
+        for(const ch of line){target.textContent+=ch;await wait(42);}
+        await wait(1250);
+        while(target.textContent.length){target.textContent=target.textContent.slice(0,-1);await wait(20);}
+        await wait(260);
+      }
+    }
+  }
+  setTimeout(loop,2200);
+})();
+
+/* BIO LETTER LOOP */
+(function(){
+  const b=document.querySelector(".bio-b"),i=document.querySelector(".bio-i"),o=document.querySelector(".bio-o");
+  if(!b||!i||!o)return;
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function loop(){
+    while(true){
+      b.classList.remove("is-off");i.classList.remove("is-off");o.classList.remove("is-off");
+      await wait(1600);
+      b.classList.add("is-off");
+      await wait(300);
+      o.classList.add("is-off");
+      await wait(180);
+      for(let n=0;n<3;n++){
+        i.classList.add("is-off");o.classList.remove("is-off");
+        await wait(300);
+        i.classList.remove("is-off");o.classList.add("is-off");
+        await wait(300);
+      }
+      i.classList.remove("is-off");o.classList.remove("is-off");
+      await wait(250);
+      b.classList.remove("is-off");
+      await wait(1500);
+    }
+  }
+  loop();
+})();
+
+/* VARIABLE PROXIMITY — vanilla equivalent for BIO copy */
+(function(){
+  const container=document.querySelector(".mf-about-text");
+  if(!container)return;
+  const radius=120;
+  const falloff="linear";
+  const texts=[...container.querySelectorAll("p, .mf-about-note")];
+  texts.forEach(el=>{
+    const label=el.textContent;
+    el.setAttribute("aria-label",label);
+    el.textContent="";
+    [...label].forEach(ch=>{
+      const span=document.createElement("span");
+      span.className="vp-char";
+      span.setAttribute("aria-hidden","true");
+      span.textContent=ch===" "?" ":ch;
+      el.appendChild(span);
+    });
+  });
+  let mouse={x:-9999,y:-9999},raf=0;
+  function update(){
+    raf=0;
+    container.querySelectorAll(".vp-char").forEach(char=>{
+      const r=char.getBoundingClientRect();
+      const dx=mouse.x-(r.left+r.width/2),dy=mouse.y-(r.top+r.height/2);
+      const d=Math.sqrt(dx*dx+dy*dy);
+      let n=Math.max(0,Math.min(1,1-d/radius));
+      if(falloff==="exponential")n=n*n;
+      else if(falloff==="gaussian")n=Math.exp(-Math.pow(d/(radius/2),2)/2);
+      const wght=400+(850-400)*n;
+      const opsz=9+(40-9)*n;
+      char.style.fontVariationSettings=`'wght' ${wght}, 'opsz' ${opsz}`;
+      char.style.fontWeight=String(Math.round(wght));
+    });
+  }
+  container.addEventListener("pointermove",e=>{mouse={x:e.clientX,y:e.clientY};if(!raf)raf=requestAnimationFrame(update);});
+  container.addEventListener("pointerleave",()=>{mouse={x:-9999,y:-9999};if(!raf)raf=requestAnimationFrame(update);});
+})();
 
 /* PRACTICE ROLL */
 function positionRollCopies(){document.querySelectorAll(".mf-roll").forEach(row=>{const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");if(!left||!right)return;const rowRect=row.getBoundingClientRect(),leftRect=left.getBoundingClientRect(),rightRect=right.getBoundingClientRect();const center=((leftRect.right+rightRect.left)/2)-rowRect.left;row.style.setProperty("--copy-x",center+"px");});}
