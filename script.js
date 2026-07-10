@@ -65,14 +65,24 @@ if(type==="strv"){
 }
 
 if(type==="symbio"){
-  title.innerHTML='<span class="xp-symbio-word">SYMBIO</span><span class="xp-symbio-digital"> Digital</span>';
-  const word=title.querySelector(".xp-symbio-word"),digital=title.querySelector(".xp-symbio-digital");
-  if(word&&digital){
-    word.style.transition="transform 1.25s cubic-bezier(.16,1,.3,1),letter-spacing 1.25s cubic-bezier(.16,1,.3,1),opacity 1.25s cubic-bezier(.16,1,.3,1)";
-    digital.style.transition="transform 1.25s cubic-bezier(.16,1,.3,1)";
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{if(killed)return;word.style.transform="translateX(-.22em) scaleX(.12)";word.style.letterSpacing="-.62em";word.style.opacity=".9";digital.style.transform="translateX(-4.55em)";}));
+  /* Wrap each char for individual fade */
+  const text="SYMBIO Digital";
+  title.innerHTML="";
+  for(const ch of text){
+    const s=document.createElement("span");
+    s.className="xp-char";
+    s.textContent=ch===" "?" ":ch;
+    s.style.transition="opacity .18s linear";
+    title.appendChild(s);
   }
-  t(()=>{title.innerHTML="☯ Digital";},1450);
+  const chars=[...title.querySelectorAll(".xp-char")];
+  /* Fade out one by one, 80ms apart */
+  chars.forEach((ch,i)=>t(()=>{ch.style.opacity="0"},i*80));
+  /* After all faded, show ☯ rotated 45deg + Digital */
+  t(()=>{
+    if(killed)return;
+    title.innerHTML='<span style="display:inline-block;transform:rotate(45deg);transform-origin:center;margin-right:.25em;">☯</span>Digital';
+  },chars.length*80+120);
 }
 
 if(type==="fg"){
@@ -111,3 +121,88 @@ document.querySelectorAll(".mf-roll").forEach(row=>{
     });
   });
 });
+
+/* XP CANVAS — interactive dot/image grid effect */
+(function(){
+  const wrap = document.getElementById("xpCanvasWrap");
+  const c    = document.getElementById("xpCanvas");
+  if(!wrap || !c) return;
+
+  const ctx = c.getContext("2d");
+  const cw  = 1200;
+  c.width = c.height = cw;
+
+  let cRect = c.getBoundingClientRect();
+  let sx = cw / (cRect.width  || 1);
+  let sy = cw / (cRect.height || 1);
+
+  const T = Math.PI * 2;
+  const m = { x:cw/2, y:cw/2, s:1.5, x2:cw/2, y2:cw/2 };
+
+  /* GSAP quick setters */
+  const xTo = gsap.quickTo(m, "x", {duration:1,   ease:"expo"});
+  const yTo = gsap.quickTo(m, "y", {duration:1,   ease:"expo"});
+  const sTo = gsap.quickTo(m, "s", {duration:2,   ease:"power2"});
+
+  let boxes = [];
+  const boxSize = 100;
+
+  /* B&W sea waves from Unsplash */
+  const imgUrl = "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1200&q=80&sat=-100";
+
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = imgUrl;
+  img.onload = () => {
+    boxes = [];
+    for(let x=0; x<=cw; x+=boxSize)
+      for(let y=0; y<=cw; y+=boxSize)
+        boxes.push({x, y, d:0, s:0});
+    gsap.ticker.add(update);
+    /* Fade in once image loads */
+    wrap.classList.add("visible");
+  };
+
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+
+  function update(){
+    const d = Math.hypot(m.x - m.x2, m.y - m.y2);
+    sTo(d / cw * 2);
+    ctx.clearRect(0, 0, cw, cw);
+    ctx.drawImage(img, 0, 0, cw, cw, 0, 0, cw, cw);
+    boxes.forEach(drawBox);
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    boxes.forEach(drawDot);
+  }
+
+  function drawBox(b){
+    b.d = Math.hypot(b.x - m.x, b.y - m.y);
+    b.s = 1 - gsap.utils.clamp(0, 1, b.d / cw / m.s);
+    if(b.s < 0.001) return;
+    const bs = boxSize * b.s;
+    ctx.drawImage(img, b.x+bs/2, b.y+bs/2, boxSize-bs, boxSize-bs, b.x, b.y, boxSize, boxSize);
+  }
+
+  function drawDot(b){
+    if(b.s < 0.001) return;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, boxSize * 0.12 * b.s, 0, T);
+    ctx.fill();
+  }
+
+  c.addEventListener("pointermove", e => {
+    cRect = c.getBoundingClientRect();
+    sx = cw / cRect.width;
+    sy = cw / cRect.height;
+    m.x2 = (e.clientX - cRect.left) * sx;
+    m.y2 = (e.clientY - cRect.top)  * sy;
+    xTo(m.x2);
+    yTo(m.y2);
+  });
+
+  window.addEventListener("resize", () => {
+    cRect = c.getBoundingClientRect();
+    sx = cw / cRect.width;
+    sy = cw / cRect.height;
+  });
+})();
