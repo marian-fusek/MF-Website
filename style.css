@@ -1382,3 +1382,99 @@ body {
     bottom: 3vh;
   }
 }
+
+/* ============================================================
+   V5 — exact footer centering and more compact signature
+   ============================================================ */
+.mf-footer {
+  position: relative;
+  min-height: 100vh;
+  height: 100vh;
+  padding: 0 6vw;
+}
+
+.mf-footer-inner {
+  position: absolute;
+  top: 50%;
+  left: 6vw;
+  right: 6vw;
+  width: auto;
+  height: 24px;
+  margin: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.mf-footer-links,
+.mf-footer-contact {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.mf-footer-typewriter {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: min(42vw, 620px);
+  max-width: none;
+  min-height: 1.45em;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mf-footer-name {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  transform: translateX(-50%);
+  font-size: clamp(9px, .72vw, 13px);
+  line-height: 1;
+  letter-spacing: -.025em;
+  font-weight: 400;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.mf-footer-bottom {
+  left: 6vw;
+  right: 6vw;
+  bottom: 3vh;
+}
+
+@media (max-width: 900px) {
+  .mf-footer { height: auto; min-height: 100vh; padding: 12vh 6vw 12vh; }
+  .mf-footer-inner {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    height: auto;
+    transform: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .mf-footer-typewriter {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    transform: none;
+    justify-content: flex-start;
+    text-align: left;
+    white-space: normal;
+  }
+}
