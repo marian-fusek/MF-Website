@@ -1478,3 +1478,30 @@ body {
     white-space: normal;
   }
 }
+
+
+/* ============================================================
+   V6 — miniature varied particles + footer signature placement
+   ============================================================ */
+.mf-footer-name {
+  left: 0;
+  top: auto;
+  bottom: calc(100% + 18px);
+  transform: none;
+  font-size: clamp(12px, .95vw, 16px);
+  line-height: 1;
+  letter-spacing: -.025em;
+  font-weight: 400;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .mf-footer-name {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    order: -1;
+    margin-bottom: 2px;
+  }
+}

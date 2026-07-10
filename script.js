@@ -222,7 +222,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=520;
+  const COUNT=680;
   const SHAPE_MAP={independent:"triangle",coach:"star",strv:"heart",symbio:"circle",fg:"arrow"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
@@ -238,7 +238,9 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         pos:p.createVector(p.random(-R,R),p.random(-R,R)),
         vel:p.createVector(p.random(-1.2,1.2),p.random(-1.2,1.2)),
         acc:p.createVector(0,0),
-        sz:p.random(3.2,6.8),
+        sz:p.random(.55,2.35),
+        alpha:p.random(.18,.82),
+        trail:p.random(1.8,5.8),
         phase:p.random(p.TWO_PI),
         phase2:p.random(p.TWO_PI)
       });
@@ -280,9 +282,22 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         pt.acc.mult(0);
 
         const motion=Math.min(1,pt.vel.mag()/Math.max(speed,.01));
+
+        /* Fine motion trail: only becomes visible while particles travel. */
+        if(motion>.06){
+          p.stroke(0,0,98,pt.alpha*motion*.34);
+          p.strokeWeight(Math.max(.28,pt.sz*.42));
+          p.line(
+            pt.pos.x-pt.vel.x*pt.trail,
+            pt.pos.y-pt.vel.y*pt.trail,
+            pt.pos.x,
+            pt.pos.y
+          );
+        }
+
         p.noStroke();
-        p.fill(0,0,96,.58+motion*.32);
-        p.circle(pt.pos.x,pt.pos.y,pt.sz*(1+motion*.22));
+        p.fill(0,0,98,Math.min(.94,pt.alpha+motion*.16));
+        p.circle(pt.pos.x,pt.pos.y,pt.sz*(1+motion*.14));
       });
     };
 
