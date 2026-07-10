@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grid Reel — photo grid animator</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">
+    <span class="brand"><span class="brand-dot"></span>Grid Reel</span>
+    <div class="spacer"></div>
+    <span class="hint">Upload up to 6 photos, pick a motion, export as embeddable HTML.</span>
+  </header>
+
+  <!-- LEFT: preset library -->
+  <aside class="panel panel-left" id="presetList"></aside>
+
+  <!-- CENTER: stage -->
+  <section class="stage-wrap">
+    <div class="ratio-switch">
+      <button class="ratio-btn" data-ratio="16:9">16:9</button>
+      <button class="ratio-btn" data-ratio="4:3">4:3</button>
+      <button class="ratio-btn active" data-ratio="1:1">1:1</button>
+      <button class="ratio-btn" data-ratio="4:5">4:5</button>
+      <button class="ratio-btn" data-ratio="9:16">9:16</button>
+    </div>
+    <div class="frame" id="frame">
+      <div class="grid-root" id="gridRoot"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: media + controls -->
+  <aside class="panel panel-right">
+    <div class="panel-section-title">Media · 6 slots</div>
+    <div class="slots" id="slots"></div>
+    <button class="ghost-btn" id="clearImagesBtn">Clear images</button>
+
+    <div class="panel-section-title">Timing</div>
+    <div class="control-row">
+      <span class="label">Loop duration</span>
+      <span class="value" id="loopVal">8.0s</span>
+    </div>
+    <div class="chip-row">
+      <button class="chip" data-loop="5">5s</button>
+      <button class="chip active" data-loop="8">8s</button>
+      <button class="chip" data-loop="10">10s</button>
+      <button class="chip" data-loop="15">15s</button>
+    </div>
+
+    <div class="panel-section-title" id="activePresetTitle">POP GRID</div>
+
+    <div class="control-row">
+      <span class="label">Background</span>
+    </div>
+    <div class="color-row">
+      <input type="text" id="bgHex" value="#0c0c0c" />
+      <input type="color" id="bgColor" value="#0c0c0c" />
+    </div>
+
+    <div class="control-row">
+      <span class="label">Padding</span>
+      <span class="value" id="paddingVal">6%</span>
+    </div>
+    <input type="range" class="range" id="paddingRange" min="0" max="15" step="0.5" value="6" />
+
+    <div class="control-row">
+      <span class="label">Corner radius</span>
+      <span class="value" id="radiusVal">3%</span>
+    </div>
+    <input type="range" class="range" id="radiusRange" min="0" max="20" step="0.5" value="3" />
+
+    <div class="control-row">
+      <span class="label">Gap</span>
+      <span class="value" id="gapVal">3%</span>
+    </div>
+    <input type="range" class="range" id="gapRange" min="0" max="10" step="0.5" value="3" />
+
+    <div class="control-row">
+      <span class="label">Intensity</span>
+      <span class="value" id="ampVal">100%</span>
+    </div>
+    <input type="range" class="range" id="ampRange" min="0.3" max="1.8" step="0.05" value="1" />
+
+    <div class="control-row">
+      <span class="label">Stagger</span>
+      <span class="value" id="stagVal">100%</span>
+    </div>
+    <input type="range" class="range" id="stagRange" min="0" max="2" step="0.05" value="1" />
+  </aside>
+
+  <!-- BOTTOM: transport -->
+  <footer class="transport">
+    <button class="tbtn" id="playBtn"></button>
+    <button class="tbtn" id="restartBtn" title="Restart">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 1-5.29 3.17L4 6.5 1 7 1.5 4l1.2 1.2A6 6 0 0 1 8 2z"/></svg>
+    </button>
+    <input type="range" class="scrubber" id="scrub" min="0" max="1000" value="0" />
+    <span class="time-label" id="timeLabel">0.0s / 8.0s</span>
+    <button class="export-btn" id="exportBtn">Export embed</button>
+  </footer>
+
+</div>
+
+<input type="file" id="hiddenFileInput" accept="image/*" />
+<script src="script.js"></script>
+</body>
+</html>
