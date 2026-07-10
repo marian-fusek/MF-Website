@@ -65,32 +65,22 @@ if(type==="strv"){
 }
 
 if(type==="symbio"){
-  /* Wrap each char for individual fade */
-  const text="SYMBIO Digital";
-  title.innerHTML="";
-  for(const ch of text){
-    const s=document.createElement("span");
-    s.className="xp-char";
-    s.textContent=ch===" "?" ":ch;
-    s.style.transition="opacity .18s linear";
-    title.appendChild(s);
+  title.innerHTML='<span class="xp-symbio-word">SYMBIO</span><span class="xp-symbio-digital"> Digital</span>';
+  const word=title.querySelector(".xp-symbio-word"),digital=title.querySelector(".xp-symbio-digital");
+  if(word&&digital){
+    word.style.transition="transform 1.25s cubic-bezier(.16,1,.3,1),letter-spacing 1.25s cubic-bezier(.16,1,.3,1),opacity 1.25s cubic-bezier(.16,1,.3,1)";
+    digital.style.transition="transform 1.25s cubic-bezier(.16,1,.3,1)";
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{if(killed)return;word.style.transform="translateX(-.22em) scaleX(.12)";word.style.letterSpacing="-.62em";word.style.opacity=".9";digital.style.transform="translateX(-4.55em)";}));
   }
-  const chars=[...title.querySelectorAll(".xp-char")];
-  /* Fade out one by one, 80ms apart */
-  chars.forEach((ch,i)=>t(()=>{ch.style.opacity="0"},i*80));
-  /* After all faded, show ☯ rotated 45deg + Digital */
-  t(()=>{
-    if(killed)return;
-    title.innerHTML='<span style="display:inline-block;transform:rotate(45deg);transform-origin:center;margin-right:.25em;">☯</span>Digital';
-  },chars.length*80+120);
+  t(()=>{title.innerHTML="☯ Digital";},1450);
 }
 
 if(type==="fg"){
-  t(()=>setPlain(title,"FG 1"),500);
-  t(()=>setPlain(title,"FG 2"),1400);
-  t(()=>setPlain(title,"FG 3"),2300);
-  t(()=>setPlain(title,"FG 4"),3200);
-  t(()=>{setPlain(title,"FG 4rest");clearAll();},4100);
+  t(()=>setPlain(title,"FG 1"),300);
+  t(()=>setPlain(title,"FG 2"),700);
+  t(()=>setPlain(title,"FG 3"),1100);
+  t(()=>setPlain(title,"FG 4"),1500);
+  t(()=>{setPlain(title,"FG 4rest");clearAll();},1900);
 }
 
 return ()=>{killed=true;clearAll();resetTitle(title);};}
@@ -122,87 +112,211 @@ document.querySelectorAll(".mf-roll").forEach(row=>{
   });
 });
 
-/* XP CANVAS — interactive dot/image grid effect */
+/* XP SHAPE — p5.js particle shapes, one per card hover */
 (function(){
-  const wrap = document.getElementById("xpCanvasWrap");
-  const c    = document.getElementById("xpCanvas");
-  if(!wrap || !c) return;
+  const container = document.getElementById("xpShape");
+  if(!container || typeof p5 === "undefined") return;
 
-  const ctx = c.getContext("2d");
-  const cw  = 1200;
-  c.width = c.height = cw;
+  const PARTICLES_COUNT = 900;
+  const MAX_SPEED = 5.0;
+  const MAX_FORCE = 0.25;
+  const MORPH_DURATION = 40;
 
-  let cRect = c.getBoundingClientRect();
-  let sx = cw / (cRect.width  || 1);
-  let sy = cw / (cRect.height || 1);
-
-  const T = Math.PI * 2;
-  const m = { x:cw/2, y:cw/2, s:1.5, x2:cw/2, y2:cw/2 };
-
-  /* GSAP quick setters */
-  const xTo = gsap.quickTo(m, "x", {duration:1,   ease:"expo"});
-  const yTo = gsap.quickTo(m, "y", {duration:1,   ease:"expo"});
-  const sTo = gsap.quickTo(m, "s", {duration:2,   ease:"power2"});
-
-  let boxes = [];
-  const boxSize = 100;
-
-  /* B&W sea waves from Unsplash */
-  const imgUrl = "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1200&q=80&sat=-100";
-
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = imgUrl;
-  img.onload = () => {
-    boxes = [];
-    for(let x=0; x<=cw; x+=boxSize)
-      for(let y=0; y<=cw; y+=boxSize)
-        boxes.push({x, y, d:0, s:0});
-    gsap.ticker.add(update);
-    /* Fade in once image loads */
-    wrap.classList.add("visible");
+  /* Shape index per card */
+  const SHAPE_MAP = {
+    independent: "triangle",
+    coach:       "star",
+    strv:        "heart",
+    symbio:      "circle",
+    fg:          "arrow"
   };
 
-  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  /* Default: circle */
+  let currentShape = "circle";
+  let targetShape  = "circle";
+  let morphFrame   = 0;
+  let isMorphing   = false;
 
-  function update(){
-    const d = Math.hypot(m.x - m.x2, m.y - m.y2);
-    sTo(d / cw * 2);
-    ctx.clearRect(0, 0, cw, cw);
-    ctx.drawImage(img, 0, 0, cw, cw, 0, 0, cw, cw);
-    boxes.forEach(drawBox);
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    boxes.forEach(drawDot);
-  }
+  const sketch = (p) => {
+    let particles = [];
+    let R; /* shape radius */
 
-  function drawBox(b){
-    b.d = Math.hypot(b.x - m.x, b.y - m.y);
-    b.s = 1 - gsap.utils.clamp(0, 1, b.d / cw / m.s);
-    if(b.s < 0.001) return;
-    const bs = boxSize * b.s;
-    ctx.drawImage(img, b.x+bs/2, b.y+bs/2, boxSize-bs, boxSize-bs, b.x, b.y, boxSize, boxSize);
-  }
+    p.setup = () => {
+      const cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);
+      cnv.parent(container);
+      p.colorMode(p.HSB, 360, 100, 100, 1);
+      p.background(0,0,0,0);
+      R = Math.min(p.width, p.height) * 0.28;
 
-  function drawDot(b){
-    if(b.s < 0.001) return;
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, boxSize * 0.12 * b.s, 0, T);
-    ctx.fill();
-  }
+      for(let i=0; i<PARTICLES_COUNT; i++){
+        const part = {
+          pos: p.createVector(p.random(-p.width/2, p.width/2), p.random(-p.height/2, p.height/2)),
+          vel: p.createVector(0,0),
+          acc: p.createVector(0,0),
+          prev: p.createVector(0,0),
+          spd: p.random(1, MAX_SPEED),
+          frc: p.random(0.05, MAX_FORCE),
+          sz:  p.random(0.5, 2.2)
+        };
+        part.prev.set(part.pos);
+        particles.push(part);
+      }
+    };
 
-  c.addEventListener("pointermove", e => {
-    cRect = c.getBoundingClientRect();
-    sx = cw / cRect.width;
-    sy = cw / cRect.height;
-    m.x2 = (e.clientX - cRect.left) * sx;
-    m.y2 = (e.clientY - cRect.top)  * sy;
-    xTo(m.x2);
-    yTo(m.y2);
+    p.draw = () => {
+      p.background(0, 0, 0, 0.22);
+      p.translate(p.width/2, p.height/2);
+
+      if(isMorphing){
+        morphFrame++;
+        if(morphFrame >= MORPH_DURATION){
+          isMorphing  = false;
+          morphFrame  = 0;
+          currentShape = targetShape;
+        }
+      }
+
+      for(let i=0; i<particles.length; i++){
+        const part = particles[i];
+        const angle = p.map(i, 0, PARTICLES_COUNT, 0, p.TWO_PI);
+
+        const from = shapePos(p, currentShape, angle, R);
+        let to;
+        if(isMorphing){
+          const toP = shapePos(p, targetShape, angle, R);
+          const ease = easeInOut(morphFrame / MORPH_DURATION);
+          to = p5.Vector.lerp(from, toP, ease);
+        } else {
+          to = from;
+        }
+
+        /* seek */
+        const desired = p5.Vector.sub(to, part.pos);
+        desired.setMag(part.spd);
+        const steer = p5.Vector.sub(desired, part.vel);
+        steer.limit(part.frc);
+        part.acc.add(steer);
+        part.vel.add(part.acc);
+        part.vel.limit(part.spd);
+        part.pos.add(part.vel);
+        part.acc.mult(0);
+
+        /* draw */
+        const spd = part.vel.mag();
+        const br  = p.map(spd, 0, part.spd, 55, 100);
+        const al  = p.map(spd, 0, part.spd, 0.08, 0.75);
+        const wt  = p.map(spd, 0, part.spd, part.sz*0.4, part.sz);
+        p.stroke(0, 0, br, al);
+        p.strokeWeight(wt);
+        p.line(part.pos.x, part.pos.y, part.prev.x, part.prev.y);
+        part.prev.set(part.pos);
+      }
+    };
+
+    p.windowResized = () => {
+      p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+      R = Math.min(p.width, p.height) * 0.28;
+    };
+
+    /* Expose morph trigger */
+    window._xpMorph = (shape) => {
+      if(shape === currentShape && !isMorphing) return;
+      targetShape = shape;
+      morphFrame  = 0;
+      isMorphing  = true;
+    };
+  };
+
+  new p5(sketch, container);
+
+  /* Wire up card hovers */
+  const track = document.getElementById("timelineItems");
+  if(!track) return;
+  track.querySelectorAll(".mf-xp-card").forEach(card => {
+    const effect = card.dataset.xpEffect;
+    const shape  = SHAPE_MAP[effect] || "circle";
+    card.addEventListener("mouseenter", () => { if(window._xpMorph) window._xpMorph(shape); });
+    card.addEventListener("mouseleave", () => { if(window._xpMorph) window._xpMorph("circle"); });
   });
 
-  window.addEventListener("resize", () => {
-    cRect = c.getBoundingClientRect();
-    sx = cw / cRect.width;
-    sy = cw / cRect.height;
-  });
+  /* Shape position functions */
+  function shapePos(p, shape, angle, r){
+    switch(shape){
+      case "circle":   return circlePos(p, angle, r);
+      case "triangle": return trianglePos(p, angle, r);
+      case "star":     return starPos(p, angle, r);
+      case "heart":    return heartPos(p, angle, r);
+      case "arrow":    return arrowPos(p, angle, r);
+      default:         return circlePos(p, angle, r);
+    }
+  }
+
+  function circlePos(p, angle, r){
+    return p.createVector(p.cos(angle)*r, p.sin(angle)*r);
+  }
+
+  function trianglePos(p, angle, r){
+    angle -= p.PI/2;
+    let a = ((angle % p.TWO_PI) + p.TWO_PI) % p.TWO_PI;
+    const side = Math.floor(a / (p.TWO_PI/3));
+    const t    = (a % (p.TWO_PI/3)) / (p.TWO_PI/3);
+    const p1   = p.createVector(p.cos(side*p.TWO_PI/3)*r, p.sin(side*p.TWO_PI/3)*r);
+    const p2   = p.createVector(p.cos((side+1)*p.TWO_PI/3)*r, p.sin((side+1)*p.TWO_PI/3)*r);
+    return p5.Vector.lerp(p1, p2, t);
+  }
+
+  function starPos(p, angle, r){
+    const outer = r, inner = r*0.45, pts = 5;
+    const step  = p.TWO_PI / (pts*2);
+    let a = angle - p.PI/2;
+    const seg = Math.floor(a / step);
+    const r1  = (seg%2===0) ? outer : inner;
+    const r2  = (seg%2===0) ? inner : outer;
+    const t   = (a - seg*step) / step;
+    const p1  = p.createVector(p.cos(seg*step)*r1, p.sin(seg*step)*r1);
+    const p2  = p.createVector(p.cos((seg+1)*step)*r2, p.sin((seg+1)*step)*r2);
+    return p5.Vector.lerp(p1, p2, t);
+  }
+
+  function heartPos(p, angle, r){
+    /* Parametric heart */
+    const t = angle - p.PI/2;
+    const scale = r / 17;
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+    return p.createVector(x*scale, y*scale);
+  }
+
+  function arrowPos(p, angle, r){
+    /* Upward arrow outline — normalize angle to 0–TWO_PI */
+    let a = ((angle % p.TWO_PI) + p.TWO_PI) % p.TWO_PI;
+    const total = p.TWO_PI;
+    /* Arrow made of 6 segments:
+       0-1/6: right side of arrowhead going up-right
+       1/6-2/6: right side of arrowhead going down
+       2/6-3/6: right side of shaft going down
+       3/6-4/6: bottom of shaft going left
+       4/6-5/6: left side of shaft going up
+       5/6-6/6: left side of arrowhead going up-right */
+    const pts = [
+      p.createVector(0,       -r),        /* tip */
+      p.createVector(r*0.55,  -r*0.25),   /* right arrowhead */
+      p.createVector(r*0.25,  -r*0.25),   /* right inner */
+      p.createVector(r*0.25,   r*0.75),   /* right shaft bottom */
+      p.createVector(-r*0.25,  r*0.75),   /* left shaft bottom */
+      p.createVector(-r*0.25, -r*0.25),   /* left inner */
+      p.createVector(-r*0.55, -r*0.25),   /* left arrowhead */
+    ];
+    const segs = pts.length;
+    const segLen = total / segs;
+    const seg = Math.floor(a / segLen);
+    const t   = (a - seg*segLen) / segLen;
+    const from = pts[seg % segs];
+    const to   = pts[(seg+1) % segs];
+    return p5.Vector.lerp(from, to, t);
+  }
+
+  function easeInOut(t){
+    return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+  }
 })();
