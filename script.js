@@ -120,9 +120,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const target=document.getElementById("metaText");
   if(!target)return;
   const lines=[
-    "18+ YEARS IN DIGITAL",
-    "LED DESIGN & ENGINEERING TEAMS",
-    "BUILT BRANDS, PRODUCTS & PEOPLE"
+    "20+ YEARS OF XP",
+    "DESIGN, LEADERSHIP, COACHING, EMPATHY",
+    "SUPERPOWER: FINDING YOUR SUPERPOWER"
   ];
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function loop(){
@@ -167,43 +167,49 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   loop();
 })();
 
-/* VARIABLE PROXIMITY — vanilla equivalent for BIO copy */
+/* VARIABLE PROXIMITY — word-safe BIO copy */
 (function(){
   const container=document.querySelector(".mf-about-text");
   if(!container)return;
   const radius=120;
-  const falloff="linear";
   const texts=[...container.querySelectorAll("p, .mf-about-note")];
+
   texts.forEach(el=>{
     const label=el.textContent;
     el.setAttribute("aria-label",label);
     el.textContent="";
-    [...label].forEach(ch=>{
-      const span=document.createElement("span");
-      span.className="vp-char";
-      span.setAttribute("aria-hidden","true");
-      span.textContent=ch===" "?" ":ch;
-      el.appendChild(span);
+    const words=label.split(" ");
+    words.forEach((word,wordIndex)=>{
+      const wordSpan=document.createElement("span");
+      wordSpan.className="vp-word";
+      [...word].forEach(ch=>{
+        const span=document.createElement("span");
+        span.className="vp-char";
+        span.setAttribute("aria-hidden","true");
+        span.textContent=ch;
+        wordSpan.appendChild(span);
+      });
+      el.appendChild(wordSpan);
+      if(wordIndex<words.length-1)el.appendChild(document.createTextNode(" "));
     });
   });
-  let mouse={x:-9999,y:-9999},raf=0;
+
+  let mouse={x:-9999,y:-9999},raf=0,inside=false;
   function update(){
     raf=0;
     container.querySelectorAll(".vp-char").forEach(char=>{
       const r=char.getBoundingClientRect();
       const dx=mouse.x-(r.left+r.width/2),dy=mouse.y-(r.top+r.height/2);
       const d=Math.sqrt(dx*dx+dy*dy);
-      let n=Math.max(0,Math.min(1,1-d/radius));
-      if(falloff==="exponential")n=n*n;
-      else if(falloff==="gaussian")n=Math.exp(-Math.pow(d/(radius/2),2)/2);
+      const n=Math.max(0,Math.min(1,1-d/radius));
       const wght=400+(850-400)*n;
-      const opsz=9+(40-9)*n;
-      char.style.fontVariationSettings=`'wght' ${wght}, 'opsz' ${opsz}`;
+      char.style.fontVariationSettings=`'wght' ${wght}, 'opsz' ${9+(40-9)*n}`;
       char.style.fontWeight=String(Math.round(wght));
+      char.style.opacity=String(.8+(.2*n));
     });
   }
-  container.addEventListener("pointermove",e=>{mouse={x:e.clientX,y:e.clientY};if(!raf)raf=requestAnimationFrame(update);});
-  container.addEventListener("pointerleave",()=>{mouse={x:-9999,y:-9999};if(!raf)raf=requestAnimationFrame(update);});
+  container.addEventListener("pointermove",e=>{inside=true;mouse={x:e.clientX,y:e.clientY};if(!raf)raf=requestAnimationFrame(update);});
+  container.addEventListener("pointerleave",()=>{inside=false;mouse={x:-9999,y:-9999};if(!raf)raf=requestAnimationFrame(update);});
 })();
 
 /* PRACTICE ROLL */
@@ -212,23 +218,129 @@ positionRollCopies();
 window.addEventListener("resize",positionRollCopies);
 document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].forEach(event=>{row.addEventListener(event,()=>{requestAnimationFrame(positionRollCopies);[100,200,300,400,500,600,700].forEach(ms=>setTimeout(positionRollCopies,ms));});});});
 
-/* XP SHAPE — p5.js particle shapes */
+/* XP SHAPE — transparent, restrained particle morphs */
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=450,IDLE_SPEED=0.6,SEEK_SPEED=5.0,IDLE_FORCE=0.015,SEEK_FORCE=0.22,MORPH_DUR=35;
+  const COUNT=380;
   const SHAPE_MAP={independent:"triangle",coach:"star",strv:"heart",symbio:"circle",fg:"arrow"};
-  let currentShape="circle",targetShape="circle",morphFrame=0,isMorphing=false,isHovering=false;
-  const sketch=(p)=>{
-    let particles=[],R;
-    p.setup=()=>{const cnv=p.createCanvas(container.offsetWidth,container.offsetHeight);cnv.parent(container);p.colorMode(p.HSB,360,100,100,1);p.background(0,0,0,0);R=Math.min(p.width,p.height)*.3;for(let i=0;i<COUNT;i++){particles.push({pos:p.createVector(p.random(-p.width/2,p.width/2),p.random(-p.height/2,p.height/2)),vel:p.createVector(p.random(-.5,.5),p.random(-.5,.5)),acc:p.createVector(0,0),sz:p.random(1.5,3.5)});}};
-    p.draw=()=>{p.background(0,0,0,.18);p.translate(p.width/2,p.height/2);if(isMorphing){morphFrame++;if(morphFrame>=MORPH_DUR){isMorphing=false;morphFrame=0;currentShape=targetShape;}}const spd=isHovering?SEEK_SPEED:IDLE_SPEED,frc=isHovering?SEEK_FORCE:IDLE_FORCE;for(let i=0;i<particles.length;i++){const pt=particles[i],angle=p.map(i,0,COUNT,0,p.TWO_PI);const from=shapePos(p,currentShape,angle,R);let to;if(isMorphing){const toP=shapePos(p,targetShape,angle,R);const e=easeInOut(morphFrame/MORPH_DUR);to=p5.Vector.lerp(from,toP,e);}else{to=from;}const desired=p5.Vector.sub(to,pt.pos);desired.setMag(spd);const steer=p5.Vector.sub(desired,pt.vel);steer.limit(frc);pt.acc.add(steer);pt.vel.add(pt.acc);pt.vel.limit(spd);pt.pos.add(pt.vel);pt.acc.mult(0);const s=pt.vel.mag(),br=p.map(s,0,spd,55,100),al=p.map(s,0,spd,.1,.8),sz=p.map(s,0,spd,pt.sz*.4,pt.sz);p.noStroke();p.fill(0,0,br,al);p.circle(pt.pos.x,pt.pos.y,sz);}};
-    p.windowResized=()=>{p.resizeCanvas(container.offsetWidth,container.offsetHeight);R=Math.min(p.width,p.height)*.3;};
-    window._xpMorph=(shape,hovering)=>{isHovering=hovering;if(shape===currentShape&&!isMorphing)return;targetShape=shape;morphFrame=0;isMorphing=true;};
+  let currentShape="circle",targetShape="circle",morphFrame=0,morphDuration=36,isMorphing=false,isHovering=false;
+
+  const sketch=p=>{
+    let particles=[],R=0;
+    p.setup=()=>{
+      const cnv=p.createCanvas(container.offsetWidth,container.offsetHeight);
+      cnv.parent(container);
+      p.colorMode(p.HSB,360,100,100,1);
+      R=Math.min(p.width,p.height)*.27;
+      for(let i=0;i<COUNT;i++)particles.push({
+        pos:p.createVector(p.random(-R,R),p.random(-R,R)),
+        vel:p.createVector(p.random(-.08,.08),p.random(-.08,.08)),
+        acc:p.createVector(0,0),
+        sz:p.random(1.25,2.7)
+      });
+    };
+
+    p.draw=()=>{
+      p.clear();
+      p.translate(p.width/2,p.height/2);
+      if(isMorphing){
+        morphFrame++;
+        if(morphFrame>=morphDuration){isMorphing=false;morphFrame=0;currentShape=targetShape;}
+      }
+      const breathe=1+Math.sin(p.frameCount*.018)*.007;
+      const speed=isHovering?2.15:.72;
+      const force=isHovering?.14:.05;
+      const damping=isHovering?.84:.9;
+
+      particles.forEach((pt,i)=>{
+        const angle=p.map(i,0,COUNT,0,p.TWO_PI);
+        const from=shapePos(p,currentShape,angle,R*breathe);
+        let target=from;
+        if(isMorphing){
+          const to=shapePos(p,targetShape,angle,R*breathe);
+          target=p5.Vector.lerp(from,to,easeInOut(morphFrame/morphDuration));
+        }
+        const desired=p5.Vector.sub(target,pt.pos);
+        if(desired.mag()>.01)desired.setMag(Math.min(speed,desired.mag()*.18));
+        const steer=p5.Vector.sub(desired,pt.vel).limit(force);
+        pt.acc.add(steer);
+        pt.vel.add(pt.acc).mult(damping).limit(speed);
+        pt.pos.add(pt.vel);
+        pt.acc.mult(0);
+
+        const motion=Math.min(1,pt.vel.mag()/Math.max(speed,.01));
+        p.noStroke();
+        p.fill(0,0,92,.38+motion*.25);
+        p.circle(pt.pos.x,pt.pos.y,pt.sz*(.82+motion*.18));
+      });
+    };
+
+    p.windowResized=()=>{
+      p.resizeCanvas(container.offsetWidth,container.offsetHeight);
+      R=Math.min(p.width,p.height)*.27;
+    };
+
+    window._xpMorph=(shape,hovering)=>{
+      isHovering=hovering;
+      targetShape=shape;
+      morphFrame=0;
+      morphDuration=hovering?36:18;
+      isMorphing=true;
+    };
   };
+
   new p5(sketch,container);
-  const track=document.getElementById("timelineItems");if(!track)return;
-  track.querySelectorAll(".mf-xp-card").forEach(card=>{const shape=SHAPE_MAP[card.dataset.xpEffect]||"circle";card.addEventListener("mouseenter",()=>{if(window._xpMorph)window._xpMorph(shape,true);});card.addEventListener("mouseleave",()=>{if(window._xpMorph)window._xpMorph("circle",false);});});
-  function shapePos(p,shape,angle,r){switch(shape){case"circle":return p.createVector(p.cos(angle)*r,p.sin(angle)*r);case"triangle":{angle-=p.PI/2;let a=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI;const side=Math.floor(a/(p.TWO_PI/3)),t=(a%(p.TWO_PI/3))/(p.TWO_PI/3),p1=p.createVector(p.cos(side*p.TWO_PI/3)*r,p.sin(side*p.TWO_PI/3)*r),p2=p.createVector(p.cos((side+1)*p.TWO_PI/3)*r,p.sin((side+1)*p.TWO_PI/3)*r);return p5.Vector.lerp(p1,p2,t);}case"star":{const outer=r,inner=r*.45,step=p.TWO_PI/10;let a=angle-p.PI/2;const seg=Math.floor(a/step),r1=seg%2===0?outer:inner,r2=seg%2===0?inner:outer,t=(a-seg*step)/step,p1=p.createVector(p.cos(seg*step)*r1,p.sin(seg*step)*r1),p2=p.createVector(p.cos((seg+1)*step)*r2,p.sin((seg+1)*step)*r2);return p5.Vector.lerp(p1,p2,t);}case"heart":{const t=angle-p.PI/2,sc=r/17,x=16*Math.pow(Math.sin(t),3),y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));return p.createVector(x*sc,y*sc);}case"arrow":{let a=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI;const pts=[p.createVector(0,-r),p.createVector(r*.55,-r*.25),p.createVector(r*.25,-r*.25),p.createVector(r*.25,r*.75),p.createVector(-r*.25,r*.75),p.createVector(-r*.25,-r*.25),p.createVector(-r*.55,-r*.25)];const segLen=p.TWO_PI/pts.length,seg=Math.floor(a/segLen),t=(a-seg*segLen)/segLen;return p5.Vector.lerp(pts[seg%pts.length],pts[(seg+1)%pts.length],t);}default:return p.createVector(0,0);}}
+  const track=document.getElementById("timelineItems");
+  if(track)track.querySelectorAll(".mf-xp-card").forEach(card=>{
+    const shape=SHAPE_MAP[card.dataset.xpEffect]||"circle";
+    card.addEventListener("mouseenter",()=>window._xpMorph&&window._xpMorph(shape,true));
+    card.addEventListener("mouseleave",()=>window._xpMorph&&window._xpMorph("circle",false));
+  });
+
+  function shapePos(p,shape,angle,r){
+    switch(shape){
+      case"circle":return p.createVector(p.cos(angle)*r,p.sin(angle)*r);
+      case"triangle":{
+        const a=((angle-p.PI/2)%p.TWO_PI+p.TWO_PI)%p.TWO_PI,side=Math.floor(a/(p.TWO_PI/3)),t=(a%(p.TWO_PI/3))/(p.TWO_PI/3);
+        return p5.Vector.lerp(p.createVector(p.cos(side*p.TWO_PI/3-p.PI/2)*r,p.sin(side*p.TWO_PI/3-p.PI/2)*r),p.createVector(p.cos((side+1)*p.TWO_PI/3-p.PI/2)*r,p.sin((side+1)*p.TWO_PI/3-p.PI/2)*r),t);
+      }
+      case"star":{
+        const step=p.TWO_PI/10,a=((angle-p.PI/2)%p.TWO_PI+p.TWO_PI)%p.TWO_PI,seg=Math.floor(a/step),t=(a-seg*step)/step;
+        const r1=seg%2===0?r:r*.45,r2=seg%2===0?r*.45:r;
+        return p5.Vector.lerp(p.createVector(p.cos(seg*step-p.PI/2)*r1,p.sin(seg*step-p.PI/2)*r1),p.createVector(p.cos((seg+1)*step-p.PI/2)*r2,p.sin((seg+1)*step-p.PI/2)*r2),t);
+      }
+      case"heart":{
+        const t=angle-p.PI/2,sc=r/17,x=16*Math.pow(Math.sin(t),3),y=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+        return p.createVector(x*sc,y*sc);
+      }
+      case"arrow":{
+        const a=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI,pts=[p.createVector(0,-r),p.createVector(r*.55,-r*.25),p.createVector(r*.25,-r*.25),p.createVector(r*.25,r*.75),p.createVector(-r*.25,r*.75),p.createVector(-r*.25,-r*.25),p.createVector(-r*.55,-r*.25)];
+        const len=p.TWO_PI/pts.length,seg=Math.floor(a/len),t=(a-seg*len)/len;
+        return p5.Vector.lerp(pts[seg%pts.length],pts[(seg+1)%pts.length],t);
+      }
+      default:return p.createVector(0,0);
+    }
+  }
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+})();
+
+/* FOOTER TYPEWRITER */
+(function(){
+  const target=document.getElementById("twText");
+  if(!target)return;
+  const lines=["AVAILABLE FOR SELECTED PROJECTS","LET'S FIND THE THING WORTH BUILDING"];
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  async function loop(){
+    while(true){
+      for(const line of lines){
+        target.textContent="";
+        for(const ch of line){target.textContent+=ch;await wait(42);}
+        await wait(1450);
+        while(target.textContent.length){target.textContent=target.textContent.slice(0,-1);await wait(18);}
+        await wait(320);
+      }
+    }
+  }
+  loop();
 })();

@@ -1154,3 +1154,128 @@ body {
     justify-self: start;
   }
 }
+/* ============================================================
+   JULY 2026 REFINEMENTS
+   ============================================================ */
+
+/* XP particles remain transparent and physically separated from the timeline. */
+.mf-xp {
+  position: relative;
+  justify-content: flex-start;
+  background: transparent;
+}
+
+.mf-xp-shape {
+  top: 4vh;
+  right: 4vw;
+  bottom: auto;
+  left: 4vw;
+  height: 42vh;
+  background: transparent;
+  opacity: .72;
+  overflow: hidden;
+}
+
+.mf-xp-shape canvas {
+  background: transparent !important;
+}
+
+.mf-xp-track {
+  margin-top: 43vh;
+}
+
+/* BIO: preserve whole words and use 80% resting opacity. */
+.vp-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.vp-char {
+  opacity: .8;
+  transition: font-weight .08s linear, opacity .08s linear;
+}
+
+/* Footer rebuilt as menu / typewriter / contacts, with the name grounded below. */
+.mf-footer {
+  padding: 12vh 6vw 3vh;
+}
+
+.mf-footer-inner {
+  grid-template-columns: repeat(12, 1fr);
+  align-items: center;
+  margin-top: 27vh;
+}
+
+.mf-footer-links {
+  grid-column: 1 / 4;
+  align-self: center;
+  gap: clamp(20px, 2.1vw, 40px);
+}
+
+.mf-footer-typewriter {
+  grid-column: 4 / 9;
+  justify-self: center;
+  align-self: center;
+  width: min(100%, 520px);
+  max-width: none;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+.mf-footer-contact {
+  grid-column: 9 / 13;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: clamp(24px, 3vw, 58px);
+}
+
+.mf-footer-name {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  transform: translateX(-50%);
+  width: max-content;
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(28px, 5.2vw, 88px);
+  line-height: .9;
+  letter-spacing: -.06em;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mf-footer-bottom {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.7);
+}
+
+@media (max-width: 900px) {
+  .mf-xp-shape { top: 8vh; height: 34vh; }
+  .mf-xp-track { margin-top: 35vh; }
+
+  .mf-footer-inner {
+    grid-template-columns: 1fr;
+    margin-top: 16vh;
+    gap: 42px;
+  }
+  .mf-footer-links,
+  .mf-footer-typewriter,
+  .mf-footer-contact {
+    grid-column: 1;
+    justify-self: start;
+    text-align: left;
+  }
+  .mf-footer-contact { justify-content: flex-start; }
+  .mf-footer-name { bottom: 10vh; }
+}
