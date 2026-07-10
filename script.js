@@ -218,13 +218,13 @@ positionRollCopies();
 window.addEventListener("resize",positionRollCopies);
 document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].forEach(event=>{row.addEventListener(event,()=>{requestAnimationFrame(positionRollCopies);[100,200,300,400,500,600,700].forEach(ms=>setTimeout(positionRollCopies,ms));});});});
 
-/* XP SHAPE — transparent, restrained particle morphs */
+/* XP SHAPE — large, fast-forming particle morphs with restrained breathing */
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=380;
+  const COUNT=520;
   const SHAPE_MAP={independent:"triangle",coach:"star",strv:"heart",symbio:"circle",fg:"arrow"};
-  let currentShape="circle",targetShape="circle",morphFrame=0,morphDuration=36,isMorphing=false,isHovering=false;
+  let currentShape="circle",targetShape="circle",morphFrame=0,morphDuration=12,isMorphing=false,isHovering=false;
 
   const sketch=p=>{
     let particles=[],R=0;
@@ -232,12 +232,13 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       const cnv=p.createCanvas(container.offsetWidth,container.offsetHeight);
       cnv.parent(container);
       p.colorMode(p.HSB,360,100,100,1);
-      R=Math.min(p.width,p.height)*.27;
+      R=Math.min(p.width,p.height)*.39;
       for(let i=0;i<COUNT;i++)particles.push({
         pos:p.createVector(p.random(-R,R),p.random(-R,R)),
-        vel:p.createVector(p.random(-.08,.08),p.random(-.08,.08)),
+        vel:p.createVector(p.random(-.16,.16),p.random(-.16,.16)),
         acc:p.createVector(0,0),
-        sz:p.random(1.25,2.7)
+        sz:p.random(2.4,5.2),
+        phase:p.random(p.TWO_PI)
       });
     };
 
@@ -248,10 +249,11 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         morphFrame++;
         if(morphFrame>=morphDuration){isMorphing=false;morphFrame=0;currentShape=targetShape;}
       }
-      const breathe=1+Math.sin(p.frameCount*.018)*.007;
-      const speed=isHovering?2.15:.72;
-      const force=isHovering?.14:.05;
-      const damping=isHovering?.84:.9;
+
+      const breathe=1+Math.sin(p.frameCount*.022)*.012;
+      const speed=isHovering?5.2:1.15;
+      const force=isHovering?.34:.085;
+      const damping=isHovering?.78:.92;
 
       particles.forEach((pt,i)=>{
         const angle=p.map(i,0,COUNT,0,p.TWO_PI);
@@ -261,8 +263,14 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
           const to=shapePos(p,targetShape,angle,R*breathe);
           target=p5.Vector.lerp(from,to,easeInOut(morphFrame/morphDuration));
         }
+
+        /* Small organic drift keeps the assembled shape alive without vibrating. */
+        const driftAmp=isHovering?1.1:2.4;
+        target.x+=Math.sin(p.frameCount*.018+pt.phase)*driftAmp;
+        target.y+=Math.cos(p.frameCount*.015+pt.phase)*driftAmp;
+
         const desired=p5.Vector.sub(target,pt.pos);
-        if(desired.mag()>.01)desired.setMag(Math.min(speed,desired.mag()*.18));
+        if(desired.mag()>.01)desired.setMag(Math.min(speed,Math.max(.18,desired.mag()*.32)));
         const steer=p5.Vector.sub(desired,pt.vel).limit(force);
         pt.acc.add(steer);
         pt.vel.add(pt.acc).mult(damping).limit(speed);
@@ -271,21 +279,21 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
         const motion=Math.min(1,pt.vel.mag()/Math.max(speed,.01));
         p.noStroke();
-        p.fill(0,0,92,.38+motion*.25);
-        p.circle(pt.pos.x,pt.pos.y,pt.sz*(.82+motion*.18));
+        p.fill(0,0,94,.52+motion*.28);
+        p.circle(pt.pos.x,pt.pos.y,pt.sz*(.94+motion*.16));
       });
     };
 
     p.windowResized=()=>{
       p.resizeCanvas(container.offsetWidth,container.offsetHeight);
-      R=Math.min(p.width,p.height)*.27;
+      R=Math.min(p.width,p.height)*.39;
     };
 
     window._xpMorph=(shape,hovering)=>{
       isHovering=hovering;
       targetShape=shape;
       morphFrame=0;
-      morphDuration=hovering?36:18;
+      morphDuration=hovering?12:6;
       isMorphing=true;
     };
   };
@@ -329,14 +337,20 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 (function(){
   const target=document.getElementById("twText");
   if(!target)return;
-  const lines=["AVAILABLE FOR SELECTED PROJECTS","LET'S FIND THE THING WORTH BUILDING"];
+  const sentences = [
+    "“You met me at a very strange time in my life.”",
+    "“There is no spoon.”",
+    "“Just be a rock.”",
+    "“Devour feculence.”",
+    "“Majestical.”"
+  ];
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   async function loop(){
     while(true){
-      for(const line of lines){
+      for(const sentence of sentences){
         target.textContent="";
-        for(const ch of line){target.textContent+=ch;await wait(42);}
-        await wait(1450);
+        for(const ch of sentence){target.textContent+=ch;await wait(42);}
+        await wait(3000);
         while(target.textContent.length){target.textContent=target.textContent.slice(0,-1);await wait(18);}
         await wait(320);
       }

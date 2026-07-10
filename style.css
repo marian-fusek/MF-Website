@@ -1279,3 +1279,106 @@ body {
   .mf-footer-contact { justify-content: flex-start; }
   .mf-footer-name { bottom: 10vh; }
 }
+
+/* ============================================================
+   V4 — full-height XP composition + footer baseline alignment
+   ============================================================ */
+
+/* XP / TRACK fills the viewport again: label at top, cards at bottom,
+   oversized particle drawing held between them. */
+.mf-xp {
+  min-height: 100vh;
+  height: 100vh;
+  padding: 10vh 6vw 8vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  background: transparent;
+}
+
+.mf-xp-head {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+}
+
+.mf-xp-shape {
+  position: absolute;
+  z-index: 1;
+  top: 7vh;
+  left: 1vw;
+  right: 1vw;
+  width: auto;
+  height: 72vh;
+  opacity: .9;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent;
+}
+
+.mf-xp-track {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+  margin-top: 0;
+  width: 100%;
+  align-self: stretch;
+}
+
+/* Footer text, navigation and socials share one horizontal row. */
+.mf-footer-inner {
+  margin-top: 27vh;
+  align-items: center;
+}
+
+.mf-footer-typewriter {
+  align-self: center;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Name sits on the same bottom baseline as copyright and status. */
+.mf-footer-name {
+  bottom: 3vh;
+  font-size: clamp(14px, 2.6vw, 44px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.mf-footer-bottom {
+  position: absolute;
+  left: 6vw;
+  right: 6vw;
+  bottom: 3vh;
+  width: auto;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: .06em;
+}
+
+@media (max-width: 900px) {
+  .mf-xp {
+    height: auto;
+    min-height: 100vh;
+    padding-top: 9vh;
+  }
+  .mf-xp-shape {
+    top: 9vh;
+    left: -12vw;
+    right: -12vw;
+    height: 58vh;
+  }
+  .mf-xp-track {
+    margin-top: 58vh;
+  }
+  .mf-footer-typewriter {
+    white-space: normal;
+  }
+  .mf-footer-name,
+  .mf-footer-bottom {
+    bottom: 3vh;
+  }
+}
