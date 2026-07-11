@@ -43,6 +43,72 @@ if(indexExtra){
   runIndexLoop();
 }
 
+
+/* INDEX HOVER PREVIEWS */
+(function(){
+  const previewImages={
+    "01":[
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=76"
+    ],
+    "02":[
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
+    ],
+    "03":[
+      "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=76"
+    ],
+    "04":[
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1464820453369-31d2c0b651af?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=900&q=76"
+    ],
+    "05":[
+      "https://images.unsplash.com/photo-1464278533981-50106e6176b1?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=900&q=76",
+      "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=900&q=76"
+    ]
+  };
+  const strips=[...document.querySelectorAll('.mf-strip')];
+  const updateLeft=strip=>{
+    const desc=strip.querySelector('.mf-strip-desc');
+    if(!desc)return;
+    const s=strip.getBoundingClientRect(),d=desc.getBoundingClientRect();
+    strip.style.setProperty('--preview-left',Math.max(0,d.left-s.left)+'px');
+  };
+  strips.forEach(strip=>{
+    const list=previewImages[strip.dataset.index]||[];
+    const preview=document.createElement('div');
+    preview.className='mf-strip-preview';
+    list.slice(0,3).forEach((src,i)=>{
+      const frame=document.createElement('div');
+      frame.className='mf-strip-preview-frame';
+      frame.style.setProperty('--preview-order',i);
+      const img=document.createElement('img');
+      img.src=src; img.alt=''; img.loading='lazy'; img.decoding='async';
+      frame.appendChild(img); preview.appendChild(frame);
+    });
+    const more=Math.max(0,list.length-3);
+    const moreCard=document.createElement('div');
+    moreCard.className='mf-strip-preview-more';
+    moreCard.style.setProperty('--preview-order',3);
+    moreCard.textContent=`[+${more} MORE]`;
+    preview.appendChild(moreCard);
+    strip.appendChild(preview);
+    updateLeft(strip);
+  });
+  window.addEventListener('resize',()=>strips.forEach(updateLeft));
+})();
+
 /* PROJECT OVERLAYS */
 (function(){
   const overlay=document.getElementById("mfOverlay");
@@ -408,7 +474,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
   const COUNT=760;
-  const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"letterS",symbio:"wave",fg:"sharpWave"};
+  const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"letterS",symbio:"vesica",fg:"spiral"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
 
@@ -532,18 +598,19 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         const x=Math.sin((u*2.2-1.1)*Math.PI)*r*.58;
         return p.createVector(x,y);
       }
-      case"wave":{
+      case"vesica":{
         const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
-        return p.createVector((u-.5)*2*r,Math.sin(u*Math.PI*3)*r*.34);
+        const first=u<.5;
+        const t=(first?u:u-.5)*p.TWO_PI;
+        const offset=r*.40;
+        return p.createVector(p.cos(t)*r*.60+(first?-offset:offset),p.sin(t)*r*.60);
       }
-      case"sharpWave":{
+      case"spiral":{
         const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
-        const pts=[
-          p.createVector(-r,0),p.createVector(-r*.66,-r*.38),p.createVector(-r*.33,r*.38),
-          p.createVector(0,-r*.38),p.createVector(r*.33,r*.38),p.createVector(r*.66,-r*.38),p.createVector(r,0)
-        ];
-        const pos=u*(pts.length-1),seg=Math.min(pts.length-2,Math.floor(pos)),t=pos-seg;
-        return p5.Vector.lerp(pts[seg],pts[seg+1],t);
+        const turns=3.15;
+        const rr=r*(.08+.90*u);
+        const a=-p.PI/2+u*p.TWO_PI*turns;
+        return p.createVector(p.cos(a)*rr,p.sin(a)*rr);
       }
       default:return p.createVector(0,0);
     }
