@@ -172,10 +172,41 @@
     <div class="mf-footer-bottom"><div>©MF 2026</div><div>Still here.</div></div>
   </footer>
 
-  <div class="mf-overlay" id="mfOverlay">
-    <div class="mf-overlay-img"></div><div class="mf-overlay-top-left"></div><div class="mf-overlay-top-right">Selected Work</div><div class="mf-overlay-mini">Brand · UI · Visual Direction</div>
-    <div class="mf-overlay-text"><p>This is placeholder project copy. Replace with a sharp summary of the work, what Marian led, and why the project needed its own visual behavior.</p><p>Scope, outcome, materials, interface logic, creative direction, collaborators — anything that gives the work weight without turning it into a case study essay.</p></div>
-    <button class="mf-close" type="button" aria-label="Close"></button>
+  <div class="mf-overlay" id="mfOverlay" aria-hidden="true">
+    <div class="mf-project-shell">
+      <aside class="mf-project-info" aria-live="polite">
+        <div class="mf-project-info-inner">
+          <div class="mf-project-index" id="projectIndex">PROJECT 01</div>
+          <h2 class="mf-project-title" id="projectTitle">MIUNĀE</h2>
+          <p class="mf-project-intro" id="projectIntro"></p>
+
+          <div class="mf-project-section mf-project-scope-block">
+            <h3>SCOPE</h3>
+            <p id="projectScope"></p>
+          </div>
+
+          <div class="mf-project-bottom-copy">
+            <div class="mf-project-section">
+              <h3>CONTEXT</h3>
+              <p class="mf-project-long" id="projectContext"></p>
+            </div>
+            <div class="mf-project-section">
+              <h3>APPROACH</h3>
+              <p class="mf-project-long" id="projectApproach"></p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="mf-project-gallery" id="projectGallery" tabindex="0" aria-label="Project image gallery">
+        <div class="mf-project-slides" id="projectSlides"></div>
+      </div>
+    </div>
+
+    <div class="mf-project-counter" id="projectCounter">01 / 04</div>
+    <button class="mf-close" type="button" aria-label="Close project">
+      <span></span><span></span>
+    </button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/p5.min.js"></script>

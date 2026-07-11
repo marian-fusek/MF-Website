@@ -4,7 +4,7 @@ document.addEventListener("visibilitychange",()=>{document.title=document.hidden
 const loader=document.getElementById("mfLoader");
 if(loader){const spans=loader.querySelectorAll("span");spans.forEach(s=>{s.style.transform="translateY(0)"});requestAnimationFrame(()=>requestAnimationFrame(()=>spans.forEach(s=>{s.style.transform=""})));setTimeout(()=>loader.classList.add("done"),1800);}
 
-(function(){let targetY=window.scrollY,currentY=window.scrollY,ticking=false;const ease=.065;function tick(){const d=targetY-currentY;if(Math.abs(d)<.35){currentY=targetY;window.scrollTo(0,currentY);ticking=false;return}currentY+=d*ease;window.scrollTo(0,currentY);requestAnimationFrame(tick)}window.addEventListener("wheel",e=>{e.preventDefault();targetY+=e.deltaY*1.4;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:false});let touchStart=0,lastTouch=0,lastTime=0,velocity=0;window.addEventListener("touchstart",e=>{touchStart=lastTouch=e.touches[0].clientY;lastTime=Date.now();velocity=0},{passive:true});window.addEventListener("touchmove",e=>{const y=e.touches[0].clientY,dt=Date.now()-lastTime||1;velocity=((lastTouch-y)/dt)*16;lastTouch=y;lastTime=Date.now();targetY+=touchStart-y;touchStart=y;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window.addEventListener("touchend",()=>{targetY+=velocity*200;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window._mfScroll=function(y){targetY=y;currentY=window.scrollY;if(!ticking){ticking=true;requestAnimationFrame(tick)}}})();
+(function(){let targetY=window.scrollY,currentY=window.scrollY,ticking=false;const ease=.065;function tick(){const d=targetY-currentY;if(Math.abs(d)<.35){currentY=targetY;window.scrollTo(0,currentY);ticking=false;return}currentY+=d*ease;window.scrollTo(0,currentY);requestAnimationFrame(tick)}window.addEventListener("wheel",e=>{if(document.body.classList.contains("project-open"))return;e.preventDefault();targetY+=e.deltaY*1.4;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:false});let touchStart=0,lastTouch=0,lastTime=0,velocity=0;window.addEventListener("touchstart",e=>{touchStart=lastTouch=e.touches[0].clientY;lastTime=Date.now();velocity=0},{passive:true});window.addEventListener("touchmove",e=>{if(document.body.classList.contains("project-open"))return;const y=e.touches[0].clientY,dt=Date.now()-lastTime||1;velocity=((lastTouch-y)/dt)*16;lastTouch=y;lastTime=Date.now();targetY+=touchStart-y;touchStart=y;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window.addEventListener("touchend",()=>{if(document.body.classList.contains("project-open"))return;targetY+=velocity*200;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window._mfScroll=function(y){targetY=y;currentY=window.scrollY;if(!ticking){ticking=true;requestAnimationFrame(tick)}}})();
 
 document.querySelectorAll('a[href^="#"]').forEach(link=>{link.addEventListener("click",e=>{const id=link.getAttribute("href").slice(1);if(!id){e.preventDefault();window._mfScroll?window._mfScroll(0):window.scrollTo({top:0,behavior:"smooth"});return}const target=document.getElementById(id);if(!target)return;e.preventDefault();const y=target.getBoundingClientRect().top+window.scrollY;if(window._mfScroll)window._mfScroll(y);else window.scrollTo({top:y,behavior:"smooth"});});});
 
@@ -43,7 +43,192 @@ if(indexExtra){
   runIndexLoop();
 }
 
-const overlay=document.getElementById("mfOverlay");if(overlay){const overlayImage=overlay.querySelector(".mf-overlay-img"),overlayTitle=overlay.querySelector(".mf-overlay-top-left"),overlayIndex=overlay.querySelector(".mf-overlay-top-right"),overlayClose=overlay.querySelector(".mf-close");document.querySelectorAll(".mf-strip").forEach(strip=>{strip.addEventListener("click",()=>{if(overlayImage)overlayImage.style.backgroundImage=`url('${strip.dataset.img}')`;if(overlayTitle)overlayTitle.textContent=strip.dataset.title||"";if(overlayIndex)overlayIndex.textContent=`Project ${strip.dataset.index||""}`;overlay.classList.add("active");document.body.style.overflow="hidden";});});function closeOverlay(){overlay.classList.remove("active");document.body.style.overflow=""}if(overlayClose)overlayClose.addEventListener("click",closeOverlay);document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOverlay()});}
+/* PROJECT OVERLAYS */
+(function(){
+  const overlay=document.getElementById("mfOverlay");
+  const gallery=document.getElementById("projectGallery");
+  const slides=document.getElementById("projectSlides");
+  const closeButton=overlay?.querySelector(".mf-close");
+  if(!overlay||!gallery||!slides||!closeButton)return;
+
+  const projectData={
+    "01":{
+      title:"MIUNĀE",
+      intro:"A natural skincare brand built around time, tactility and restraint. The system turns Eastern European botanical knowledge into a contemporary luxury world without sanding away its character.",
+      scope:"Creative direction, brand system, packaging, digital art direction, campaign language and launch expression.",
+      context:"MIUNĀE needed to enter a saturated skincare category without resembling another polished wellness brand. Its formulas carried real history, but the story had to feel immediate rather than nostalgic. The work needed enough discipline to feel premium and enough tension to remain alive.",
+      approach:"I built the identity around time as both ingredient and attitude. Typography, material choices and imagery were reduced until every element felt deliberate. The resulting system moves between quiet control and botanical overgrowth while staying recognizably MIUNĀE.",
+      images:[
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
+      ]
+    },
+    "02":{
+      title:"GoBaller",
+      intro:"A football coaching app for players of all ages. The product makes structured training feel clear, motivating and personal without turning the experience into another generic fitness interface.",
+      scope:"Brand identity, product strategy, iOS application design, interaction system and visual direction.",
+      context:"GoBaller had to work for ambitious young players, parents and experienced coaches at the same time. The product contained a deep training system, but the interface could not feel technical or intimidating. It needed credibility on the pitch and clarity in the hand.",
+      approach:"I organized the product around progression, repetition and visible momentum. The identity borrows energy from sport without relying on predictable visual clichés. Every screen was shaped to keep the next useful action obvious while preserving a strong, ownable character.",
+      images:[
+        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
+      ]
+    },
+    "03":{
+      title:"AIMS",
+      intro:"The most advanced AI search for music catalogs. AIMS translates complex machine-learning capability into a product story that music professionals can understand, trust and use.",
+      scope:"Website, brand refresh, product narrative, sales deck, launch materials and interface direction.",
+      context:"AIMS had technology with unusual depth, but its value was difficult to communicate outside technical conversations. Buyers needed to understand the advantage quickly while still believing the system could handle professional-scale catalogs. The brand had to bridge engineering precision and creative intuition.",
+      approach:"I reframed the platform around the moments where search changes the work itself. Product language became more direct, the identity gained focus and the sales story moved from feature inventory to practical leverage. The system gives the technology room to feel sophisticated without becoming abstract.",
+      images:[
+        "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2200&q=88"
+      ]
+    },
+    "04":{
+      title:"Mindset Coaching",
+      intro:"One-to-one sessions, group work, mentoring and team audits for founders, leaders and creatives. The practice creates room for direct conversations that move past performance and into useful change.",
+      scope:"Positioning, coaching framework, service design, session formats, communication and experience direction.",
+      context:"Creative and technical leaders often arrive with a visible work problem and a less visible pattern underneath it. Standard coaching language can make those conversations feel distant or overly polished. The practice needed to feel rigorous, human and safe without becoming soft or formulaic.",
+      approach:"I designed the experience around attention rather than templates. The language stays direct, the structure remains flexible and every format is built to surface what is actually blocking movement. The result is a practice that can hold both strategic decisions and the personal reality beneath them.",
+      images:[
+        "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1497436072909-f5e4be1713c0?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=2200&q=88"
+      ]
+    },
+    "05":{
+      title:"Team Leadership",
+      intro:"Design and engineering leadership focused on empowering leaders of leaders. The work joins product quality, organizational clarity and the conditions people need to do their strongest work.",
+      scope:"Executive leadership, design organization, engineering partnership, team systems, hiring and leadership development.",
+      context:"Growing product organizations create pressure faster than they create shared judgment. Teams can add process while losing clarity, ownership and the standard that made the work valuable. Leadership needed to scale without turning the organization into a machine for meetings.",
+      approach:"I treated structure as a tool for better decisions rather than control. Responsibilities, critique and communication were redesigned around trust, explicit standards and stronger leaders at every level. The organization could move faster because authority and quality no longer depended on one person.",
+      images:[
+        "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2200&q=88",
+        "https://images.unsplash.com/photo-1464278533981-50106e6176b1?auto=format&fit=crop&w=2200&q=88"
+      ]
+    }
+  };
+
+  const fields={
+    index:document.getElementById("projectIndex"),
+    title:document.getElementById("projectTitle"),
+    intro:document.getElementById("projectIntro"),
+    scope:document.getElementById("projectScope"),
+    context:document.getElementById("projectContext"),
+    approach:document.getElementById("projectApproach"),
+    counter:document.getElementById("projectCounter")
+  };
+
+  let activeIndex=0;
+  let wheelLocked=false;
+  let wheelTotal=0;
+  let wheelReset=0;
+
+  function renderProject(key){
+    const project=projectData[key]||projectData["01"];
+    fields.index.textContent=`PROJECT ${key}`;
+    fields.title.textContent=project.title;
+    fields.intro.textContent=project.intro;
+    fields.scope.textContent=project.scope;
+    fields.context.textContent=project.context;
+    fields.approach.textContent=project.approach;
+    slides.innerHTML=project.images.map((src,i)=>`<figure class="mf-project-slide" data-slide="${i}"><img src="${src}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`).join("");
+    activeIndex=0;
+    gallery.scrollTop=0;
+    updateCounter();
+  }
+
+  function updateCounter(){
+    const total=slides.children.length||1;
+    fields.counter.textContent=`${String(activeIndex+1).padStart(2,"0")} / ${String(total).padStart(2,"0")}`;
+  }
+
+  function openProject(strip){
+    const key=strip.dataset.index||"01";
+    renderProject(key);
+    overlay.classList.remove("is-closing");
+    overlay.classList.add("active");
+    overlay.setAttribute("aria-hidden","false");
+    document.body.classList.add("project-open");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add("is-visible")));
+    setTimeout(()=>gallery.focus({preventScroll:true}),520);
+  }
+
+  function closeProject(){
+    if(!overlay.classList.contains("active"))return;
+    overlay.classList.add("is-closing");
+    overlay.classList.remove("is-visible");
+    setTimeout(()=>{
+      overlay.classList.remove("active","is-closing");
+      overlay.setAttribute("aria-hidden","true");
+      document.body.classList.remove("project-open");
+      slides.innerHTML="";
+    },620);
+  }
+
+  function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  function scrollToSlide(next){
+    const total=slides.children.length;
+    next=Math.max(0,Math.min(total-1,next));
+    if(next===activeIndex||wheelLocked)return;
+    wheelLocked=true;
+    const start=gallery.scrollTop;
+    const target=next*gallery.clientHeight;
+    const delta=target-start;
+    const duration=760;
+    const began=performance.now();
+    function frame(now){
+      const t=Math.min(1,(now-began)/duration);
+      gallery.scrollTop=start+delta*easeInOutCubic(t);
+      if(t<1)requestAnimationFrame(frame);
+      else{
+        activeIndex=next;
+        updateCounter();
+        wheelLocked=false;
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  document.querySelectorAll(".mf-strip").forEach(strip=>strip.addEventListener("click",()=>openProject(strip)));
+  closeButton.addEventListener("click",closeProject);
+  document.addEventListener("keydown",e=>{
+    if(!overlay.classList.contains("active"))return;
+    if(e.key==="Escape")closeProject();
+    if(e.key==="ArrowDown"||e.key==="PageDown"){e.preventDefault();scrollToSlide(activeIndex+1);}
+    if(e.key==="ArrowUp"||e.key==="PageUp"){e.preventDefault();scrollToSlide(activeIndex-1);}
+  });
+
+  gallery.addEventListener("wheel",e=>{
+    e.preventDefault();
+    if(wheelLocked)return;
+    wheelTotal+=e.deltaY;
+    clearTimeout(wheelReset);
+    wheelReset=setTimeout(()=>wheelTotal=0,140);
+    if(Math.abs(wheelTotal)<34)return;
+    const direction=wheelTotal>0?1:-1;
+    wheelTotal=0;
+    scrollToSlide(activeIndex+direction);
+  },{passive:false});
+
+  let touchStartY=0;
+  gallery.addEventListener("touchstart",e=>{touchStartY=e.touches[0].clientY;},{passive:true});
+  gallery.addEventListener("touchend",e=>{
+    const endY=e.changedTouches[0].clientY;
+    const delta=touchStartY-endY;
+    if(Math.abs(delta)>40)scrollToSlide(activeIndex+(delta>0?1:-1));
+  },{passive:true});
+})();
 
 function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,padding=viewport*.008,scale=(viewport-padding*2)/width,scaledWidth=width*scale,offset=(viewport-scaledWidth)/2;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scaleHeroName);else setTimeout(scaleHeroName,200);scaleHeroName();window.addEventListener("resize",scaleHeroName);
