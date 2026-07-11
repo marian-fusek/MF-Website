@@ -654,11 +654,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
   let pieces=[];
   let offsetX=0,offsetY=0;
-  let dragging=false,lastX=0,lastY=0;
-  const seeded=i=>{
-    const x=Math.sin(i*12.9898)*43758.5453;
-    return x-Math.floor(x);
-  };
+  let dragging=false,lastX=0,lastY=0,dragDistance=0;
+  let expanded=null;
+  const seeded=i=>{const x=Math.sin(i*12.9898)*43758.5453;return x-Math.floor(x);};
+
   function build(){
     if(pieces.length)return;
     world.innerHTML="";
@@ -667,35 +666,49 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     pieces=files.map((name,i)=>{
       const figure=document.createElement("figure");
       figure.className="mf-art-piece";
-      const size=Math.round(120+seeded(i+2)*220);
+      figure.style.setProperty("--float-delay",`${-(seeded(i+11)*5).toFixed(2)}s`);
+      figure.style.setProperty("--float-duration",`${(4.8+seeded(i+19)*4.8).toFixed(2)}s`);
+      figure.style.setProperty("--float-x",`${(-8+seeded(i+27)*16).toFixed(1)}px`);
+      figure.style.setProperty("--float-y",`${(-10+seeded(i+35)*20).toFixed(1)}px`);
+      const size=Math.round(115+seeded(i+2)*225);
       const ratio=.72+seeded(i+31)*.62;
       figure.style.width=size+"px";
       figure.style.height=Math.round(size*ratio)+"px";
       figure.style.zIndex=String(1+Math.floor(seeded(i+68)*8));
       const img=document.createElement("img");
-      img.src=`/images/art/${name}`;
+      img.src=`./images/art/${name}`;
       img.alt="";
       img.draggable=false;
+      img.onerror=()=>{ img.src=`images/art/${name}`; };
       figure.appendChild(img);
       world.appendChild(figure);
-      return {
-        el:figure,
-        x:(seeded(i+90)-.5)*fieldW,
-        y:(seeded(i+150)-.5)*fieldH,
-        w:size,h:Math.round(size*ratio)
-      };
+      return {el:figure,img,x:(seeded(i+90)-.5)*fieldW,y:(seeded(i+150)-.5)*fieldH,w:size,h:Math.round(size*ratio)};
     });
     render();
   }
-  function wrap(value,span){ return ((value+span/2)%span+span)%span-span/2; }
+  function wrap(value,span){return ((value+span/2)%span+span)%span-span/2;}
   function render(){
+    if(expanded)return;
     const vw=window.innerWidth,vh=window.innerHeight;
     const spanX=vw*3.6,spanY=vh*3.2;
     pieces.forEach(piece=>{
       const x=wrap(piece.x+offsetX,spanX)+vw/2-piece.w/2;
       const y=wrap(piece.y+offsetY,spanY)+vh/2-piece.h/2;
-      piece.el.style.transform=`translate3d(${x}px,${y}px,0)`;
+      piece.el.style.setProperty("--base-transform",`translate3d(${x}px,${y}px,0)`);
     });
+  }
+  function expandPiece(piece){
+    if(expanded)return;
+    expanded=piece;
+    overlay.classList.add("is-image-open");
+    pieces.forEach(p=>p.el.classList.toggle("is-expanded",p===piece));
+  }
+  function collapsePiece(){
+    if(!expanded)return;
+    expanded=null;
+    overlay.classList.remove("is-image-open");
+    pieces.forEach(p=>p.el.classList.remove("is-expanded"));
+    render();
   }
   function openArt(){
     build();
@@ -705,6 +718,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add("is-visible")));
   }
   function closeArt(){
+    collapsePiece();
     overlay.classList.remove("is-visible");
     setTimeout(()=>{
       overlay.classList.remove("active","is-dragging");
@@ -713,26 +727,35 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     },720);
   }
   button.addEventListener("click",openArt);
-  close.addEventListener("click",closeArt);
-  overlay.addEventListener("pointerdown",e=>{
+  close.addEventListener("click",e=>{e.stopPropagation();closeArt();});
+
+  overlay.addEventListener("click",e=>{
     if(e.target.closest(".mf-art-close"))return;
-    dragging=true;lastX=e.clientX;lastY=e.clientY;
+    if(expanded){collapsePiece();return;}
+    if(dragDistance>7)return;
+    const figure=e.target.closest(".mf-art-piece");
+    if(figure){const piece=pieces.find(p=>p.el===figure);if(piece)expandPiece(piece);}
+  });
+  overlay.addEventListener("pointerdown",e=>{
+    if(expanded||e.target.closest(".mf-art-close"))return;
+    dragging=true;dragDistance=0;lastX=e.clientX;lastY=e.clientY;
     overlay.classList.add("is-dragging");
     overlay.setPointerCapture?.(e.pointerId);
   });
   overlay.addEventListener("pointermove",e=>{
     if(!dragging)return;
-    offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;
-    lastX=e.clientX;lastY=e.clientY;render();
+    const dx=e.clientX-lastX,dy=e.clientY-lastY;
+    dragDistance+=Math.abs(dx)+Math.abs(dy);
+    offsetX+=dx;offsetY+=dy;lastX=e.clientX;lastY=e.clientY;render();
   });
-  const stopDrag=e=>{
-    dragging=false;overlay.classList.remove("is-dragging");
-    try{overlay.releasePointerCapture?.(e.pointerId)}catch(_){}
-  };
+  const stopDrag=e=>{dragging=false;overlay.classList.remove("is-dragging");try{overlay.releasePointerCapture?.(e.pointerId)}catch(_){}};
   overlay.addEventListener("pointerup",stopDrag);
   overlay.addEventListener("pointercancel",stopDrag);
   window.addEventListener("resize",render);
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("active"))closeArt();});
+  document.addEventListener("keydown",e=>{
+    if(e.key!=="Escape"||!overlay.classList.contains("active"))return;
+    if(expanded)collapsePiece();else closeArt();
+  });
 })();
 
 /* FOOTER TYPEWRITER */
