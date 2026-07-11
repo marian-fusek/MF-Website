@@ -1,9 +1,12 @@
-PROJECT OVERLAY UPDATE
+V10 website files
 
-Files:
+Keep these files together:
 - index.html
 - style.css
 - script.js
 
-The overlay uses the existing Geist font paths in style.css. Keep your existing /fonts folder beside these files.
-Project copy and demo image URLs are stored in the PROJECT OVERLAYS block in script.js.
+Expected image paths on the live site:
+- /images/marian-fusek.png
+- /images/art/01-konnichiwawa.png through /images/art/30-orange.png
+
+The page loads p5.js and GSAP from jsDelivr.

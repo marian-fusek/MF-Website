@@ -474,7 +474,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
   const COUNT=760;
-  const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"letterS",symbio:"vesica",fg:"spiral"};
+  const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"fourStar",symbio:"sinusoid",fg:"spiral"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
 
@@ -592,18 +592,22 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         const pos=u*pts.length,seg=Math.floor(pos)%pts.length,t=pos-Math.floor(pos);
         return p5.Vector.lerp(pts[seg],pts[(seg+1)%pts.length],t);
       }
-      case"letterS":{
+      case"fourStar":{
         const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
-        const y=(u-.5)*2*r;
-        const x=Math.sin((u*2.2-1.1)*Math.PI)*r*.58;
-        return p.createVector(x,y);
+        const points=[];
+        for(let k=0;k<8;k++){
+          const a=-p.PI/2+k*p.PI/4;
+          const rr=k%2===0?r:r*.18;
+          points.push(p.createVector(p.cos(a)*rr,p.sin(a)*rr));
+        }
+        const pos=u*points.length,seg=Math.floor(pos)%points.length,t=pos-Math.floor(pos);
+        return p5.Vector.lerp(points[seg],points[(seg+1)%points.length],t);
       }
-      case"vesica":{
+      case"sinusoid":{
         const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
-        const first=u<.5;
-        const t=(first?u:u-.5)*p.TWO_PI;
-        const offset=r*.40;
-        return p.createVector(p.cos(t)*r*.60+(first?-offset:offset),p.sin(t)*r*.60);
+        const x=(u-.5)*2*r;
+        const y=Math.sin(u*p.TWO_PI*2)*r*.48;
+        return p.createVector(x,y);
       }
       case"spiral":{
         const u=((angle%p.TWO_PI)+p.TWO_PI)%p.TWO_PI/p.TWO_PI;
@@ -616,6 +620,119 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     }
   }
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+})();
+
+
+/* MF ART — magnetic button + infinitely wrapping draggable field */
+(function(){
+  const zone=document.getElementById("mfArtZone");
+  const button=document.getElementById("mfArtButton");
+  const overlay=document.getElementById("mfArtOverlay");
+  const world=document.getElementById("mfArtWorld");
+  const close=document.getElementById("mfArtClose");
+  if(!zone||!button||!overlay||!world||!close)return;
+
+  const files=[
+    "01-konnichiwawa.png","02-perefction.png","03-flawr.png","04-mattress.png","05-egg.png",
+    "06-huh.png","07-hotdog.png","08-jail.png","09-box.png","10-ufo.png","11-claude.png",
+    "12-hay.png","13-spaghet.png","14-doctor.png","15-cher.png","16-pantalones.png","17-tuli.png",
+    "18-wave.png","19-bean.png","20-accept.png","21-violins.png","22-holy.png","23-tiktok.png",
+    "24-ai.png","25-blushies.png","26-arse.png","27-glow.png","28-smash.png","29-stairs.png","30-orange.png"
+  ];
+  const strength=.34;
+  const moveButton=(x,y,duration=.4,ease="power2.out")=>{
+    if(window.gsap)gsap.to(button,{x,y,duration,ease,overwrite:true});
+    else button.style.transform=`translate(${x}px,${y}px)`;
+  };
+  zone.addEventListener("mousemove",e=>{
+    const rect=zone.getBoundingClientRect();
+    const x=((e.clientX-rect.left)/rect.width-.5)*rect.width;
+    const y=((e.clientY-rect.top)/rect.height-.5)*rect.height;
+    moveButton(x*strength,y*strength);
+  });
+  zone.addEventListener("mouseleave",()=>moveButton(0,0,.7,"elastic.out(1, 0.4)"));
+
+  let pieces=[];
+  let offsetX=0,offsetY=0;
+  let dragging=false,lastX=0,lastY=0;
+  const seeded=i=>{
+    const x=Math.sin(i*12.9898)*43758.5453;
+    return x-Math.floor(x);
+  };
+  function build(){
+    if(pieces.length)return;
+    world.innerHTML="";
+    const vw=window.innerWidth,vh=window.innerHeight;
+    const fieldW=vw*3.6,fieldH=vh*3.2;
+    pieces=files.map((name,i)=>{
+      const figure=document.createElement("figure");
+      figure.className="mf-art-piece";
+      const size=Math.round(120+seeded(i+2)*220);
+      const ratio=.72+seeded(i+31)*.62;
+      figure.style.width=size+"px";
+      figure.style.height=Math.round(size*ratio)+"px";
+      figure.style.zIndex=String(1+Math.floor(seeded(i+68)*8));
+      const img=document.createElement("img");
+      img.src=`/images/art/${name}`;
+      img.alt="";
+      img.draggable=false;
+      figure.appendChild(img);
+      world.appendChild(figure);
+      return {
+        el:figure,
+        x:(seeded(i+90)-.5)*fieldW,
+        y:(seeded(i+150)-.5)*fieldH,
+        w:size,h:Math.round(size*ratio)
+      };
+    });
+    render();
+  }
+  function wrap(value,span){ return ((value+span/2)%span+span)%span-span/2; }
+  function render(){
+    const vw=window.innerWidth,vh=window.innerHeight;
+    const spanX=vw*3.6,spanY=vh*3.2;
+    pieces.forEach(piece=>{
+      const x=wrap(piece.x+offsetX,spanX)+vw/2-piece.w/2;
+      const y=wrap(piece.y+offsetY,spanY)+vh/2-piece.h/2;
+      piece.el.style.transform=`translate3d(${x}px,${y}px,0)`;
+    });
+  }
+  function openArt(){
+    build();
+    overlay.classList.add("active");
+    overlay.setAttribute("aria-hidden","false");
+    document.body.classList.add("art-open");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add("is-visible")));
+  }
+  function closeArt(){
+    overlay.classList.remove("is-visible");
+    setTimeout(()=>{
+      overlay.classList.remove("active","is-dragging");
+      overlay.setAttribute("aria-hidden","true");
+      document.body.classList.remove("art-open");
+    },720);
+  }
+  button.addEventListener("click",openArt);
+  close.addEventListener("click",closeArt);
+  overlay.addEventListener("pointerdown",e=>{
+    if(e.target.closest(".mf-art-close"))return;
+    dragging=true;lastX=e.clientX;lastY=e.clientY;
+    overlay.classList.add("is-dragging");
+    overlay.setPointerCapture?.(e.pointerId);
+  });
+  overlay.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+    offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;
+    lastX=e.clientX;lastY=e.clientY;render();
+  });
+  const stopDrag=e=>{
+    dragging=false;overlay.classList.remove("is-dragging");
+    try{overlay.releasePointerCapture?.(e.pointerId)}catch(_){}
+  };
+  overlay.addEventListener("pointerup",stopDrag);
+  overlay.addEventListener("pointercancel",stopDrag);
+  window.addEventListener("resize",render);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("active"))closeArt();});
 })();
 
 /* FOOTER TYPEWRITER */
