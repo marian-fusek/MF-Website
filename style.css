@@ -2574,3 +2574,55 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-art-actions { flex-direction:column; }
   .mf-art-cta { width:100%; max-width:330px; }
 }
+
+
+/* ============================================================
+   V15 — donation stacking + footer bottom-center typewriter
+   ============================================================ */
+
+/* Donation must sit above the open ART gallery, including its images and intro. */
+.mf-donation-overlay {
+  z-index: 1200 !important;
+  background: #050505 !important;
+}
+
+.mf-donation-card,
+#kofiframe {
+  background: #050505 !important;
+}
+
+/* Keep the quote on the exact same bottom baseline as copyright and status. */
+.mf-footer-typewriter {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 3vh !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  width: min(58vw, 760px) !important;
+  min-height: 11px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  z-index: 6 !important;
+}
+
+.mf-footer-bottom {
+  bottom: 3vh !important;
+  align-items: flex-end !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 900px) {
+  .mf-footer-typewriter {
+    bottom: 3vh !important;
+    width: 64vw !important;
+    white-space: nowrap !important;
+    font-size: 8px !important;
+  }
+}
