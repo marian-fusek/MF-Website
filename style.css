@@ -2626,3 +2626,101 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
     font-size: 8px !important;
   }
 }
+
+
+/* ============================================================
+   V16 — spacing, navigation, footer, gallery interaction
+   ============================================================ */
+
+/* Top navigation: MF hugs the left edge; all other links form a right-aligned group. */
+.mf-nav {
+  display:flex !important;
+  grid-template-columns:none !important;
+  align-items:flex-start !important;
+  gap:clamp(18px,2.2vw,42px) !important;
+  padding-left:var(--page-pad) !important;
+  padding-right:var(--page-pad) !important;
+}
+.mf-nav-logo { margin-right:auto !important; }
+.mf-nav-index,.mf-nav-xp,.mf-nav-bio,.mf-nav-contact {
+  grid-column:auto !important;
+  flex:0 0 auto !important;
+  text-align:left !important;
+  margin:0 !important;
+}
+.mf-nav-contact { text-align:right !important; }
+
+/* Footer: edge-aligned navigation/socials and a true bottom-center typewriter. */
+.mf-footer {
+  padding-left:var(--page-pad) !important;
+  padding-right:var(--page-pad) !important;
+}
+.mf-footer-inner {
+  left:var(--page-pad) !important;
+  right:var(--page-pad) !important;
+  width:auto !important;
+}
+.mf-footer-links { margin-left:0 !important; justify-content:flex-start !important; }
+.mf-footer-contact { margin-left:auto !important; justify-content:flex-end !important; }
+.mf-footer-bottom {
+  left:var(--page-pad) !important;
+  right:var(--page-pad) !important;
+  bottom:18px !important;
+  width:auto !important;
+  font-size:11px !important;
+}
+.mf-footer-typewriter {
+  position:absolute !important;
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:18px !important;
+  transform:translateX(-50%) !important;
+  width:min(58vw,760px) !important;
+  margin:0 !important;
+  padding:0 !important;
+  line-height:1 !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  z-index:9 !important;
+}
+
+/* Gallery intro buttons sit a little lower. */
+.mf-art-actions { margin-top:38px !important; }
+
+/* Random poster angle and shallow 3D perspective, preserving parallax positioning. */
+.mf-art-piece {
+  transform-style:preserve-3d;
+  perspective:900px;
+}
+@keyframes mfArtFloat {
+  from {
+    transform:var(--base-transform)
+      translate3d(calc(var(--float-x,6px) * -.35),calc(var(--float-y,8px) * -.35),0)
+      perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) rotate(calc(var(--tilt,0deg) - .35deg));
+  }
+  to {
+    transform:var(--base-transform)
+      translate3d(var(--float-x,6px),var(--float-y,8px),0)
+      perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) rotate(calc(var(--tilt,0deg) + .35deg));
+  }
+}
+.mf-art-piece { pointer-events:auto !important; }
+.mf-art-piece img { pointer-events:none !important; }
+.mf-art-piece.is-expanded {
+  z-index:999 !important;
+  pointer-events:auto !important;
+}
+
+/* Hero name keeps equal breathing room at both viewport edges. */
+.mf-hero-name { padding-inline:0 !important; }
+
+@media (max-width:900px) {
+  .mf-nav { gap:14px !important; font-size:9px !important; }
+  .mf-footer-inner { left:var(--page-pad) !important; right:var(--page-pad) !important; }
+  .mf-footer-bottom { left:var(--page-pad) !important; right:var(--page-pad) !important; bottom:14px !important; }
+  .mf-footer-typewriter { bottom:14px !important; width:62vw !important; font-size:8px !important; }
+}
