@@ -2290,3 +2290,73 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-art-piece { max-width:none !important; }
   .mf-footer-name { top:22vh !important; }
 }
+
+/* ============================================================
+   V13 refinements
+   ============================================================ */
+
+/* Gallery depth cue: the farthest pieces are at most 20% darker. */
+.mf-art-piece img {
+  filter: brightness(var(--depth-brightness,1)) drop-shadow(0 14px 24px rgba(0,0,0,.5));
+}
+.mf-art-piece:hover img {
+  filter: brightness(1) drop-shadow(0 22px 34px rgba(0,0,0,.7));
+}
+
+/* BIO portrait moved 50px right and allowed a small pointer-driven drift. */
+.mf-about-layout { position:relative; }
+.mf-photo-card {
+  margin-left:50px !important;
+  transform:translate3d(var(--photo-x,0),var(--photo-y,0),0) !important;
+  transition:opacity 1s var(--ease), transform .18s ease-out !important;
+  will-change:transform;
+}
+.mf-photo-glitch {
+  position:absolute;
+  z-index:4;
+  font-family:"Geist Mono",monospace;
+  font-size:9px;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.7);
+  opacity:0;
+  transform:translateY(4px) skewX(-8deg);
+  pointer-events:none;
+  mix-blend-mode:difference;
+}
+.mf-photo-glitch.show { animation:mfPhotoGlitch .8s steps(2,end) forwards; }
+@keyframes mfPhotoGlitch {
+  0%{opacity:0;clip-path:inset(0 100% 0 0)}
+  15%{opacity:1;clip-path:inset(0 0 0 0)}
+  45%{transform:translate(3px,-2px) skewX(8deg)}
+  70%{opacity:.75}
+  100%{opacity:0;transform:translate(-2px,1px)}
+}
+
+/* Footer name centered on the copyright baseline, half-sized, all caps and proximity-reactive. */
+.mf-footer-name {
+  top:auto !important;
+  bottom:6vh !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  font-size:clamp(10px,1.28vw,23px) !important;
+  line-height:1 !important;
+  letter-spacing:-.035em !important;
+  text-transform:uppercase !important;
+  font-weight:400 !important;
+  opacity:1 !important;
+  white-space:nowrap;
+}
+.footer-vp-char {
+  display:inline-block;
+  opacity:.5;
+  font-weight:400;
+  transition:font-weight .08s linear,opacity .08s linear;
+}
+
+/* Sharp-cornered MF ART button. */
+.mf-art-button { border-radius:0 !important; }
+
+@media (max-width:900px) {
+  .mf-photo-card { margin-left:0 !important; }
+  .mf-footer-name { bottom:6vh !important; }
+}
