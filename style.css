@@ -340,7 +340,7 @@ body {
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
-  font-size: 220px;
+  font-size: 260px;
   letter-spacing: -0.065em;
 }
 
