@@ -2938,3 +2938,82 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
 @media (max-width:900px){
   .mf-photo-card{height:58vh !important;}
 }
+
+
+/* ============================================================
+   V21 — locked hero wordmark, locked BIO photo, segmented grid hover
+   ============================================================ */
+
+/* Hero: global kerning only. JS fits the full wordmark as one unit. */
+.mf-hero-name {
+  letter-spacing: -0.082em !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  overflow: visible !important;
+}
+
+#nameWrap {
+  white-space: nowrap !important;
+  transform-origin: left bottom !important;
+}
+
+/* Grid hover: draw only the exact side of the rectangle under the cursor. */
+.mf-grid-segments {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.mf-grid-segment {
+  position: absolute;
+  display: block;
+  background: rgba(255,255,255,0);
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 280ms var(--ease), background-color 280ms var(--ease), box-shadow 280ms var(--ease);
+  will-change: opacity, background-color;
+}
+
+.mf-grid-segment.is-active {
+  opacity: 1;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 0 10px rgba(255,255,255,.26);
+  transition-duration: 120ms;
+}
+
+.mf-grid.is-soft + .mf-grid-segments,
+.mf-grid.is-gone + .mf-grid-segments {
+  opacity: 0;
+}
+
+/* BIO photo: fixed 2:3 portrait, exact 300px width, no scale/parallax/crop drift. */
+.mf-photo-card {
+  grid-column: 6 / 9 !important;
+  width: 300px !important;
+  height: 450px !important;
+  aspect-ratio: 2 / 3 !important;
+  max-width: 300px !important;
+  min-height: 0 !important;
+  justify-self: center !important;
+  margin-left: 0 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  clip-path: none !important;
+  transform: none !important;
+  transition: opacity 1s var(--ease) !important;
+  will-change: opacity !important;
+  background: none !important;
+  background-image: none !important;
+  border: 1px solid var(--line) !important;
+}
+
+@media (max-width:900px){
+  .mf-photo-card {
+    width: min(300px, 72vw) !important;
+    height: calc(min(300px, 72vw) * 1.5) !important;
+    max-width: 300px !important;
+  }
+}
