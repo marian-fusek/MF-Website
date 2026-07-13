@@ -2908,3 +2908,33 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-photo-card{height:58vh !important;}
   .mf-light-rays{opacity:.26;}
 }
+
+
+/* ============================================================
+   V20 — final hero fit, no light rays, BIO crop, white footer name
+   ============================================================ */
+.mf-light-rays { display:none !important; }
+
+/* Reserve a hard 30px safety area on the right; JS handles exact fit. */
+.mf-hero-name { letter-spacing:-0.071em !important; }
+
+/* Crop 20% horizontally (10% each side), then scale the whole image down 15%. */
+.mf-photo-card {
+  height:68vh !important;
+  width:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  clip-path:inset(0 10% 0 10%) !important;
+  transform:translate(var(--photo-x,0),var(--photo-y,0)) scale(.85) !important;
+  transform-origin:center center !important;
+}
+
+.mf-footer-name,
+.footer-vp-char {
+  color:#fff !important;
+  opacity:1 !important;
+}
+
+@media (max-width:900px){
+  .mf-photo-card{height:58vh !important;}
+}
