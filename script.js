@@ -300,20 +300,23 @@ function scaleHeroName(){
   const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");
   if(!hero||!wrap)return;
 
-  /* V21: no individual-letter nudging. The name is treated as one locked wordmark:
-     tighter global kerning + whole-block left shift + right-side safety margin. */
+  /* V23: wordmark uses the same left margin as the MF nav logo.
+     Right side gets that same margin + 40px to compensate for the K optical/text-box edge. */
   hero.style.fontSize="300px";
   hero.style.letterSpacing="-0.082em";
   wrap.style.transform="none";
 
   const viewport=window.innerWidth;
-  const leftShift=viewport<700?-8:-18;
-  const rightSafety=viewport<700?26:52;
+  const rootStyles=getComputedStyle(document.documentElement);
+  const pagePadRaw=rootStyles.getPropertyValue("--page-pad").trim();
+  const pagePad=parseFloat(pagePadRaw)||8;
+  const leftSpace=pagePad;
+  const rightSpace=pagePad+40;
   const rawWidth=wrap.scrollWidth||1;
-  const available=viewport-leftShift-rightSafety;
+  const available=viewport-leftSpace-rightSpace;
   const scale=Math.min(1.12,Math.max(.2,available/rawWidth));
 
-  wrap.style.transform=`translateX(${leftShift}px) scale(${scale})`;
+  wrap.style.transform=`translateX(${leftSpace}px) scale(${scale})`;
   wrap.style.transformOrigin="left bottom";
 
   if(info&&window.innerWidth>1000){
