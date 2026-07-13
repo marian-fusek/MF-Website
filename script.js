@@ -297,27 +297,38 @@ if(indexExtra){
 })();
 
 function scaleHeroName(){
-  const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");
+  const hero=document.getElementById("heroName");
+  const wrap=document.getElementById("nameWrap");
+  const info=document.querySelector(".mf-hero-info");
   if(!hero||!wrap)return;
 
-  /* V23: wordmark uses the same left margin as the MF nav logo.
-     Right side gets that same margin + 40px to compensate for the K optical/text-box edge. */
-  hero.style.fontSize="300px";
-  hero.style.letterSpacing="-0.082em";
-  wrap.style.transform="none";
-
+  /* V24: clean wordmark-fit system, inspired by the Charlie Osborne-style full-width name.
+     No per-letter nudging. We measure the actual rendered text range, then scale the whole
+     wordmark to fit between the MF/nav left margin and a protected optical right edge. */
   const viewport=window.innerWidth;
   const rootStyles=getComputedStyle(document.documentElement);
-  const pagePadRaw=rootStyles.getPropertyValue("--page-pad").trim();
-  const pagePad=parseFloat(pagePadRaw)||8;
-  const leftSpace=pagePad;
-  const rightSpace=pagePad+40;
-  const rawWidth=wrap.scrollWidth||1;
-  const available=viewport-leftSpace-rightSpace;
-  const scale=Math.min(1.12,Math.max(.2,available/rawWidth));
+  const pagePad=parseFloat(rootStyles.getPropertyValue("--page-pad"))||8;
+  const leftTarget=pagePad;
+  const rightTarget=pagePad+40; // K/right-edge optical compensation requested
+  const available=Math.max(120,viewport-leftTarget-rightTarget);
 
-  wrap.style.transform=`translateX(${leftSpace}px) scale(${scale})`;
+  hero.style.fontSize="300px";
+  hero.style.letterSpacing="-0.082em";
+  wrap.style.transform="matrix(1,0,0,1,0,0)";
   wrap.style.transformOrigin="left bottom";
+
+  const range=document.createRange();
+  range.selectNodeContents(wrap);
+  const textRect=range.getBoundingClientRect();
+  const wrapRect=wrap.getBoundingClientRect();
+  range.detach();
+
+  const rawInkWidth=textRect.width||wrap.scrollWidth||1;
+  const inkOffsetLeft=textRect.left-wrapRect.left;
+  const scale=Math.max(.12,available/rawInkWidth);
+  const tx=leftTarget-(inkOffsetLeft*scale);
+
+  wrap.style.transform=`matrix(${scale},0,0,${scale},${tx},0)`;
 
   if(info&&window.innerWidth>1000){
     const fChar=hero.querySelector(".n-f");
@@ -1050,23 +1061,42 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     return Math.abs(y-s.y1);
   }
 
-  let last=null;
+  function activateSegment(s){
+    s.el.classList.add("is-active");
+    clearTimeout(s.timer);
+    s.timer=setTimeout(()=>s.el.classList.remove("is-active"),2200);
+  }
+
+  let lastPoint=null;
   window.addEventListener("pointermove",e=>{
     if(grid.classList.contains("is-gone"))return;
-    const threshold=7;
-    let best=null,bestDistance=Infinity;
-    for(const s of segments){
-      const d=distanceToSegment(s,e.clientX,e.clientY);
-      if(d<bestDistance){best=s;bestDistance=d;}
+    const threshold=8;
+    const x=e.clientX,y=e.clientY;
+    const points=[];
+
+    if(lastPoint){
+      const dx=x-lastPoint.x,dy=y-lastPoint.y;
+      const distance=Math.hypot(dx,dy);
+      const steps=Math.max(1,Math.ceil(distance/8));
+      for(let i=1;i<=steps;i++){
+        const t=i/steps;
+        points.push({x:lastPoint.x+dx*t,y:lastPoint.y+dy*t});
+      }
+    }else{
+      points.push({x,y});
     }
-    if(!best||bestDistance>threshold)return;
-    if(last&&last!==best)last.el.classList.remove("is-active");
-    last=best;
-    best.el.classList.add("is-active");
-    clearTimeout(best.timer);
-    best.timer=setTimeout(()=>best.el.classList.remove("is-active"),2200);
+    lastPoint={x,y};
+
+    const touched=new Set();
+    for(const point of points){
+      for(const s of segments){
+        if(distanceToSegment(s,point.x,point.y)<=threshold)touched.add(s);
+      }
+    }
+    touched.forEach(activateSegment);
   },{passive:true});
 
-  window.addEventListener("resize",build,{passive:true});
+  window.addEventListener("pointerleave",()=>{lastPoint=null;},{passive:true});
+  window.addEventListener("resize",()=>{lastPoint=null;build();},{passive:true});
   build();
 })();

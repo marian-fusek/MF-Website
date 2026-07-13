@@ -100,6 +100,16 @@ body {
   text-decoration: none;
 }
 
+::selection {
+  background: #fff;
+  color: #000;
+}
+
+::-moz-selection {
+  background: #fff;
+  color: #000;
+}
+
 /* Loader */
 
 .mf-loader {
@@ -340,7 +350,7 @@ body {
   opacity: 0;
   animation: mfNameIn 1.8s var(--ease) 1.4s forwards;
   cursor: default;
-  font-size: 400px;
+  font-size: 200px;
   letter-spacing: -0.065em;
 }
 
@@ -2984,8 +2994,9 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   opacity: 1;
   background: rgba(255,255,255,.98);
   box-shadow:
-    0 0 9px rgba(255,255,255,.46),
-    0 0 22px rgba(255,255,255,.18);
+    0 0 14px rgba(255,255,255,.62),
+    0 0 34px rgba(255,255,255,.30),
+    0 0 58px rgba(255,255,255,.13);
 }
 
 .mf-grid.is-soft + .mf-grid-segments,
