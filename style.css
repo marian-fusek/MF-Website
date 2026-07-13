@@ -2971,17 +2971,21 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   position: absolute;
   display: block;
   background: rgba(255,255,255,0);
-  box-shadow: none;
+  box-shadow: 0 0 0 rgba(255,255,255,0);
   opacity: 0;
-  transition: opacity 280ms var(--ease), background-color 280ms var(--ease), box-shadow 280ms var(--ease);
-  will-change: opacity, background-color;
+  transition:
+    opacity 2s var(--ease),
+    background-color 2s var(--ease),
+    box-shadow 2s var(--ease);
+  will-change: opacity, background-color, box-shadow;
 }
 
 .mf-grid-segment.is-active {
   opacity: 1;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 0 10px rgba(255,255,255,.26);
-  transition-duration: 120ms;
+  background: rgba(255,255,255,.98);
+  box-shadow:
+    0 0 9px rgba(255,255,255,.46),
+    0 0 22px rgba(255,255,255,.18);
 }
 
 .mf-grid.is-soft + .mf-grid-segments,

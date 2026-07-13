@@ -1061,7 +1061,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     last=best;
     best.el.classList.add("is-active");
     clearTimeout(best.timer);
-    best.timer=setTimeout(()=>best.el.classList.remove("is-active"),520);
+    best.timer=setTimeout(()=>best.el.classList.remove("is-active"),2200);
   },{passive:true});
 
   window.addEventListener("resize",build,{passive:true});
