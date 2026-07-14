@@ -1058,3 +1058,89 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   }
   loop();
 })();
+
+/* V24 — click-and-hold a hero grid cell to illuminate all four edges. */
+(function(){
+  const grid=document.getElementById("mfGrid");
+  const hero=document.getElementById("heroSection");
+  if(!grid||!hero)return;
+  let active=[];
+  const clear=()=>{
+    active.forEach(line=>line.classList.remove("is-on"));
+    const old=active;active=[];
+    setTimeout(()=>old.forEach(line=>line.remove()),380);
+  };
+  const make=(cls,styles)=>{
+    const line=document.createElement("span");
+    line.className=`mf-grid-cell-line ${cls}`;
+    Object.assign(line.style,styles);
+    grid.appendChild(line);
+    requestAnimationFrame(()=>line.classList.add("is-on"));
+    active.push(line);
+  };
+  hero.addEventListener("pointerdown",e=>{
+    if(e.button!==0)return;
+    clear();
+    const col=Math.max(0,Math.min(9,Math.floor(e.clientX/(innerWidth/10))));
+    const row=Math.max(0,Math.min(2,Math.floor(e.clientY/(innerHeight/3))));
+    const left=col*innerWidth/10,right=(col+1)*innerWidth/10;
+    const top=row*innerHeight/3,bottom=(row+1)*innerHeight/3;
+    make("is-v",{left:`${left}px`,top:`${top}px`,height:`${bottom-top}px`});
+    make("is-v",{left:`${right}px`,top:`${top}px`,height:`${bottom-top}px`});
+    make("is-h",{left:`${left}px`,top:`${top}px`,width:`${right-left}px`});
+    make("is-h",{left:`${left}px`,top:`${bottom}px`,width:`${right-left}px`});
+  });
+  window.addEventListener("pointerup",clear);
+  window.addEventListener("pointercancel",clear);
+})();
+
+/* V24 — the ART preview uses the same image set as the full overlay. */
+(function(){
+  const world=document.getElementById("mfArtMiniWorld");
+  if(!world)return;
+  const files=[
+    "01-konnichiwawa.png","02-perefction.png","03-flawr.png","04-mattress.png","05-egg.png","06-huh.png","07-hotdog.png","08-jail.png","09-box.png","10-ufo.png","11-claude.png","12-hay.png","13-spaghet.png","14-doctor.png","15-cher.png","16-pantalones.png","17-tuli.png","18-wave.png","19-bean.png","20-accept.png","21-violins.png","22-holy.png","23-tiktok.png","24-ai.png","25-blushies.png","26-arse.png","27-glow.png","28-smash.png","29-stairs.png","30-orange.png"
+  ];
+  const seeded=n=>{const x=Math.sin(n*9283.31)*43758.5453;return x-Math.floor(x);};
+  const shown=[0,2,4,6,9,12,15,18,22,27];
+  shown.forEach((index,i)=>{
+    const piece=document.createElement("span");
+    piece.className="mf-art-mini-piece";
+    const x=(seeded(i+1)*88-4).toFixed(1)+"%";
+    const y=(seeded(i+11)*88-4).toFixed(1)+"%";
+    piece.style.setProperty("--mx",x);
+    piece.style.setProperty("--my",y);
+    piece.style.setProperty("--mr",(-1+seeded(i+21)*2).toFixed(2)+"deg");
+    piece.style.setProperty("--md",(8+seeded(i+31)*8).toFixed(2)+"s");
+    piece.style.setProperty("--mDelay",(-seeded(i+41)*8).toFixed(2)+"s");
+    piece.style.setProperty("--mdx",(-12+seeded(i+51)*24).toFixed(1)+"px");
+    piece.style.setProperty("--mdy",(-10+seeded(i+61)*20).toFixed(1)+"px");
+    piece.style.setProperty("--mini-opacity",(.34+seeded(i+71)*.46).toFixed(2));
+    piece.style.setProperty("--mini-bright",(.48+seeded(i+81)*.34).toFixed(2));
+    const img=document.createElement("img");
+    img.src=`/images/art/${files[index]}`;
+    img.alt="";
+    img.onerror=()=>{img.onerror=null;img.src=`./images/art/${files[index]}`;};
+    piece.appendChild(img);world.appendChild(piece);
+  });
+})();
+
+/* V24 — keep BIO glitches inside the portrait and add a small RGB split every 3s. */
+(function(){
+  const wrap=document.querySelector(".mf-photo-wrap");
+  const photo=wrap?.querySelector(".mf-photo-card");
+  if(!wrap||!photo)return;
+  const chars=["+ +","001101","// MF","[ERR]","<>_","0xFF","::: ","* * *"];
+  setInterval(()=>{
+    wrap.classList.add("is-rgb-glitch");
+    setTimeout(()=>wrap.classList.remove("is-rgb-glitch"),180);
+    const glitch=document.createElement("span");
+    glitch.className="mf-photo-glitch";
+    glitch.textContent=chars[Math.floor(Math.random()*chars.length)];
+    glitch.style.left=(6+Math.random()*Math.max(10,wrap.clientWidth-46))+"px";
+    glitch.style.top=(8+Math.random()*Math.max(10,wrap.clientHeight-28))+"px";
+    wrap.appendChild(glitch);
+    requestAnimationFrame(()=>glitch.classList.add("show"));
+    setTimeout(()=>glitch.remove(),850);
+  },3000);
+})();

@@ -3280,3 +3280,191 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-art-button-deck{left:58% !important;}
   .mf-art-button-deck > span{width:108px !important;left:calc(var(--i) * 14px + 2%) !important;}
 }
+
+/* ============================================================
+   V24 — grid trail/click cells, full-width ART showcase, BIO crop
+   ============================================================ */
+
+/* Trail is exactly twice as slow in and out while preserving segmented behavior. */
+.mf-grid-segment {
+  transition: opacity 300ms var(--ease), filter 360ms var(--ease) !important;
+}
+.mf-grid-segment.is-on {
+  transition-duration: 60ms,60ms !important;
+}
+.mf-grid-cell-line {
+  position:absolute;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  background:#fff;
+  box-shadow:0 0 13px rgba(255,255,255,.28);
+  filter:blur(.12px);
+  transition:opacity 300ms var(--ease);
+}
+.mf-grid-cell-line.is-on { opacity:.98; transition-duration:60ms; }
+.mf-grid-cell-line.is-v { width:1px; }
+.mf-grid-cell-line.is-h { height:1px; }
+
+/* BIO portrait: retain width, reduce only visible height by 25%, contain glitches. */
+.mf-photo-wrap {
+  grid-column:6 / 9;
+  position:relative;
+  width:85%;
+  height:51vh;
+  margin-left:50px;
+  overflow:hidden;
+  align-self:start;
+}
+.mf-photo-card {
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  margin:0 !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  clip-path:inset(0 10% 0 10%) !important;
+  transform:translate3d(var(--photo-x,0),var(--photo-y,0),0) !important;
+  transition:opacity 1s var(--ease),transform .18s ease-out,filter .16s linear !important;
+}
+.mf-photo-wrap .mf-photo-glitch { position:absolute; }
+.mf-photo-wrap.is-rgb-glitch .mf-photo-card {
+  filter:drop-shadow(3px 0 0 rgba(255,0,55,.55)) drop-shadow(-3px 0 0 rgba(0,180,255,.48));
+}
+
+/* Full-screen ART showcase inspired by the supplied case-study layout. */
+.mf-art-showcase {
+  min-height:100vh;
+  padding:8vh 6vw 10vh;
+  display:flex;
+  align-items:stretch;
+}
+.mf-art-showcase-inner {
+  width:100%;
+  min-height:82vh;
+  border-top:1px solid var(--line);
+  display:grid;
+  grid-template-columns:minmax(260px,28vw) 1fr;
+  gap:clamp(36px,6vw,110px);
+  padding-top:10vh;
+}
+.mf-art-showcase-copy {
+  position:relative;
+  min-height:68vh;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+.mf-art-showcase-copy h2 {
+  margin:0;
+  font-size:clamp(34px,4.2vw,76px);
+  line-height:.95;
+  letter-spacing:-.06em;
+  font-weight:400;
+}
+.mf-art-showcase-tags {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:26px;
+}
+.mf-art-showcase-tags span {
+  border:1px solid var(--line-strong);
+  padding:5px 8px 4px;
+  font-family:"Geist Mono",monospace;
+  font-size:9px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.mf-art-showcase-copy > p {
+  margin:auto 0 0;
+  max-width:390px;
+  font-family:"Geist",Arial,sans-serif;
+  font-size:clamp(15px,1.2vw,20px);
+  line-height:1.28;
+  letter-spacing:-.025em;
+  color:rgba(244,244,244,.72);
+}
+.mf-art-preview-frame {
+  position:relative;
+  min-height:68vh;
+  padding:0;
+  border:0;
+  overflow:hidden;
+  background:#050505;
+  color:#fff;
+  cursor:nesw-resize;
+  text-align:left;
+  isolation:isolate;
+}
+.mf-art-preview-frame::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:8;
+  border:1px solid rgba(255,255,255,.08);
+  pointer-events:none;
+  transition:background .45s var(--ease),border-color .45s var(--ease);
+}
+.mf-art-preview-frame:hover::after {
+  background:rgba(255,255,255,.025);
+  border-color:rgba(255,255,255,.22);
+}
+.mf-art-mini-world { position:absolute; inset:0; z-index:1; overflow:hidden; }
+.mf-art-mini-piece {
+  position:absolute;
+  width:clamp(120px,14vw,250px);
+  aspect-ratio:1 / .72;
+  opacity:var(--mini-opacity,.7);
+  transform:translate3d(var(--mx),var(--my),0) rotate(var(--mr));
+  animation:mfMiniDrift var(--md) ease-in-out var(--mDelay) infinite alternate;
+  will-change:transform;
+}
+.mf-art-mini-piece img {
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:grayscale(1) brightness(var(--mini-bright,.72));
+  box-shadow:0 15px 34px rgba(0,0,0,.42);
+}
+@keyframes mfMiniDrift {
+  to { transform:translate3d(calc(var(--mx) + var(--mdx)),calc(var(--my) + var(--mdy)),0) rotate(var(--mr)); }
+}
+.mf-art-mini-intro {
+  position:absolute;
+  z-index:6;
+  left:50%;top:50%;
+  width:min(52%,520px);
+  transform:translate(-50%,-50%);
+  text-align:center;
+  pointer-events:none;
+}
+.mf-art-mini-intro h3 { margin:0;font-size:clamp(24px,3vw,48px);font-weight:400;letter-spacing:-.05em; }
+.mf-art-mini-intro > p { margin:15px auto 24px;max-width:470px;font-family:"Geist Mono",monospace;font-size:9px;line-height:1.5;color:rgba(255,255,255,.52);text-transform:uppercase; }
+.mf-art-mini-actions { display:flex;justify-content:center;gap:8px;flex-wrap:wrap; }
+.mf-art-mini-actions span,
+.mf-art-cta {
+  border:1px solid var(--line-strong) !important;
+  background:transparent !important;
+  color:#fff !important;
+  border-radius:0 !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  padding:10px 14px !important;
+  box-shadow:none !important;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease) !important;
+}
+.mf-art-cta:hover {
+  background:rgba(255,255,255,.13) !important;
+  border-color:rgba(255,255,255,.45) !important;
+  transform:translateY(-2px);
+}
+
+@media (max-width:900px) {
+  .mf-photo-wrap { grid-column:1 / -1;width:min(78%,420px);height:42vh;margin:50px 0 0 auto; }
+  .mf-art-showcase { padding:8vh 18px; }
+  .mf-art-showcase-inner { grid-template-columns:1fr;padding-top:8vh; }
+  .mf-art-showcase-copy { min-height:42vh; }
+  .mf-art-preview-frame { min-height:62vh; }
+}

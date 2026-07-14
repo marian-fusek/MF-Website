@@ -1,7 +1,7 @@
-V22 — targeted repair build
-
-- Restores the established hero name positioning and BIO portrait.
-- Restores segmented hero-grid touch highlights, with only the peak pause shortened.
-- Keeps hero-name ASCII fragmentation.
-- Repairs footer variable-font proximity without cursor lag.
-- Refines the MF ART strip tags, copy and tightly stacked edge-on cards.
+V24
+- Hero grid segment fade-in/out is 2x longer.
+- Click-and-hold any hero grid rectangle to light all four edges; release fades them.
+- MF ART is a full-width showcase section with a live drifting preview of the existing overlay gallery.
+- Gallery overlay behavior remains unchanged; click the preview frame to open it.
+- Gallery CTAs are regular outlined buttons with restrained hover highlighting.
+- BIO portrait is 25% shorter vertically at the same visual width; ASCII/RGB glitches are clipped inside.
