@@ -828,9 +828,13 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   }
   let artMotionFrame=0;
   function animateArt(now){
-    if(overlay.classList.contains("active")&&!expanded)render(now);
+    if(!expanded && (miniWorld || overlay.classList.contains("active"))) render(now);
     artMotionFrame=requestAnimationFrame(animateArt);
   }
+  requestAnimationFrame(()=>{
+    build();
+    render(performance.now());
+  });
   artMotionFrame=requestAnimationFrame(animateArt);
   function expandPiece(piece){
     if(expanded)return;

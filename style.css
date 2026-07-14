@@ -3557,3 +3557,41 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
 }
 /* Retire the old independent mini-gallery styling. */
 .mf-art-mini-piece { display:none !important; }
+
+
+/* ============================================================
+   V27 — initialize shared preview immediately + ART copy refinements
+   ============================================================ */
+.mf-art-showcase-copy {
+  justify-content:flex-start !important;
+}
+.mf-art-showcase-bottom {
+  width:130%;
+  max-width:510px;
+  margin-top:auto;
+}
+.mf-art-showcase-bottom .mf-art-showcase-tags {
+  margin:0 0 16px;
+}
+.mf-art-showcase-bottom > p {
+  margin:0;
+  width:100%;
+  max-width:none;
+  font-family:"Geist",Arial,sans-serif;
+  font-size:clamp(15px,1.2vw,20px);
+  line-height:1.28;
+  letter-spacing:-.025em;
+  color:#fff;
+}
+.mf-art-preview-frame {
+  transform:scale(1);
+  transform-origin:center;
+  transition:transform .7s var(--ease), filter .45s var(--ease);
+  will-change:transform;
+}
+.mf-art-preview-frame:hover {
+  transform:scale(1.02);
+}
+@media (max-width:900px){
+  .mf-art-showcase-bottom { width:100%; max-width:620px; }
+}
