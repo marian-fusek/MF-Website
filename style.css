@@ -3207,3 +3207,76 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-art-button-tags { display:flex !important; gap:4px; }
   .mf-art-button-tags > span { font-size:8px; padding:3px 5px 2px; }
 }
+
+/* ============================================================
+   V23 — isolated refinements only
+   ============================================================ */
+
+/* BIO portrait: restore the exact V20 treatment. */
+.mf-photo-card {
+  height:68vh !important;
+  width:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  clip-path:inset(0 10% 0 10%) !important;
+  transform:translate(var(--photo-x,0),var(--photo-y,0)) scale(.85) !important;
+  transform-origin:center center !important;
+  flex-shrink:0 !important;
+}
+
+/* ART strip: slightly shorter horizontally, 20% taller and roomier. */
+.mf-about-layout .mf-art-zone {
+  width:94% !important;
+  height:clamp(158px,16.8vh,212px) !important;
+  justify-self:start !important;
+}
+.mf-art-button {
+  padding:32px 38px !important;
+}
+.mf-art-button-copy strong {
+  font-size:clamp(21px,1.8vw,32px) !important;
+  margin-bottom:12px !important;
+}
+.mf-art-button-tags {
+  margin-bottom:18px !important;
+}
+
+/* Static edge-on wallpaper stack: no hover rotation or re-layout. */
+.mf-art-button-deck {
+  left:51% !important;
+  right:3% !important;
+  top:0 !important;
+  bottom:0 !important;
+  overflow:hidden !important;
+  perspective:1400px !important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 94%,transparent 100%) !important;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 94%,transparent 100%) !important;
+}
+.mf-art-button-deck > span {
+  top:18% !important;
+  bottom:0 !important;
+  left:calc(var(--i) * 18px + 4%) !important;
+  width:132px !important;
+  height:auto !important;
+  background-size:contain !important;
+  background-repeat:no-repeat !important;
+  background-position:center bottom !important;
+  transform-origin:left bottom !important;
+  transform:rotateY(-78deg) translateZ(calc(var(--i) * -3px)) !important;
+  opacity:calc(.96 - var(--i) * .045) !important;
+  border:1px solid rgba(244,244,244,.18) !important;
+  box-shadow:10px 0 18px rgba(0,0,0,.28) !important;
+  transition:filter .35s var(--ease), opacity .35s var(--ease) !important;
+}
+.mf-art-button:hover .mf-art-button-deck > span {
+  transform:rotateY(-78deg) translateZ(calc(var(--i) * -3px)) !important;
+  filter:brightness(1.05) !important;
+}
+
+@media (max-width:900px){
+  .mf-photo-card{height:58vh !important;}
+  .mf-about-layout .mf-art-zone{width:100% !important;height:190px !important;}
+  .mf-art-button{padding:26px 24px !important;}
+  .mf-art-button-deck{left:58% !important;}
+  .mf-art-button-deck > span{width:108px !important;left:calc(var(--i) * 14px + 2%) !important;}
+}
