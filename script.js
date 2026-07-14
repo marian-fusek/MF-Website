@@ -688,7 +688,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const donation=document.getElementById("mfDonationOverlay");
   const donationClose=document.getElementById("mfDonationClose");
   const donationParticles=document.getElementById("mfDonationParticles");
-  if(!zone||!button||!overlay||!world||!close)return;
+  if(!button||!overlay||!world||!close)return;
 
   const files=[
     "01-konnichiwawa.png","02-perefction.png","03-flawr.png","04-mattress.png","05-egg.png",
@@ -702,13 +702,15 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     if(window.gsap)gsap.to(button,{x,y,duration,ease,overwrite:true});
     else button.style.transform=`translate(${x}px,${y}px)`;
   };
-  zone.addEventListener("mousemove",e=>{
-    const rect=zone.getBoundingClientRect();
-    const x=((e.clientX-rect.left)/rect.width-.5)*rect.width;
-    const y=((e.clientY-rect.top)/rect.height-.5)*rect.height;
-    moveButton(x*strength,y*strength);
-  });
-  zone.addEventListener("mouseleave",()=>moveButton(0,0,.7,"elastic.out(1, 0.4)"));
+  if(zone){
+    zone.addEventListener("mousemove",e=>{
+      const rect=zone.getBoundingClientRect();
+      const x=((e.clientX-rect.left)/rect.width-.5)*rect.width;
+      const y=((e.clientY-rect.top)/rect.height-.5)*rect.height;
+      moveButton(x*strength,y*strength);
+    });
+    zone.addEventListener("mouseleave",()=>moveButton(0,0,.7,"elastic.out(1, 0.4)"));
+  }
 
   let pieces=[];
   let offsetX=0,offsetY=0;
@@ -1094,7 +1096,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   window.addEventListener("pointercancel",clear);
 })();
 
-/* V24 — the ART preview uses the same image set as the full overlay. */
+/* V25 — ART preview mirrors the gallery with evenly distributed drifting pieces. */
 (function(){
   const world=document.getElementById("mfArtMiniWorld");
   if(!world)return;
@@ -1103,20 +1105,23 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   ];
   const seeded=n=>{const x=Math.sin(n*9283.31)*43758.5453;return x-Math.floor(x);};
   const shown=[0,2,4,6,9,12,15,18,22,27];
+  const cols=4, rows=3;
   shown.forEach((index,i)=>{
     const piece=document.createElement("span");
     piece.className="mf-art-mini-piece";
-    const x=(seeded(i+1)*88-4).toFixed(1)+"%";
-    const y=(seeded(i+11)*88-4).toFixed(1)+"%";
-    piece.style.setProperty("--mx",x);
-    piece.style.setProperty("--my",y);
+    const col=i%cols,row=Math.floor(i/cols);
+    const left=5+col*24+(seeded(i+1)-.5)*7;
+    const top=5+row*31+(seeded(i+11)-.5)*9;
+    piece.style.left=left.toFixed(1)+"%";
+    piece.style.top=top.toFixed(1)+"%";
     piece.style.setProperty("--mr",(-1+seeded(i+21)*2).toFixed(2)+"deg");
     piece.style.setProperty("--md",(8+seeded(i+31)*8).toFixed(2)+"s");
     piece.style.setProperty("--mDelay",(-seeded(i+41)*8).toFixed(2)+"s");
-    piece.style.setProperty("--mdx",(-12+seeded(i+51)*24).toFixed(1)+"px");
-    piece.style.setProperty("--mdy",(-10+seeded(i+61)*20).toFixed(1)+"px");
-    piece.style.setProperty("--mini-opacity",(.34+seeded(i+71)*.46).toFixed(2));
-    piece.style.setProperty("--mini-bright",(.48+seeded(i+81)*.34).toFixed(2));
+    piece.style.setProperty("--mdx",(-10+seeded(i+51)*20).toFixed(1)+"px");
+    piece.style.setProperty("--mdy",(-8+seeded(i+61)*16).toFixed(1)+"px");
+    piece.style.setProperty("--mini-opacity",(.34+seeded(i+71)*.42).toFixed(2));
+    piece.style.setProperty("--mini-bright",(.5+seeded(i+81)*.3).toFixed(2));
+    piece.style.zIndex=String(1+Math.floor(seeded(i+91)*4));
     const img=document.createElement("img");
     img.src=`/images/art/${files[index]}`;
     img.alt="";
@@ -1137,8 +1142,9 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     const glitch=document.createElement("span");
     glitch.className="mf-photo-glitch";
     glitch.textContent=chars[Math.floor(Math.random()*chars.length)];
-    glitch.style.left=(6+Math.random()*Math.max(10,wrap.clientWidth-46))+"px";
-    glitch.style.top=(8+Math.random()*Math.max(10,wrap.clientHeight-28))+"px";
+    const photoRect={left:photo.offsetLeft,top:photo.offsetTop,width:photo.offsetWidth,height:photo.offsetHeight};
+    glitch.style.left=(photoRect.left+6+Math.random()*Math.max(10,photoRect.width-46))+"px";
+    glitch.style.top=(photoRect.top+8+Math.random()*Math.max(10,photoRect.height-28))+"px";
     wrap.appendChild(glitch);
     requestAnimationFrame(()=>glitch.classList.add("show"));
     setTimeout(()=>glitch.remove(),850);
