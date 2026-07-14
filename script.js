@@ -681,6 +681,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const button=document.getElementById("mfArtButton");
   const overlay=document.getElementById("mfArtOverlay");
   const world=document.getElementById("mfArtWorld");
+  const miniWorld=document.getElementById("mfArtMiniWorld");
   const close=document.getElementById("mfArtClose");
   const intro=document.getElementById("mfArtIntro");
   const particleHost=document.getElementById("mfArtParticles");
@@ -713,6 +714,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   }
 
   let pieces=[];
+  let miniPieces=[];
   let offsetX=0,offsetY=0;
   let dragging=false,lastX=0,lastY=0,dragDistance=0,downFigure=null;
   let velocityX=0,velocityY=0,lastMoveTime=0,inertiaFrame=0;
@@ -725,6 +727,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   function build(){
     if(pieces.length)return;
     world.innerHTML="";
+    if(miniWorld)miniWorld.innerHTML="";
     const vw=window.innerWidth,vh=window.innerHeight;
     const fieldW=vw*2.45,fieldH=vh*2.25;
     const cols=6,rows=5,cellW=fieldW/cols,cellH=fieldH/rows;
@@ -755,10 +758,28 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       img.onerror=()=>{ img.onerror=null; img.src=`./images/art/${name}`; };
       figure.appendChild(img);
       world.appendChild(figure);
+
+      let miniEl=null,miniImg=null;
+      if(miniWorld){
+        miniEl=document.createElement("figure");
+        miniEl.className="mf-art-piece mf-art-piece--mini";
+        miniEl.style.zIndex=figure.style.zIndex;
+        miniEl.style.setProperty("--depth-brightness",figure.style.getPropertyValue("--depth-brightness"));
+        miniEl.style.setProperty("--depth-blur",figure.style.getPropertyValue("--depth-blur"));
+        miniImg=document.createElement("img");
+        miniImg.src=img.src;
+        miniImg.alt="";
+        miniImg.draggable=false;
+        miniImg.onerror=()=>{miniImg.onerror=null;miniImg.src=`./images/art/${name}`;};
+        miniEl.appendChild(miniImg);
+        miniWorld.appendChild(miniEl);
+      }
+
+      const x=((i%cols)+.5)*cellW-fieldW/2+(seeded(i+90)-.5)*cellW*.32;
+      const y=(Math.floor(i/cols)+.5)*cellH-fieldH/2+(seeded(i+150)-.5)*cellH*.28;
       return {
-        el:figure,img,
-        x:((i%cols)+.5)*cellW-fieldW/2+(seeded(i+90)-.5)*cellW*.32,
-        y:(Math.floor(i/cols)+.5)*cellH-fieldH/2+(seeded(i+150)-.5)*cellH*.28,
+        el:figure,img,miniEl,miniImg,
+        x,y,nx:x/fieldW,ny:y/fieldH,
         w:size,h:Math.round(size*ratio),depth,
         driftX:(seeded(i+210)-.5)*10,
         driftY:(seeded(i+260)-.5)*8,
@@ -781,12 +802,28 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     const t=now*.00012;
     const wholeX=Math.sin(t)*22;
     const wholeY=Math.cos(t*.82)*16;
+    const miniRect=miniWorld?.getBoundingClientRect();
+    const mw=miniRect?.width||0,mh=miniRect?.height||0;
+    const miniSpanX=mw*2.45,miniSpanY=mh*2.25;
+    const scale=mw&&mh?Math.min(mw/vw,mh/vh):0;
     pieces.forEach(piece=>{
       const localX=Math.sin(t*(.7+piece.depth*.45)+piece.phase)*piece.driftX;
       const localY=Math.cos(t*(.65+piece.depth*.38)+piece.phase)*piece.driftY;
-      const x=wrap(piece.x+(offsetX+wholeX)*piece.depth+localX,spanX)+vw/2-piece.w/2;
-      const y=wrap(piece.y+(offsetY+wholeY)*piece.depth+localY,spanY)+vh/2-piece.h/2;
+      const x=wrap(piece.nx*spanX+(offsetX+wholeX)*piece.depth+localX,spanX)+vw/2-piece.w/2;
+      const y=wrap(piece.ny*spanY+(offsetY+wholeY)*piece.depth+localY,spanY)+vh/2-piece.h/2;
       piece.el.style.setProperty("--base-transform",`translate3d(${x}px,${y}px,0)`);
+
+      if(piece.miniEl&&mw&&mh){
+        const miniW=Math.max(42,piece.w*scale);
+        const miniH=Math.max(32,piece.h*scale);
+        const miniOffsetX=(offsetX+wholeX)*scale;
+        const miniOffsetY=(offsetY+wholeY)*scale;
+        const mx=wrap(piece.nx*miniSpanX+miniOffsetX*piece.depth+localX*scale,miniSpanX)+mw/2-miniW/2;
+        const my=wrap(piece.ny*miniSpanY+miniOffsetY*piece.depth+localY*scale,miniSpanY)+mh/2-miniH/2;
+        piece.miniEl.style.width=`${miniW}px`;
+        piece.miniEl.style.height=`${miniH}px`;
+        piece.miniEl.style.setProperty("--base-transform",`translate3d(${mx}px,${my}px,0)`);
+      }
     });
   }
   let artMotionFrame=0;
@@ -1096,39 +1133,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   window.addEventListener("pointercancel",clear);
 })();
 
-/* V25 — ART preview mirrors the gallery with evenly distributed drifting pieces. */
-(function(){
-  const world=document.getElementById("mfArtMiniWorld");
-  if(!world)return;
-  const files=[
-    "01-konnichiwawa.png","02-perefction.png","03-flawr.png","04-mattress.png","05-egg.png","06-huh.png","07-hotdog.png","08-jail.png","09-box.png","10-ufo.png","11-claude.png","12-hay.png","13-spaghet.png","14-doctor.png","15-cher.png","16-pantalones.png","17-tuli.png","18-wave.png","19-bean.png","20-accept.png","21-violins.png","22-holy.png","23-tiktok.png","24-ai.png","25-blushies.png","26-arse.png","27-glow.png","28-smash.png","29-stairs.png","30-orange.png"
-  ];
-  const seeded=n=>{const x=Math.sin(n*9283.31)*43758.5453;return x-Math.floor(x);};
-  const shown=[0,2,4,6,9,12,15,18,22,27];
-  const cols=4, rows=3;
-  shown.forEach((index,i)=>{
-    const piece=document.createElement("span");
-    piece.className="mf-art-mini-piece";
-    const col=i%cols,row=Math.floor(i/cols);
-    const left=5+col*24+(seeded(i+1)-.5)*7;
-    const top=5+row*31+(seeded(i+11)-.5)*9;
-    piece.style.left=left.toFixed(1)+"%";
-    piece.style.top=top.toFixed(1)+"%";
-    piece.style.setProperty("--mr",(-1+seeded(i+21)*2).toFixed(2)+"deg");
-    piece.style.setProperty("--md",(8+seeded(i+31)*8).toFixed(2)+"s");
-    piece.style.setProperty("--mDelay",(-seeded(i+41)*8).toFixed(2)+"s");
-    piece.style.setProperty("--mdx",(-10+seeded(i+51)*20).toFixed(1)+"px");
-    piece.style.setProperty("--mdy",(-8+seeded(i+61)*16).toFixed(1)+"px");
-    piece.style.setProperty("--mini-opacity",(.34+seeded(i+71)*.42).toFixed(2));
-    piece.style.setProperty("--mini-bright",(.5+seeded(i+81)*.3).toFixed(2));
-    piece.style.zIndex=String(1+Math.floor(seeded(i+91)*4));
-    const img=document.createElement("img");
-    img.src=`/images/art/${files[index]}`;
-    img.alt="";
-    img.onerror=()=>{img.onerror=null;img.src=`./images/art/${files[index]}`;};
-    piece.appendChild(img);world.appendChild(piece);
-  });
-})();
+/* ART preview uses the exact same renderer and state as the full gallery.
+   It remains non-interactive; clicking the frame opens the full overlay. */
 
 /* V24 — keep BIO glitches inside the portrait and add a small RGB split every 3s. */
 (function(){

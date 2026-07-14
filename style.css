@@ -3524,3 +3524,36 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   .mf-photo-wrap { width:min(78%,420px) !important;height:42vh !important;margin:40px 0 0 auto !important; }
   .mf-photo-card { width:70% !important;height:70% !important; }
 }
+
+/* ============================================================
+   V26 — shared ART renderer in preview and full overlay
+   ============================================================ */
+.mf-art-mini-world {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:1;
+}
+.mf-art-piece--mini {
+  position:absolute !important;
+  inset:auto !important;
+  margin:0 !important;
+  max-width:none !important;
+  pointer-events:none !important;
+  transform:var(--base-transform) !important;
+  animation:none !important;
+  opacity:.72;
+  will-change:transform;
+}
+.mf-art-piece--mini img {
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  display:block !important;
+  filter:grayscale(1) brightness(var(--depth-brightness, .8)) blur(var(--depth-blur, 0px)) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.42) !important;
+  transform:none !important;
+}
+/* Retire the old independent mini-gallery styling. */
+.mf-art-mini-piece { display:none !important; }
