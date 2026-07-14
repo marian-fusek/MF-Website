@@ -1,4 +1,7 @@
-V18 fixes:
-- Dedicated full-screen art preview above the gallery; click/tap an artwork to open, click anywhere or X/Escape to close.
-- Ko-fi overlay/card/iframe background matched to #f9f9f9 and black close X.
-- Hero name shifted/scaled left to compensate for font side-bearing while keeping right edge protected.
+V22 — targeted repair build
+
+- Restores the established hero name positioning and BIO portrait.
+- Restores segmented hero-grid touch highlights, with only the peak pause shortened.
+- Keeps hero-name ASCII fragmentation.
+- Repairs footer variable-font proximity without cursor lag.
+- Refines the MF ART strip tags, copy and tightly stacked edge-on cards.

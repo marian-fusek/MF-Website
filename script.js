@@ -14,42 +14,56 @@ const grid=document.getElementById("mfGrid"),blur=document.getElementById("mfBlu
 
 const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add("visible")})},{threshold:.1});document.querySelectorAll(".mf-reveal").forEach(el=>revealObserver.observe(el));
 
-/* HERO GRID — quick white touch, shorter peak hold */
+/* HERO GRID — preserve segmented touch behavior; only shorten the peak pause */
 (function(){
   const grid=document.getElementById("mfGrid");
   const hero=document.getElementById("heroSection");
   if(!grid||!hero)return;
-  const lines=[];
-  for(let i=1;i<10;i++){
-    const line=document.createElement("span");
-    line.className="mf-grid-touch is-v";
-    line.style.left=(i*10)+"%";
-    grid.appendChild(line);lines.push({el:line,axis:"x",ratio:i/10,timer:0});
+
+  const vertical=Array.from({length:9},(_,i)=>(i+1)/10);
+  const horizontal=[1/3,2/3];
+  const SEGMENT=74;
+  const HIT=17;
+  const HOLD=70;
+
+  function sparkLine(axis,ratio,x,y){
+    const segment=document.createElement("span");
+    segment.className=`mf-grid-segment is-${axis}`;
+    if(axis==="v"){
+      segment.style.left=`${ratio*100}%`;
+      segment.style.top=`${Math.max(0,Math.min(innerHeight-SEGMENT,y-SEGMENT/2))}px`;
+      segment.style.height=SEGMENT+"px";
+    }else{
+      segment.style.top=`${ratio*100}%`;
+      segment.style.left=`${Math.max(0,Math.min(innerWidth-SEGMENT,x-SEGMENT/2))}px`;
+      segment.style.width=SEGMENT+"px";
+    }
+    grid.appendChild(segment);
+    requestAnimationFrame(()=>segment.classList.add("is-on"));
+    setTimeout(()=>segment.classList.remove("is-on"),HOLD);
+    setTimeout(()=>segment.remove(),HOLD+240);
   }
-  [1/3,2/3].forEach(r=>{
-    const line=document.createElement("span");
-    line.className="mf-grid-touch is-h";
-    line.style.top=(r*100)+"%";
-    grid.appendChild(line);lines.push({el:line,axis:"y",ratio:r,timer:0});
-  });
-  let raf=0,lastEvent=null;
+
+  let previous={x:null,y:null};
   window.addEventListener("pointermove",e=>{
-    lastEvent=e;
-    if(raf)return;
-    raf=requestAnimationFrame(()=>{
-      raf=0;
-      if(window.scrollY>hero.offsetHeight)return;
-      const x=lastEvent.clientX,y=lastEvent.clientY,w=innerWidth,h=innerHeight;
-      lines.forEach(item=>{
-        const distance=item.axis==="x"?Math.abs(x-w*item.ratio):Math.abs(y-h*item.ratio);
-        if(distance<15){
-          item.el.classList.add("is-hot");
-          clearTimeout(item.timer);
-          item.timer=setTimeout(()=>item.el.classList.remove("is-hot"),90);
-        }
+    if(window.scrollY>hero.offsetHeight)return;
+    const points=[];
+    if(previous.x!==null){
+      const distance=Math.hypot(e.clientX-previous.x,e.clientY-previous.y);
+      const steps=Math.max(1,Math.ceil(distance/12));
+      for(let i=1;i<=steps;i++)points.push({
+        x:previous.x+(e.clientX-previous.x)*i/steps,
+        y:previous.y+(e.clientY-previous.y)*i/steps
       });
+    }else points.push({x:e.clientX,y:e.clientY});
+    previous={x:e.clientX,y:e.clientY};
+
+    points.forEach(point=>{
+      vertical.forEach(r=>{if(Math.abs(point.x-innerWidth*r)<HIT)sparkLine("v",r,point.x,point.y);});
+      horizontal.forEach(r=>{if(Math.abs(point.y-innerHeight*r)<HIT)sparkLine("h",r,point.x,point.y);});
     });
   },{passive:true});
+  window.addEventListener("pointerleave",()=>{previous={x:null,y:null};});
 })();
 
 const marksWrap=document.querySelector(".mf-intersections");if(marksWrap){for(let i=0;i<8;i++){const mark=document.createElement("div");mark.className="mf-mark "+["dot","dot","dot","star","diamond"][Math.floor(Math.random()*5)];mark.style.left=[10,20,30,40,50,60,70,80,90][Math.floor(Math.random()*9)]+"%";mark.style.top=[33.333,66.666][i%2]+"%";mark.style.animationDelay=(Math.random()*24).toFixed(2)+"s";marksWrap.appendChild(mark)}}
@@ -988,7 +1002,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   });
 })();
 
-/* FOOTER NAME — smooth RAF proximity interpolation */
+/* FOOTER NAME — original variable expansion, RAF-throttled to remove lag */
 (function(){
   const name=document.getElementById("footerName");
   if(!name)return;
@@ -999,28 +1013,24 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     el.className="footer-vp-char";
     el.textContent=ch===" "?"\u00A0":ch;
     name.appendChild(el);
-    return {el,current:400,target:400,cx:0,cy:0};
+    return el;
   });
-  const radius=145;
-  let mouseX=-9999,mouseY=-9999,inside=false,raf=0;
-  function measure(){chars.forEach(item=>{const r=item.el.getBoundingClientRect();item.cx=r.left+r.width/2;item.cy=r.top+r.height/2;});}
-  function frame(){
-    let moving=false;
-    chars.forEach(item=>{
-      const target=inside?400+470*Math.max(0,1-Math.hypot(mouseX-item.cx,mouseY-item.cy)/radius):400;
-      item.target=target;
-      item.current+=(item.target-item.current)*.22;
-      if(Math.abs(item.target-item.current)>.15)moving=true;
-      item.el.style.fontVariationSettings=`'wght' ${item.current.toFixed(1)}, 'opsz' ${(12+(item.current-400)/470*25).toFixed(1)}`;
+  const radius=130;
+  let x=-9999,y=-9999,raf=0,inside=false;
+  function render(){
+    raf=0;
+    chars.forEach(ch=>{
+      const r=ch.getBoundingClientRect();
+      const n=inside?Math.max(0,1-Math.hypot(x-r.left-r.width/2,y-r.top-r.height/2)/radius):0;
+      const weight=400+450*n;
+      ch.style.fontVariationSettings=`'wght' ${weight.toFixed(0)}, 'opsz' ${(12+27*n).toFixed(1)}`;
+      ch.style.fontWeight=String(Math.round(weight));
     });
-    if(moving||inside)raf=requestAnimationFrame(frame);else raf=0;
   }
-  function start(){if(!raf)raf=requestAnimationFrame(frame);}
-  name.addEventListener("pointerenter",()=>{inside=true;measure();start();});
-  name.addEventListener("pointermove",e=>{mouseX=e.clientX;mouseY=e.clientY;start();});
-  name.addEventListener("pointerleave",()=>{inside=false;start();});
-  window.addEventListener("resize",measure,{passive:true});
-  if(document.fonts?.ready)document.fonts.ready.then(measure);else setTimeout(measure,300);
+  function queue(){if(!raf)raf=requestAnimationFrame(render);}
+  name.addEventListener("pointerenter",e=>{inside=true;x=e.clientX;y=e.clientY;queue();});
+  name.addEventListener("pointermove",e=>{x=e.clientX;y=e.clientY;queue();});
+  name.addEventListener("pointerleave",()=>{inside=false;queue();});
 })();
 
 /* FOOTER TYPEWRITER */

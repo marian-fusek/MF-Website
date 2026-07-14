@@ -3098,3 +3098,112 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
 .mf-grid-touch.is-v { top:0; bottom:0; width:1px; transform:translateX(-.5px); }
 .mf-grid-touch.is-h { left:0; right:0; height:1px; transform:translateY(-.5px); }
 .mf-grid-touch.is-hot { opacity:.92; transition-duration:45ms,80ms; }
+
+/* ============================================================
+   V22 — isolated repairs
+   ============================================================ */
+
+/* Segmented hero-grid highlights: independently fade so a fast wipe leaves a trail. */
+.mf-grid-touch { display:none !important; }
+.mf-grid-segment {
+  position:absolute;
+  z-index:2;
+  display:block;
+  pointer-events:none;
+  opacity:0;
+  background:#fff;
+  box-shadow:0 0 12px rgba(255,255,255,.24);
+  transition:opacity 150ms var(--ease),filter 180ms var(--ease);
+  filter:blur(.15px);
+}
+.mf-grid-segment.is-v { width:1px; transform:translateX(-.5px); }
+.mf-grid-segment.is-h { height:1px; transform:translateY(-.5px); }
+.mf-grid-segment.is-on { opacity:.95; transition-duration:30ms,30ms; }
+
+/* Preserve the prior BIO portrait exactly; the ART strip occupies its own row. */
+.mf-photo-card { flex-shrink:0; }
+
+/* MF ART strip: more breathing room, tag chips and a denser edge-on deck. */
+.mf-art-button {
+  padding:24px 28px !important;
+}
+.mf-art-button-copy {
+  width:min(49%,620px);
+  justify-content:flex-start !important;
+  gap:0;
+}
+.mf-art-button-copy strong {
+  margin-bottom:10px;
+}
+.mf-art-button-tags {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:auto;
+  color:rgba(244,244,244,.62) !important;
+}
+.mf-art-button-tags > span {
+  display:inline-flex;
+  align-items:center;
+  min-height:21px;
+  padding:3px 7px 2px;
+  border:1px solid var(--line);
+  font-family:"Geist Mono",monospace;
+  font-size:9px;
+  line-height:1;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.mf-art-button-desc {
+  max-width:590px;
+  padding-right:18px;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:clamp(12px,.86vw,15px) !important;
+  line-height:1.25 !important;
+  letter-spacing:-.012em !important;
+  color:rgba(244,244,244,.78) !important;
+}
+.mf-art-button-deck {
+  left:50%;
+  right:1.5%;
+  top:12px;
+  bottom:12px;
+  perspective:1500px;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 92%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 5%,#000 92%,transparent 100%);
+}
+.mf-art-button-deck > span {
+  top:5%;
+  bottom:5%;
+  left:calc(var(--i) * 7.6% + 2%);
+  width:24%;
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+  transform-origin:left center;
+  transform:rotateY(-86deg) rotateZ(-.15deg) translateZ(calc(var(--i) * -2px));
+  opacity:calc(.92 - var(--i) * .055);
+}
+.mf-art-button:hover .mf-art-button-deck > span {
+  transform:rotateY(-84deg) rotateZ(-.15deg) translateZ(calc(var(--i) * -2px));
+  filter:brightness(1.08);
+}
+
+/* Footer proximity remains white and responds without interpolated cursor lag. */
+.footer-vp-char {
+  color:#fff !important;
+  opacity:1 !important;
+  transition:font-variation-settings 55ms linear,font-weight 55ms linear !important;
+}
+
+@media (max-width:900px) {
+  .mf-art-button { padding:20px !important; }
+  .mf-art-button-copy { width:60%; }
+  .mf-art-button-deck { left:58%; }
+}
+@media (max-width:620px) {
+  .mf-art-button-copy { width:76%; }
+  .mf-art-button-deck { left:70%; opacity:.62; }
+  .mf-art-button-tags { display:flex !important; gap:4px; }
+  .mf-art-button-tags > span { font-size:8px; padding:3px 5px 2px; }
+}
