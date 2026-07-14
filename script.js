@@ -51,7 +51,7 @@ const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{
 
   const vertical=Array.from({length:9},(_,i)=>(i+1)/10);
   const horizontal=[1/3,2/3];
-  const SEGMENT=74;
+  const SEGMENT=93;
   const HIT=17;
   const HOLD=115;
 

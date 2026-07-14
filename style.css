@@ -3748,3 +3748,54 @@ body.mf-preload-locked .mf-loader span {
   opacity: .98;
   transition-duration: 60ms, 60ms !important;
 }
+
+
+/* ============================================================
+   V30 — final grid rectangle and entry-copy refinements
+   ============================================================ */
+.mf-wip-gate {
+  flex-direction: column;
+}
+.mf-wip-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+.mf-wip-copy {
+  font-size: clamp(18px, 2.2vw, 36px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.035em !important;
+  font-weight: 400 !important;
+}
+.mf-wip-subcopy {
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+
+/* Hover trail keeps its softened ends; the highlighted segment is 25% longer in JS. */
+.mf-grid-segment {
+  transition: opacity 600ms var(--ease), filter 600ms var(--ease) !important;
+}
+.mf-grid-segment.is-on {
+  transition-duration: 60ms, 60ms !important;
+}
+
+/* Click rectangle: continuous white/glowing edges while held, slow clean fade on release. */
+.mf-grid-cell-line,
+.mf-grid-cell-line.is-v,
+.mf-grid-cell-line.is-h {
+  background: #fff !important;
+  box-shadow: 0 0 13px rgba(255,255,255,.32) !important;
+  filter: blur(.08px) !important;
+  transition: opacity 600ms var(--ease), filter 600ms var(--ease) !important;
+}
+.mf-grid-cell-line.is-on {
+  opacity: .98 !important;
+  transition-duration: 60ms, 60ms !important;
+}
