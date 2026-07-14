@@ -3650,3 +3650,101 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
 @media (max-width:900px) {
   .mf-art-showcase-bottom { width:100% !important; max-width:100% !important; }
 }
+
+/* ============================================================
+   V29 — click-to-enter gate + softer grid trails
+   ============================================================ */
+body.mf-preload-locked {
+  overflow: hidden !important;
+}
+body.mf-preload-locked #mf {
+  opacity: 0;
+  visibility: hidden;
+}
+body.mf-site-entered #mf {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .5s var(--ease);
+}
+body.mf-preload-locked .mf-loader span {
+  animation-play-state: paused !important;
+}
+
+.mf-wip-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #fff;
+  cursor: none;
+  opacity: 1;
+  transition: opacity .7s var(--ease), visibility .7s var(--ease);
+}
+.mf-wip-gate.is-closing {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.mf-wip-copy {
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(24px, 3.4vw, 58px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-weight: 400;
+}
+.mf-wip-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10001;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: "Geist", Arial, sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition: opacity .15s linear;
+}
+.mf-wip-cursor.is-visible { opacity: 1; }
+
+/* Keep the current segmented behavior; soften only the visual ends and fade-out. */
+.mf-grid-segment {
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: opacity 600ms var(--ease), filter 600ms var(--ease) !important;
+}
+.mf-grid-segment.is-v {
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,.98) 22%, rgba(255,255,255,.98) 78%, transparent 100%) !important;
+}
+.mf-grid-segment.is-h {
+  background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.98) 22%, rgba(255,255,255,.98) 78%, transparent 100%) !important;
+}
+.mf-grid-segment.is-on {
+  transition-duration: 60ms, 60ms !important;
+}
+
+/* Click-and-hold rectangle: same soft ends, fast entry, long release. */
+.mf-grid-cell-line {
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: opacity 600ms var(--ease), filter 600ms var(--ease) !important;
+}
+.mf-grid-cell-line.is-v {
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,.98) 12%, rgba(255,255,255,.98) 88%, transparent 100%) !important;
+}
+.mf-grid-cell-line.is-h {
+  background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.98) 12%, rgba(255,255,255,.98) 88%, transparent 100%) !important;
+}
+.mf-grid-cell-line.is-on {
+  opacity: .98;
+  transition-duration: 60ms, 60ms !important;
+}

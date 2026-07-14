@@ -2,7 +2,36 @@ const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
 const loader=document.getElementById("mfLoader");
-if(loader){const spans=loader.querySelectorAll("span");spans.forEach(s=>{s.style.transform="translateY(0)"});requestAnimationFrame(()=>requestAnimationFrame(()=>spans.forEach(s=>{s.style.transform=""})));setTimeout(()=>loader.classList.add("done"),1800);}
+function startMfSite(){
+  document.body.classList.remove("mf-preload-locked");
+  document.body.classList.add("mf-site-entered");
+  if(loader){
+    const spans=loader.querySelectorAll("span");
+    spans.forEach(span=>{span.style.animation="none";span.style.transform="translateY(0)";});
+    void loader.offsetWidth;
+    spans.forEach(span=>{span.style.animation="";span.style.transform="";});
+    setTimeout(()=>loader.classList.add("done"),1800);
+  }
+}
+
+(function(){
+  const gate=document.getElementById("mfWipGate");
+  const cursor=document.getElementById("mfWipCursor");
+  if(!gate){startMfSite();return;}
+  let closing=false;
+  const move=e=>{if(cursor){cursor.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0)`;cursor.classList.add("is-visible");}};
+  const leave=()=>cursor?.classList.remove("is-visible");
+  const close=()=>{
+    if(closing)return;closing=true;
+    gate.classList.add("is-closing");
+    cursor?.classList.remove("is-visible");
+    setTimeout(()=>{gate.remove();startMfSite();},700);
+  };
+  gate.addEventListener("pointermove",move);
+  gate.addEventListener("pointerleave",leave);
+  gate.addEventListener("click",close);
+  gate.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();close();}});
+})();
 
 (function(){let targetY=window.scrollY,currentY=window.scrollY,ticking=false;const ease=.065;function tick(){const d=targetY-currentY;if(Math.abs(d)<.35){currentY=targetY;window.scrollTo(0,currentY);ticking=false;return}currentY+=d*ease;window.scrollTo(0,currentY);requestAnimationFrame(tick)}window.addEventListener("wheel",e=>{if(document.body.classList.contains("project-open"))return;e.preventDefault();targetY+=e.deltaY*1.4;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:false});let touchStart=0,lastTouch=0,lastTime=0,velocity=0;window.addEventListener("touchstart",e=>{touchStart=lastTouch=e.touches[0].clientY;lastTime=Date.now();velocity=0},{passive:true});window.addEventListener("touchmove",e=>{if(document.body.classList.contains("project-open"))return;const y=e.touches[0].clientY,dt=Date.now()-lastTime||1;velocity=((lastTouch-y)/dt)*16;lastTouch=y;lastTime=Date.now();targetY+=touchStart-y;touchStart=y;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window.addEventListener("touchend",()=>{if(document.body.classList.contains("project-open"))return;targetY+=velocity*200;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window._mfScroll=function(y){targetY=y;currentY=window.scrollY;if(!ticking){ticking=true;requestAnimationFrame(tick)}}})();
 
@@ -41,7 +70,7 @@ const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{
     grid.appendChild(segment);
     requestAnimationFrame(()=>segment.classList.add("is-on"));
     setTimeout(()=>segment.classList.remove("is-on"),HOLD);
-    setTimeout(()=>segment.remove(),HOLD+240);
+    setTimeout(()=>segment.remove(),HOLD+700);
   }
 
   let previous={x:null,y:null};
@@ -1127,7 +1156,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const clear=()=>{
     active.forEach(line=>line.classList.remove("is-on"));
     const old=active;active=[];
-    setTimeout(()=>old.forEach(line=>line.remove()),380);
+    setTimeout(()=>old.forEach(line=>line.remove()),760);
   };
   const make=(cls,styles)=>{
     const line=document.createElement("span");
