@@ -14,6 +14,44 @@ const grid=document.getElementById("mfGrid"),blur=document.getElementById("mfBlu
 
 const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add("visible")})},{threshold:.1});document.querySelectorAll(".mf-reveal").forEach(el=>revealObserver.observe(el));
 
+/* HERO GRID — quick white touch, shorter peak hold */
+(function(){
+  const grid=document.getElementById("mfGrid");
+  const hero=document.getElementById("heroSection");
+  if(!grid||!hero)return;
+  const lines=[];
+  for(let i=1;i<10;i++){
+    const line=document.createElement("span");
+    line.className="mf-grid-touch is-v";
+    line.style.left=(i*10)+"%";
+    grid.appendChild(line);lines.push({el:line,axis:"x",ratio:i/10,timer:0});
+  }
+  [1/3,2/3].forEach(r=>{
+    const line=document.createElement("span");
+    line.className="mf-grid-touch is-h";
+    line.style.top=(r*100)+"%";
+    grid.appendChild(line);lines.push({el:line,axis:"y",ratio:r,timer:0});
+  });
+  let raf=0,lastEvent=null;
+  window.addEventListener("pointermove",e=>{
+    lastEvent=e;
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{
+      raf=0;
+      if(window.scrollY>hero.offsetHeight)return;
+      const x=lastEvent.clientX,y=lastEvent.clientY,w=innerWidth,h=innerHeight;
+      lines.forEach(item=>{
+        const distance=item.axis==="x"?Math.abs(x-w*item.ratio):Math.abs(y-h*item.ratio);
+        if(distance<15){
+          item.el.classList.add("is-hot");
+          clearTimeout(item.timer);
+          item.timer=setTimeout(()=>item.el.classList.remove("is-hot"),90);
+        }
+      });
+    });
+  },{passive:true});
+})();
+
 const marksWrap=document.querySelector(".mf-intersections");if(marksWrap){for(let i=0;i<8;i++){const mark=document.createElement("div");mark.className="mf-mark "+["dot","dot","dot","star","diamond"][Math.floor(Math.random()*5)];mark.style.left=[10,20,30,40,50,60,70,80,90][Math.floor(Math.random()*9)]+"%";mark.style.top=[33.333,66.666][i%2]+"%";mark.style.animationDelay=(Math.random()*24).toFixed(2)+"s";marksWrap.appendChild(mark)}}
 
 const ascii=Array.from(document.querySelectorAll(".mf-ascii"));let asciiIndex=0;function cycleAscii(){if(!ascii.length)return;ascii.forEach(el=>el.classList.remove("show"));const current=ascii[asciiIndex%ascii.length];current.classList.add("show");asciiIndex++;setTimeout(()=>{current.classList.remove("show");setTimeout(cycleAscii,3000)},1500)}setTimeout(cycleAscii,1200);
@@ -296,54 +334,7 @@ if(indexExtra){
   },{passive:true});
 })();
 
-function scaleHeroName(){
-  const hero=document.getElementById("heroName");
-  const wrap=document.getElementById("nameWrap");
-  const info=document.querySelector(".mf-hero-info");
-  if(!hero||!wrap)return;
-
-  /* V24: clean wordmark-fit system, inspired by the Charlie Osborne-style full-width name.
-     No per-letter nudging. We measure the actual rendered text range, then scale the whole
-     wordmark to fit between the MF/nav left margin and a protected optical right edge. */
-  const viewport=window.innerWidth;
-  const rootStyles=getComputedStyle(document.documentElement);
-  const pagePad=parseFloat(rootStyles.getPropertyValue("--page-pad"))||8;
-  const leftTarget=pagePad;
-  const rightTarget=pagePad+40; // K/right-edge optical compensation requested
-  const available=Math.max(120,viewport-leftTarget-rightTarget);
-
-  hero.style.fontSize="300px";
-  hero.style.letterSpacing="-0.082em";
-  wrap.style.transform="matrix(1,0,0,1,0,0)";
-  wrap.style.transformOrigin="left bottom";
-
-  const range=document.createRange();
-  range.selectNodeContents(wrap);
-  const textRect=range.getBoundingClientRect();
-  const wrapRect=wrap.getBoundingClientRect();
-  range.detach();
-
-  const rawInkWidth=textRect.width||wrap.scrollWidth||1;
-  const inkOffsetLeft=textRect.left-wrapRect.left;
-  const scale=Math.max(.12,available/rawInkWidth);
-  const tx=leftTarget-(inkOffsetLeft*scale);
-
-  wrap.style.transform=`matrix(${scale},0,0,${scale},${tx},0)`;
-
-  if(info&&window.innerWidth>1000){
-    const fChar=hero.querySelector(".n-f");
-    if(fChar){
-      const fRect=fChar.getBoundingClientRect();
-      info.style.left=(fRect.left+20)+"px";
-      info.style.right="auto";
-      info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";
-      info.style.top="22%";
-      info.style.bottom="auto";
-    }
-  }else if(info){
-    info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top="";
-  }
-}
+function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,leftPad=18,rightPad=30,scale=(viewport-leftPad-rightPad)/width,offset=leftPad;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scaleHeroName);else setTimeout(scaleHeroName,200);scaleHeroName();window.addEventListener("resize",scaleHeroName);
 
 (function(){const hero=document.getElementById("heroName");if(!hero)return;const wait=ms=>new Promise(r=>setTimeout(r,ms));const chars=()=>Array.from(hero.querySelectorAll(".nc")).filter(c=>!c.classList.contains("n-sp"));async function accentA(){const a=hero.querySelector(".n-a2");if(!a)return;a.textContent="Á";await wait(600);a.textContent="A"}async function accentU(){const u=hero.querySelector(".n-u");if(!u)return;u.textContent="Ů";await wait(600);u.textContent="U"}async function disappear(){const list=["n-a1","n-r","n-i","n-a2","n-n","n-u","n-s","n-e","n-k"].map(c=>hero.querySelector("."+c)).filter(Boolean);list.forEach(el=>el.style.opacity="0");await wait(2100);list.forEach(el=>el.style.opacity="");await wait(400)}async function rgb(){const all=chars(),picks=[...all].sort(()=>Math.random()-.5).slice(0,3);let frame=0,total=120;const timer=setInterval(()=>{frame++;const t=frame/total,amp=Math.sin(t*Math.PI)*4,j=(Math.random()-.5)*.8,x=(amp+j).toFixed(2),nx=(-(amp+j*.7)).toFixed(2);picks.forEach(el=>{el.style.textShadow=`${x}px 0 3px rgba(226,27,22,.8),${nx}px 0 3px rgba(0,167,255,.8)`});if(frame>=total)clearInterval(timer)},16);await wait(2050);picks.forEach(el=>el.style.textShadow="")}async function blurFx(){const all=chars();all.forEach(el=>{el.style.transition=`filter .5s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(3px)"});await wait(1300);all.forEach(el=>{el.style.transition=`filter .8s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(0)"});await wait(900);all.forEach(el=>{el.style.transition="";el.style.filter=""})}const effects=[accentA,accentU,disappear,rgb,blurFx];function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}let queue=[];async function run(){await wait(2500);while(true){if(!queue.length)queue=shuffle(effects);await queue.shift()();await wait(2500)}}run();})();
@@ -692,7 +683,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     "18-wave.png","19-bean.png","20-accept.png","21-violins.png","22-holy.png","23-tiktok.png",
     "24-ai.png","25-blushies.png","26-arse.png","27-glow.png","28-smash.png","29-stairs.png","30-orange.png"
   ];
-  const strength=.34;
+  const strength=0;
   const moveButton=(x,y,duration=.4,ease="power2.out")=>{
     if(window.gsap)gsap.to(button,{x,y,duration,ease,overwrite:true});
     else button.style.transform=`translate(${x}px,${y}px)`;
@@ -933,21 +924,32 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 })();
 
 
-/* BIO PHOTO — locked 2:3 image, no parallax, no scale drift */
+/* BIO PHOTO — subtle mouse parallax + periodic ASCII edge glitches */
 (function(){
+  const section=document.getElementById("about");
   const photo=document.querySelector(".mf-photo-card");
-  if(!photo)return;
-  photo.style.removeProperty("--photo-x");
-  photo.style.removeProperty("--photo-y");
-
+  if(!section||!photo)return;
+  let raf=0,targetX=0,targetY=0,currentX=0,currentY=0;
+  const tick=()=>{
+    currentX+=(targetX-currentX)*.12;currentY+=(targetY-currentY)*.12;
+    photo.style.setProperty("--photo-x",currentX.toFixed(2)+"px");
+    photo.style.setProperty("--photo-y",currentY.toFixed(2)+"px");
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
+  section.addEventListener("pointermove",e=>{
+    const r=section.getBoundingClientRect();
+    targetX=((e.clientX-r.left)/r.width-.5)*12;
+    targetY=((e.clientY-r.top)/r.height-.5)*10;
+  });
+  section.addEventListener("pointerleave",()=>{targetX=0;targetY=0;});
   const chars=["+ +","001101","// MF","[ERR]","<>_","0xFF",":::","* * *"];
   setInterval(()=>{
     const host=photo.parentElement;if(!host)return;
     const glitch=document.createElement("span");
     glitch.className="mf-photo-glitch";
     glitch.textContent=chars[Math.floor(Math.random()*chars.length)];
-    const leftSide=Math.random()<.5;
-    glitch.style.left=(photo.offsetLeft+(leftSide?4:Math.max(4,photo.offsetWidth-36)))+"px";
+    glitch.style.left=(photo.offsetLeft+(Math.random()<.5?4:Math.max(4,photo.offsetWidth-36)))+"px";
     glitch.style.top=(photo.offsetTop+photo.offsetHeight*(.15+Math.random()*.7))+"px";
     host.appendChild(glitch);
     requestAnimationFrame(()=>glitch.classList.add("show"));
@@ -955,23 +957,70 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   },5000);
 })();
 
-/* FOOTER NAME — variable proximity, matching BIO behavior */
+/* HERO NAME — cursor-triggered ASCII fragmentation */
+(function(){
+  const hero=document.getElementById("heroName");
+  if(!hero)return;
+  const glyphs="01<>[]{}#%+*=:/\\_~";
+  let lastEmit=0;
+  const clearTouch=el=>{clearTimeout(el._asciiTimer);el._asciiTimer=setTimeout(()=>el.classList.remove("is-ascii-touched"),110);};
+  hero.addEventListener("pointermove",e=>{
+    const letter=e.target.closest?.(".nc:not(.n-sp)");
+    if(!letter)return;
+    letter.classList.add("is-ascii-touched");
+    clearTouch(letter);
+    const now=performance.now();
+    if(now-lastEmit<38)return;
+    lastEmit=now;
+    const count=2+Math.floor(Math.random()*3);
+    for(let i=0;i<count;i++){
+      const fragment=document.createElement("span");
+      fragment.className="mf-hero-ascii-fragment";
+      fragment.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+      fragment.style.left=(e.clientX+(Math.random()-.5)*18)+"px";
+      fragment.style.top=(e.clientY+(Math.random()-.5)*20)+"px";
+      fragment.style.setProperty("--ascii-x",((Math.random()-.5)*70).toFixed(1)+"px");
+      fragment.style.setProperty("--ascii-y",((Math.random()-.5)*62).toFixed(1)+"px");
+      fragment.style.setProperty("--ascii-r",((Math.random()-.5)*24).toFixed(1)+"deg");
+      document.body.appendChild(fragment);
+      setTimeout(()=>fragment.remove(),560);
+    }
+  });
+})();
+
+/* FOOTER NAME — smooth RAF proximity interpolation */
 (function(){
   const name=document.getElementById("footerName");
   if(!name)return;
   const label="MARIAN FUSEK";
   name.textContent="";
-  [...label].forEach(ch=>{const s=document.createElement("span");s.className="footer-vp-char";s.textContent=ch===" "?"\u00A0":ch;name.appendChild(s);});
-  const radius=120;
-  name.addEventListener("pointermove",e=>{
-    name.querySelectorAll(".footer-vp-char").forEach(ch=>{
-      const r=ch.getBoundingClientRect();const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-      const n=Math.max(0,1-Math.hypot(dx,dy)/radius);
-      ch.style.fontWeight=String(Math.round(400+450*n));
-      ch.style.opacity="1";
-    });
+  const chars=[...label].map(ch=>{
+    const el=document.createElement("span");
+    el.className="footer-vp-char";
+    el.textContent=ch===" "?"\u00A0":ch;
+    name.appendChild(el);
+    return {el,current:400,target:400,cx:0,cy:0};
   });
-  name.addEventListener("pointerleave",()=>name.querySelectorAll(".footer-vp-char").forEach(ch=>{ch.style.fontWeight="400";ch.style.opacity="1";}));
+  const radius=145;
+  let mouseX=-9999,mouseY=-9999,inside=false,raf=0;
+  function measure(){chars.forEach(item=>{const r=item.el.getBoundingClientRect();item.cx=r.left+r.width/2;item.cy=r.top+r.height/2;});}
+  function frame(){
+    let moving=false;
+    chars.forEach(item=>{
+      const target=inside?400+470*Math.max(0,1-Math.hypot(mouseX-item.cx,mouseY-item.cy)/radius):400;
+      item.target=target;
+      item.current+=(item.target-item.current)*.22;
+      if(Math.abs(item.target-item.current)>.15)moving=true;
+      item.el.style.fontVariationSettings=`'wght' ${item.current.toFixed(1)}, 'opsz' ${(12+(item.current-400)/470*25).toFixed(1)}`;
+    });
+    if(moving||inside)raf=requestAnimationFrame(frame);else raf=0;
+  }
+  function start(){if(!raf)raf=requestAnimationFrame(frame);}
+  name.addEventListener("pointerenter",()=>{inside=true;measure();start();});
+  name.addEventListener("pointermove",e=>{mouseX=e.clientX;mouseY=e.clientY;start();});
+  name.addEventListener("pointerleave",()=>{inside=false;start();});
+  window.addEventListener("resize",measure,{passive:true});
+  if(document.fonts?.ready)document.fonts.ready.then(measure);else setTimeout(measure,300);
 })();
 
 /* FOOTER TYPEWRITER */
@@ -998,105 +1047,4 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     }
   }
   loop();
-})();
-
-
-/* V21 HEADER GRID — hover only one rectangle-side segment */
-(function(){
-  const grid=document.getElementById("mfGrid");
-  if(!grid)return;
-
-  const layer=document.createElement("div");
-  layer.className="mf-grid-segments";
-  layer.setAttribute("aria-hidden","true");
-  grid.insertAdjacentElement("afterend",layer);
-
-  const segments=[];
-  const addSegment=(orientation,x1,y1,x2,y2)=>{
-    const segment=document.createElement("span");
-    segment.className=`mf-grid-segment is-${orientation}`;
-    layer.appendChild(segment);
-    segments.push({el:segment,orientation,x1,y1,x2,y2,timer:0});
-  };
-
-  function build(){
-    segments.splice(0).forEach(s=>s.el.remove());
-    const w=window.innerWidth,h=window.innerHeight;
-    const xs=[];for(let i=0;i<=10;i++)xs.push(w*i/10);
-    const ys=[0,h/3,h*2/3,h];
-
-    // vertical grid sides: one segment per rectangle height, not full-height lines
-    for(let i=1;i<10;i++){
-      for(let r=0;r<3;r++)addSegment("vertical",xs[i],ys[r],xs[i],ys[r+1]);
-    }
-    // horizontal grid sides: one segment per rectangle width, not full-width lines
-    for(let r=1;r<3;r++){
-      for(let i=0;i<10;i++)addSegment("horizontal",xs[i],ys[r],xs[i+1],ys[r]);
-    }
-    layout();
-  }
-
-  function layout(){
-    segments.forEach(s=>{
-      if(s.orientation==="vertical"){
-        s.el.style.left=`${s.x1}px`;
-        s.el.style.top=`${s.y1}px`;
-        s.el.style.width="1px";
-        s.el.style.height=`${s.y2-s.y1}px`;
-      }else{
-        s.el.style.left=`${s.x1}px`;
-        s.el.style.top=`${s.y1}px`;
-        s.el.style.width=`${s.x2-s.x1}px`;
-        s.el.style.height="1px";
-      }
-    });
-  }
-
-  function distanceToSegment(s,x,y){
-    if(s.orientation==="vertical"){
-      if(y<s.y1||y>s.y2)return Infinity;
-      return Math.abs(x-s.x1);
-    }
-    if(x<s.x1||x>s.x2)return Infinity;
-    return Math.abs(y-s.y1);
-  }
-
-  function activateSegment(s){
-    s.el.classList.add("is-active");
-    clearTimeout(s.timer);
-    s.timer=setTimeout(()=>s.el.classList.remove("is-active"),2200);
-  }
-
-  let lastPoint=null;
-  window.addEventListener("pointermove",e=>{
-    if(grid.classList.contains("is-gone"))return;
-    const threshold=8;
-    const x=e.clientX,y=e.clientY;
-    const points=[];
-
-    if(lastPoint){
-      const dx=x-lastPoint.x,dy=y-lastPoint.y;
-      const distance=Math.hypot(dx,dy);
-      const steps=Math.max(1,Math.ceil(distance/8));
-      for(let i=1;i<=steps;i++){
-        const t=i/steps;
-        points.push({x:lastPoint.x+dx*t,y:lastPoint.y+dy*t});
-      }
-    }else{
-      points.push({x,y});
-    }
-    lastPoint={x,y};
-
-    const touched=new Set();
-    for(const point of points){
-      for(const s of segments){
-        if(distanceToSegment(s,point.x,point.y)<=threshold)touched.add(s);
-      }
-    }
-    touched.forEach(activateSegment);
-  },{passive:true});
-
-  window.addEventListener("pointerleave",()=>{lastPoint=null;},{passive:true});
-  window.addEventListener("resize",()=>{lastPoint=null;build();},{passive:true});
-  build();
 })();
