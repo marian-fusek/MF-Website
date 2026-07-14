@@ -3595,3 +3595,58 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
 @media (max-width:900px){
   .mf-art-showcase-bottom { width:100%; max-width:620px; }
 }
+
+/* ============================================================
+   V28 — ART copy width/tags + direction-aware comet trails
+   ============================================================ */
+.mf-art-showcase-bottom {
+  width:156% !important;
+  max-width:612px !important;
+}
+.mf-art-showcase-bottom .mf-art-showcase-tags {
+  margin:0 0 28px !important;
+}
+
+/* The glowing pixel is the comet head. Its tail is drawn behind it in
+   local movement space, so reversing direction automatically reverses
+   the trail as well. */
+.mf-art-particle.is-comet {
+  left:0 !important;
+  top:0 !important;
+  width:3px !important;
+  height:3px !important;
+  border-radius:50%;
+  background:rgba(255,255,255,.95) !important;
+  box-shadow:0 0 8px rgba(255,255,255,.82);
+  transform-origin:center;
+  animation-name:mfAmbientCometFollow !important;
+  animation-duration:9s;
+  overflow:visible;
+}
+.mf-art-particle.is-comet::before {
+  content:"";
+  position:absolute;
+  right:2px;
+  top:1px;
+  width:var(--comet-length,58px);
+  height:1px;
+  transform:translateY(-50%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.72));
+  filter:blur(.15px);
+  pointer-events:none;
+}
+@keyframes mfAmbientCometFollow {
+  0%,70% {
+    transform:translate3d(var(--comet-start-x),var(--comet-start-y),0) rotate(var(--comet-angle));
+    opacity:0;
+  }
+  76% { opacity:1; }
+  100% {
+    transform:translate3d(var(--comet-end-x),var(--comet-end-y),0) rotate(var(--comet-angle));
+    opacity:0;
+  }
+}
+
+@media (max-width:900px) {
+  .mf-art-showcase-bottom { width:100% !important; max-width:100% !important; }
+}

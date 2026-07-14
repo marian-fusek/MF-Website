@@ -878,6 +878,22 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       particle.style.setProperty("--pdx",`${-50+seeded(i+660)*100}px`);
       particle.style.setProperty("--pdy",`${-40+seeded(i+710)*80}px`);
       particle.style.setProperty("--pa",`${.18+seeded(i+760)*.62}`);
+      if(comet){
+        const travelsRight=seeded(i+860)>.5;
+        const startX=travelsRight?-18:118;
+        const endX=travelsRight?118:-18;
+        const startY=18+seeded(i+910)*68;
+        const endY=Math.max(4,Math.min(96,startY+(-28+seeded(i+960)*56)));
+        const dx=endX-startX;
+        const dy=endY-startY;
+        const angle=Math.atan2(dy,dx)*180/Math.PI;
+        particle.style.setProperty("--comet-start-x",`${startX}vw`);
+        particle.style.setProperty("--comet-start-y",`${startY}vh`);
+        particle.style.setProperty("--comet-end-x",`${endX}vw`);
+        particle.style.setProperty("--comet-end-y",`${endY}vh`);
+        particle.style.setProperty("--comet-angle",`${angle}deg`);
+        particle.style.setProperty("--comet-length",`${34+seeded(i+1010)*52}px`);
+      }
       if(seeded(i+810)>.72)particle.classList.add("is-glow");
       host.appendChild(particle);
     }
