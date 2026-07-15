@@ -207,7 +207,8 @@ if(indexExtra){
       approach:"I built the identity around time as both ingredient and attitude. Typography, material choices and imagery were reduced until every element felt deliberate. The resulting system moves between quiet control and botanical overgrowth while staying recognizably MIUNĀE.",
       images:[
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
-        {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website"},
+        {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website",liveKey:"website"},
+        {type:"instagram",src:"https://www.instagram.com/miunae.beauty/",title:"@miunae.beauty",liveKey:"instagram"},
         "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -280,7 +281,8 @@ if(indexExtra){
   let wheelLocked=false;
   let wheelTotal=0;
   let wheelReset=0;
-  let miunaeLiveActive=true;
+  const liveStates={website:false,instagram:false};
+  let instagramEmbedPromise=null;
 
   function renderProject(key){
     const project=projectData[key]||projectData["01"];
@@ -290,9 +292,22 @@ if(indexExtra){
     fields.scope.textContent=project.scope;
     fields.context.textContent=project.context;
     fields.approach.textContent=project.approach;
+    function liveLabel(key,active){
+      if(key==="instagram"){
+        return active
+          ? '<span class="mf-live-toggle-label">EXIT THE INSTA</span>'
+          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> <span class="mf-live-handle">@miunae.beauty</span></span>';
+      }
+      return active
+        ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
+    }
+
     slides.innerHTML=project.images.map((media,i)=>{
       if(media && typeof media==="object" && media.type==="iframe"){
-        return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}">
+        const key=media.liveKey||"website";
+        const active=!!liveStates[key];
+        return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}" data-live-key="${key}">
           <div class="mf-live-site">
             <div class="mf-live-loader" aria-hidden="true">
               <div class="mf-live-loader-copy">LOADING MIUNĀE.COM<span>_</span></div>
@@ -305,10 +320,31 @@ if(indexExtra){
               allow="fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"
             ></iframe>
-            <button class="mf-live-toggle" type="button" aria-pressed="${miunaeLiveActive?'true':'false'}">
-              ${miunaeLiveActive
-                ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
-                : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>'}
+            <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
+              ${liveLabel(key,active)}
+            </button>
+          </div>
+        </figure>`;
+      }
+      if(media && typeof media==="object" && media.type==="instagram"){
+        const key=media.liveKey||"instagram";
+        const active=!!liveStates[key];
+        return `<figure class="mf-project-slide mf-project-slide-live mf-project-slide-instagram" data-slide="${i}" data-live-key="${key}">
+          <div class="mf-live-site mf-instagram-live-site">
+            <div class="mf-live-loader" aria-hidden="true">
+              <div class="mf-live-loader-copy">LOADING @MIUNAE.BEAUTY<span>_</span></div>
+              <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="mf-instagram-embed-host">
+              <blockquote
+                class="instagram-media"
+                data-instgrm-permalink="${media.src}?utm_source=ig_embed&amp;utm_campaign=loading"
+                data-instgrm-version="14"
+                style="background:#fff;border:0;margin:0;max-width:540px;min-width:326px;padding:0;width:calc(100% - 2px);"
+              ></blockquote>
+            </div>
+            <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
+              ${liveLabel(key,active)}
             </button>
           </div>
         </figure>`;
@@ -316,30 +352,92 @@ if(indexExtra){
       return `<figure class="mf-project-slide" data-slide="${i}"><img src="${media}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`;
     }).join("");
 
+    function applyLiveState(slide,active){
+      const key=slide.dataset.liveKey||"website";
+      const frame=slide.querySelector("iframe");
+      const host=slide.querySelector(".mf-instagram-embed-host");
+      const toggle=slide.querySelector(".mf-live-toggle");
+      liveStates[key]=active;
+      slide.classList.toggle("is-browsing",active);
+      slide.classList.toggle("is-paused",!active);
+      if(frame)frame.style.pointerEvents=active?"auto":"none";
+      if(host)host.style.pointerEvents=active?"auto":"none";
+      if(toggle){
+        toggle.setAttribute("aria-pressed",active?"true":"false");
+        toggle.innerHTML=liveLabel(key,active);
+      }
+    }
+
     slides.querySelectorAll(".mf-project-slide-live").forEach(slide=>{
+      const key=slide.dataset.liveKey||"website";
       const frame=slide.querySelector("iframe");
       const toggle=slide.querySelector(".mf-live-toggle");
-      if(!frame||!toggle)return;
+      if(frame){
+        frame.addEventListener("load",()=>slide.classList.add("is-loaded"),{once:true});
+      }
+      if(toggle){
+        toggle.addEventListener("click",event=>{
+          event.preventDefault();
+          event.stopPropagation();
+          applyLiveState(slide,!slide.classList.contains("is-browsing"));
+        });
+      }
+      applyLiveState(slide,!!liveStates[key]);
+    });
 
-      const applyLiveState=active=>{
-        miunaeLiveActive=active;
-        slide.classList.toggle("is-browsing",active);
-        slide.classList.toggle("is-paused",!active);
-        frame.style.pointerEvents=active?"auto":"none";
-        toggle.setAttribute("aria-pressed",active?"true":"false");
-        toggle.innerHTML=active
-          ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
-          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
+    const instagramSlide=slides.querySelector('.mf-project-slide-instagram');
+    if(instagramSlide){
+      const host=instagramSlide.querySelector('.mf-instagram-embed-host');
+      const markLoaded=()=>{
+        const frame=host?.querySelector('iframe');
+        if(!frame)return false;
+        if(frame.dataset.mfLoadBound==='true')return true;
+        frame.dataset.mfLoadBound='true';
+        const finish=()=>{
+          instagramSlide.classList.add('is-loaded');
+          applyLiveState(instagramSlide,!!liveStates.instagram);
+        };
+        frame.addEventListener('load',finish,{once:true});
+        setTimeout(finish,2200);
+        return true;
+      };
+      const observer=new MutationObserver(()=>{
+        if(markLoaded())observer.disconnect();
+      });
+      if(host)observer.observe(host,{childList:true,subtree:true});
+
+      const loadInstagram=()=>{
+        if(window.instgrm?.Embeds){
+          window.instgrm.Embeds.process();
+          return Promise.resolve();
+        }
+        if(instagramEmbedPromise)return instagramEmbedPromise;
+        instagramEmbedPromise=new Promise((resolve,reject)=>{
+          let script=document.querySelector('script[data-mf-instagram-embed]');
+          if(script){
+            script.addEventListener('load',resolve,{once:true});
+            script.addEventListener('error',reject,{once:true});
+            return;
+          }
+          script=document.createElement('script');
+          script.async=true;
+          script.src='https://www.instagram.com/embed.js';
+          script.dataset.mfInstagramEmbed='true';
+          script.onload=resolve;
+          script.onerror=reject;
+          document.body.appendChild(script);
+        }).then(()=>window.instgrm?.Embeds?.process());
+        return instagramEmbedPromise;
       };
 
-      frame.addEventListener("load",()=>slide.classList.add("is-loaded"),{once:true});
-      toggle.addEventListener("click",event=>{
-        event.preventDefault();
-        event.stopPropagation();
-        applyLiveState(!slide.classList.contains("is-browsing"));
+      loadInstagram().then(()=>{
+        setTimeout(markLoaded,80);
+        setTimeout(markLoaded,900);
+      }).catch(()=>{
+        instagramSlide.classList.add('is-loaded','is-embed-error');
+        if(host)host.innerHTML='<a class="mf-instagram-fallback" href="https://www.instagram.com/miunae.beauty/" target="_blank" rel="noopener">OPEN @miunae.beauty ↗</a>';
       });
-      applyLiveState(miunaeLiveActive);
-    });
+    }
 
     activeIndex=0;
     gallery.scrollTop=0;
