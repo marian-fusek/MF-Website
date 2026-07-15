@@ -3896,3 +3896,85 @@ body.mf-preload-locked .mf-loader span {
   from { height: 3px; opacity: .28; }
   to { height: 12px; opacity: .82; }
 }
+
+/* MIUNĀE iframe browse / exit control */
+.mf-live-toggle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-top: 1px solid rgba(244,244,244,.18);
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,5,5,.94);
+  color: rgba(244,244,244,.78);
+  font-family: "Geist Mono", monospace;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    color .42s var(--ease),
+    background-color .42s var(--ease),
+    border-color .42s var(--ease);
+}
+
+.mf-live-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(244,244,244,.08);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .6s var(--ease);
+}
+
+.mf-live-toggle:hover,
+.mf-live-toggle:focus-visible {
+  color: #fff;
+  border-top-color: rgba(244,244,244,.34);
+  outline: none;
+}
+
+.mf-live-toggle:hover::before,
+.mf-live-toggle:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.mf-live-toggle-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .36em;
+}
+
+.mf-live-toggle em {
+  color: var(--red, #e21b16);
+  font-style: normal;
+  text-shadow: 0 0 12px rgba(226,27,22,.38);
+}
+
+.mf-project-slide-live.is-paused .mf-live-site iframe {
+  pointer-events: none;
+}
+
+.mf-project-slide-live.is-paused .mf-live-toggle {
+  background: rgba(5,5,5,.98);
+}
+
+@media (max-width: 900px) {
+  .mf-live-toggle {
+    min-height: 44px;
+    padding-inline: 12px;
+    font-size: 9px;
+  }
+}

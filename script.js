@@ -280,6 +280,7 @@ if(indexExtra){
   let wheelLocked=false;
   let wheelTotal=0;
   let wheelReset=0;
+  let miunaeLiveActive=true;
 
   function renderProject(key){
     const project=projectData[key]||projectData["01"];
@@ -304,15 +305,40 @@ if(indexExtra){
               allow="fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"
             ></iframe>
+            <button class="mf-live-toggle" type="button" aria-pressed="${miunaeLiveActive?'true':'false'}">
+              ${miunaeLiveActive
+                ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+                : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>'}
+            </button>
           </div>
         </figure>`;
       }
       return `<figure class="mf-project-slide" data-slide="${i}"><img src="${media}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`;
     }).join("");
 
-    slides.querySelectorAll(".mf-project-slide-live iframe").forEach(frame=>{
-      const slide=frame.closest(".mf-project-slide-live");
-      frame.addEventListener("load",()=>slide?.classList.add("is-loaded"),{once:true});
+    slides.querySelectorAll(".mf-project-slide-live").forEach(slide=>{
+      const frame=slide.querySelector("iframe");
+      const toggle=slide.querySelector(".mf-live-toggle");
+      if(!frame||!toggle)return;
+
+      const applyLiveState=active=>{
+        miunaeLiveActive=active;
+        slide.classList.toggle("is-browsing",active);
+        slide.classList.toggle("is-paused",!active);
+        frame.style.pointerEvents=active?"auto":"none";
+        toggle.setAttribute("aria-pressed",active?"true":"false");
+        toggle.innerHTML=active
+          ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
+      };
+
+      frame.addEventListener("load",()=>slide.classList.add("is-loaded"),{once:true});
+      toggle.addEventListener("click",event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        applyLiveState(!slide.classList.contains("is-browsing"));
+      });
+      applyLiveState(miunaeLiveActive);
     });
 
     activeIndex=0;
