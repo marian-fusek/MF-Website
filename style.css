@@ -3799,3 +3799,100 @@ body.mf-preload-locked .mf-loader span {
   opacity: .98 !important;
   transition-duration: 60ms, 60ms !important;
 }
+
+/* MIUNĀE live-site project slide */
+.mf-project-slide-live {
+  position: relative;
+}
+
+.mf-live-site {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.mf-live-site iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+  opacity: 0;
+  transform: scale(1.008);
+  transition:
+    opacity .55s cubic-bezier(.16,1,.3,1),
+    transform .9s cubic-bezier(.16,1,.3,1);
+}
+
+.mf-project-slide-live.is-loaded .mf-live-site iframe {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mf-live-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #000;
+  color: rgba(255,255,255,.68);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity .48s cubic-bezier(.16,1,.3,1),
+    visibility 0s linear .48s;
+  pointer-events: none;
+}
+
+.mf-project-slide-live.is-loaded .mf-live-loader {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mf-live-loader-copy {
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.mf-live-loader-copy span {
+  animation: mfLiveCursor .72s steps(1) infinite;
+}
+
+.mf-live-loader-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 12px;
+}
+
+.mf-live-loader-bars i {
+  display: block;
+  width: 2px;
+  height: 4px;
+  background: rgba(255,255,255,.48);
+  animation: mfLiveBars .9s ease-in-out infinite alternate;
+}
+
+.mf-live-loader-bars i:nth-child(2) { animation-delay: .08s; }
+.mf-live-loader-bars i:nth-child(3) { animation-delay: .16s; }
+.mf-live-loader-bars i:nth-child(4) { animation-delay: .24s; }
+.mf-live-loader-bars i:nth-child(5) { animation-delay: .32s; }
+.mf-live-loader-bars i:nth-child(6) { animation-delay: .40s; }
+
+@keyframes mfLiveCursor {
+  50% { opacity: 0; }
+}
+
+@keyframes mfLiveBars {
+  from { height: 3px; opacity: .28; }
+  to { height: 12px; opacity: .82; }
+}

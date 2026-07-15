@@ -207,7 +207,7 @@ if(indexExtra){
       approach:"I built the identity around time as both ingredient and attitude. Typography, material choices and imagery were reduced until every element felt deliberate. The resulting system moves between quiet control and botanical overgrowth while staying recognizably MIUNĀE.",
       images:[
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2200&q=88",
+        {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website"},
         "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -289,7 +289,32 @@ if(indexExtra){
     fields.scope.textContent=project.scope;
     fields.context.textContent=project.context;
     fields.approach.textContent=project.approach;
-    slides.innerHTML=project.images.map((src,i)=>`<figure class="mf-project-slide" data-slide="${i}"><img src="${src}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`).join("");
+    slides.innerHTML=project.images.map((media,i)=>{
+      if(media && typeof media==="object" && media.type==="iframe"){
+        return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}">
+          <div class="mf-live-site">
+            <div class="mf-live-loader" aria-hidden="true">
+              <div class="mf-live-loader-copy">LOADING MIUNĀE.COM<span>_</span></div>
+              <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <iframe
+              src="${media.src}"
+              title="${media.title||project.title+' live website'}"
+              loading="eager"
+              allow="fullscreen"
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          </div>
+        </figure>`;
+      }
+      return `<figure class="mf-project-slide" data-slide="${i}"><img src="${media}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`;
+    }).join("");
+
+    slides.querySelectorAll(".mf-project-slide-live iframe").forEach(frame=>{
+      const slide=frame.closest(".mf-project-slide-live");
+      frame.addEventListener("load",()=>slide?.classList.add("is-loaded"),{once:true});
+    });
+
     activeIndex=0;
     gallery.scrollTop=0;
     updateCounter();
