@@ -208,7 +208,7 @@ if(indexExtra){
       images:[
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
         {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website",liveKey:"website"},
-        {type:"instagram",src:"https://www.instagram.com/miunae.beauty/",title:"@miunae.beauty",liveKey:"instagram"},
+        {type:"instagram",src:"https://widgets.sociablekit.com/instagram-feed/iframe/25697535",title:"@miunae.beauty live feed",liveKey:"instagram"},
         "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -282,7 +282,6 @@ if(indexExtra){
   let wheelTotal=0;
   let wheelReset=0;
   const liveStates={website:false,instagram:false};
-  let instagramEmbedPromise=null;
 
   function renderProject(key){
     const project=projectData[key]||projectData["01"];
@@ -336,12 +335,14 @@ if(indexExtra){
               <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
             <div class="mf-instagram-embed-host">
-              <blockquote
-                class="instagram-media"
-                data-instgrm-permalink="${media.src}?utm_source=ig_embed&amp;utm_campaign=loading"
-                data-instgrm-version="14"
-                style="background:#fff;border:0;margin:0;max-width:540px;min-width:326px;padding:0;width:calc(100% - 2px);"
-              ></blockquote>
+              <iframe
+                src="${media.src}"
+                title="${media.title||'MIUNĀE Instagram feed'}"
+                loading="eager"
+                frameborder="0"
+                scrolling="yes"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
             </div>
             <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
               ${liveLabel(key,active)}
@@ -387,56 +388,18 @@ if(indexExtra){
 
     const instagramSlide=slides.querySelector('.mf-project-slide-instagram');
     if(instagramSlide){
-      const host=instagramSlide.querySelector('.mf-instagram-embed-host');
-      const markLoaded=()=>{
-        const frame=host?.querySelector('iframe');
-        if(!frame)return false;
-        if(frame.dataset.mfLoadBound==='true')return true;
-        frame.dataset.mfLoadBound='true';
-        const finish=()=>{
-          instagramSlide.classList.add('is-loaded');
-          applyLiveState(instagramSlide,!!liveStates.instagram);
-        };
+      const frame=instagramSlide.querySelector('.mf-instagram-embed-host iframe');
+      const finish=()=>{
+        instagramSlide.classList.add('is-loaded');
+        applyLiveState(instagramSlide,!!liveStates.instagram);
+      };
+      if(frame){
         frame.addEventListener('load',finish,{once:true});
-        setTimeout(finish,2200);
-        return true;
-      };
-      const observer=new MutationObserver(()=>{
-        if(markLoaded())observer.disconnect();
-      });
-      if(host)observer.observe(host,{childList:true,subtree:true});
-
-      const loadInstagram=()=>{
-        if(window.instgrm?.Embeds){
-          window.instgrm.Embeds.process();
-          return Promise.resolve();
-        }
-        if(instagramEmbedPromise)return instagramEmbedPromise;
-        instagramEmbedPromise=new Promise((resolve,reject)=>{
-          let script=document.querySelector('script[data-mf-instagram-embed]');
-          if(script){
-            script.addEventListener('load',resolve,{once:true});
-            script.addEventListener('error',reject,{once:true});
-            return;
-          }
-          script=document.createElement('script');
-          script.async=true;
-          script.src='https://www.instagram.com/embed.js';
-          script.dataset.mfInstagramEmbed='true';
-          script.onload=resolve;
-          script.onerror=reject;
-          document.body.appendChild(script);
-        }).then(()=>window.instgrm?.Embeds?.process());
-        return instagramEmbedPromise;
-      };
-
-      loadInstagram().then(()=>{
-        setTimeout(markLoaded,80);
-        setTimeout(markLoaded,900);
-      }).catch(()=>{
-        instagramSlide.classList.add('is-loaded','is-embed-error');
-        if(host)host.innerHTML='<a class="mf-instagram-fallback" href="https://www.instagram.com/miunae.beauty/" target="_blank" rel="noopener">OPEN @miunae.beauty ↗</a>';
-      });
+        /* Keep the loader from hanging if the widget delays its load event. */
+        setTimeout(finish,3200);
+      }else{
+        finish();
+      }
     }
 
     activeIndex=0;

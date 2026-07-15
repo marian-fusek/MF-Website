@@ -4068,3 +4068,26 @@ body.mf-preload-locked .mf-loader span {
     bottom: 44px;
   }
 }
+
+/* ============================================================
+   V34 — SociableKIT Instagram feed iframe
+   ============================================================ */
+.mf-instagram-embed-host {
+  align-items: stretch;
+  justify-content: stretch;
+  background: #fff;
+}
+
+.mf-instagram-embed-host iframe {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: #fff;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
