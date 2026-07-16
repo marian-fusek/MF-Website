@@ -212,8 +212,8 @@ if(indexExtra){
       "/images/projects/miunae/05-miunae-brandkit.jpg"
     ],
     "02":[
-      "/images/goballer/01-goballer-logo.jpg",
-      "/images/goballer/02-goballer-brand.jpg",
+      "/images/projects/goballer/01-goballer-logo.jpg",
+      "/images/projects/goballer/02-goballer-brand.jpg",
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
