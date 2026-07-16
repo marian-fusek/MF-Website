@@ -18,11 +18,15 @@ function startMfSite(){
   const gate=document.getElementById("mfWipGate");
   const cursor=document.getElementById("mfWipCursor");
   if(!gate){startMfSite();return;}
+  let alreadyDismissed=false;
+  try{alreadyDismissed=sessionStorage.getItem("mfWipDismissed")==="1";}catch(error){}
+  if(alreadyDismissed){gate.remove();startMfSite();return;}
   let closing=false;
   const move=e=>{if(cursor){cursor.style.transform=`translate3d(${e.clientX}px,${e.clientY}px,0)`;cursor.classList.add("is-visible");}};
   const leave=()=>cursor?.classList.remove("is-visible");
   const close=()=>{
     if(closing)return;closing=true;
+    try{sessionStorage.setItem("mfWipDismissed","1");}catch(error){}
     gate.classList.add("is-closing");
     cursor?.classList.remove("is-visible");
     setTimeout(()=>{gate.remove();startMfSite();},700);
@@ -169,8 +173,8 @@ if(indexExtra){
 (function(){
   const previewImages={
     "01":[
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=76",
+      "/images/projects/miunae/01-miunae-logo.jpg",
+      "/images/projects/miunae/04-miunae-all.jpg",
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=76"
     ],
@@ -246,11 +250,11 @@ if(indexExtra){
       context:"MIUNĀE needed to enter a saturated skincare category without resembling another polished wellness brand. Its formulas carried real history, but the story had to feel immediate rather than nostalgic. The work needed enough discipline to feel premium and enough tension to remain alive.",
       approach:"I built the identity around time as both ingredient and attitude. Typography, material choices and imagery were reduced until every element felt deliberate. The resulting system moves between quiet control and botanical overgrowth while staying recognizably MIUNĀE.",
       images:[
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
+        "/images/projects/miunae/01-miunae-logo.jpg",
         {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website",liveKey:"website"},
         {type:"curator",src:"https://cdn.curator.io/published/8bcd46ff-7c2b-4fd0-baa3-8d3df4db1ee3.js",title:"@miunae.beauty live feed",liveKey:"instagram"},
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
+        "/images/projects/miunae/04-miunae-all.jpg",
+        {type:"iframe",src:"https://www.miunae.com/brand-kit",title:"MIUNĀE live brand kit",liveKey:"brandKit"}
       ]
     },
     "02":{
@@ -321,7 +325,7 @@ if(indexExtra){
   let wheelLocked=false;
   let wheelTotal=0;
   let wheelReset=0;
-  const liveStates={website:false,instagram:false};
+  const liveStates={website:false,instagram:false,brandKit:false};
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
   function renderProject(key){
@@ -338,6 +342,11 @@ if(indexExtra){
           ? '<span class="mf-live-toggle-label">EXIT THE INSTA</span>'
           : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> <span class="mf-live-handle">@miunae.beauty</span></span>';
       }
+      if(key==="brandKit"){
+        return active
+          ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM / BRAND-KIT</span>';
+      }
       return active
         ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
         : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
@@ -347,10 +356,11 @@ if(indexExtra){
       if(media && typeof media==="object" && media.type==="iframe"){
         const key=media.liveKey||"website";
         const active=!!liveStates[key];
+        const loaderCopy=key==="brandKit"?"LOADING MIUNĀE BRAND KIT":"LOADING MIUNĀE.COM";
         return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}" data-live-key="${key}">
           <div class="mf-live-site">
             <div class="mf-live-loader" aria-hidden="true">
-              <div class="mf-live-loader-copy">LOADING MIUNĀE.COM<span>_</span></div>
+              <div class="mf-live-loader-copy">${loaderCopy}<span>_</span></div>
               <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
             <iframe
@@ -360,6 +370,7 @@ if(indexExtra){
               allow="fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"
             ></iframe>
+            <div class="mf-live-shield" aria-hidden="true"></div>
             <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
               ${liveLabel(key,active)}
             </button>
@@ -380,6 +391,7 @@ if(indexExtra){
                 <a href="https://curator.io" target="_blank" rel="noopener" class="crt-logo crt-tag">Powered by Curator.io</a>
               </div>
             </div>
+            <div class="mf-live-shield" aria-hidden="true"></div>
             <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
               ${liveLabel(key,active)}
             </button>
@@ -471,6 +483,7 @@ if(indexExtra){
 
   function openProject(strip){
     const key=strip.dataset.index||"01";
+    Object.keys(liveStates).forEach(liveKey=>{liveStates[liveKey]=false;});
     renderProject(key);
     overlay.classList.remove("is-closing");
     overlay.classList.add("active");
@@ -588,7 +601,7 @@ if(indexExtra){
   },{passive:true});
 })();
 
-function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,leftPad=-22,rightPad=30,scale=(viewport-leftPad-rightPad)/width,offset=leftPad;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
+function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,isMobile=viewport<=1024,leftPad=isMobile?8:-22,rightPad=isMobile?8:30,scale=(viewport-leftPad-rightPad)/width,offset=leftPad;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scaleHeroName);else setTimeout(scaleHeroName,200);scaleHeroName();window.addEventListener("resize",scaleHeroName);
 
 (function(){const hero=document.getElementById("heroName");if(!hero)return;const wait=ms=>new Promise(r=>setTimeout(r,ms));const chars=()=>Array.from(hero.querySelectorAll(".nc")).filter(c=>!c.classList.contains("n-sp"));async function accentA(){const a=hero.querySelector(".n-a2");if(!a)return;a.textContent="Á";await wait(600);a.textContent="A"}async function accentU(){const u=hero.querySelector(".n-u");if(!u)return;u.textContent="Ů";await wait(600);u.textContent="U"}async function disappear(){const list=["n-a1","n-r","n-i","n-a2","n-n","n-u","n-s","n-e","n-k"].map(c=>hero.querySelector("."+c)).filter(Boolean);list.forEach(el=>el.style.opacity="0");await wait(2100);list.forEach(el=>el.style.opacity="");await wait(400)}async function rgb(){const all=chars(),picks=[...all].sort(()=>Math.random()-.5).slice(0,3);let frame=0,total=120;const timer=setInterval(()=>{frame++;const t=frame/total,amp=Math.sin(t*Math.PI)*4,j=(Math.random()-.5)*.8,x=(amp+j).toFixed(2),nx=(-(amp+j*.7)).toFixed(2);picks.forEach(el=>{el.style.textShadow=`${x}px 0 3px rgba(226,27,22,.8),${nx}px 0 3px rgba(0,167,255,.8)`});if(frame>=total)clearInterval(timer)},16);await wait(2050);picks.forEach(el=>el.style.textShadow="")}async function blurFx(){const all=chars();all.forEach(el=>{el.style.transition=`filter .5s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(3px)"});await wait(1300);all.forEach(el=>{el.style.transition=`filter .8s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(0)"});await wait(900);all.forEach(el=>{el.style.transition="";el.style.filter=""})}const effects=[accentA,accentU,disappear,rgb,blurFx];function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}let queue=[];async function run(){await wait(2500);while(true){if(!queue.length)queue=shuffle(effects);await queue.shift()();await wait(2500)}}run();})();
