@@ -33,7 +33,47 @@ function startMfSite(){
   gate.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();close();}});
 })();
 
-(function(){let targetY=window.scrollY,currentY=window.scrollY,ticking=false;const ease=.065;function tick(){const d=targetY-currentY;if(Math.abs(d)<.35){currentY=targetY;window.scrollTo(0,currentY);ticking=false;return}currentY+=d*ease;window.scrollTo(0,currentY);requestAnimationFrame(tick)}window.addEventListener("wheel",e=>{if(document.body.classList.contains("project-open"))return;e.preventDefault();targetY+=e.deltaY*1.4;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:false});let touchStart=0,lastTouch=0,lastTime=0,velocity=0;window.addEventListener("touchstart",e=>{touchStart=lastTouch=e.touches[0].clientY;lastTime=Date.now();velocity=0},{passive:true});window.addEventListener("touchmove",e=>{if(document.body.classList.contains("project-open"))return;const y=e.touches[0].clientY,dt=Date.now()-lastTime||1;velocity=((lastTouch-y)/dt)*16;lastTouch=y;lastTime=Date.now();targetY+=touchStart-y;touchStart=y;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window.addEventListener("touchend",()=>{if(document.body.classList.contains("project-open"))return;targetY+=velocity*200;targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));if(!ticking){ticking=true;requestAnimationFrame(tick)}},{passive:true});window._mfScroll=function(y){targetY=y;currentY=window.scrollY;if(!ticking){ticking=true;requestAnimationFrame(tick)}}})();
+(function(){
+  const mobileLayout=window.matchMedia("(max-width: 1024px), (pointer: coarse)");
+
+  function nativeScroll(y){
+    window.scrollTo({top:y,behavior:"smooth"});
+  }
+
+  if(mobileLayout.matches){
+    /* Mobile uses the browser's native touch physics. The old custom touch
+       momentum ran alongside native scrolling and made the page accelerate. */
+    window._mfScroll=nativeScroll;
+    return;
+  }
+
+  let targetY=window.scrollY,currentY=window.scrollY,ticking=false;
+  const ease=.065;
+  function tick(){
+    const d=targetY-currentY;
+    if(Math.abs(d)<.35){
+      currentY=targetY;
+      window.scrollTo(0,currentY);
+      ticking=false;
+      return;
+    }
+    currentY+=d*ease;
+    window.scrollTo(0,currentY);
+    requestAnimationFrame(tick);
+  }
+  window.addEventListener("wheel",e=>{
+    if(document.body.classList.contains("project-open"))return;
+    e.preventDefault();
+    targetY+=e.deltaY*1.4;
+    targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));
+    if(!ticking){ticking=true;requestAnimationFrame(tick);}
+  },{passive:false});
+  window._mfScroll=function(y){
+    targetY=y;
+    currentY=window.scrollY;
+    if(!ticking){ticking=true;requestAnimationFrame(tick);}
+  };
+})();
 
 document.querySelectorAll('a[href^="#"]').forEach(link=>{link.addEventListener("click",e=>{const id=link.getAttribute("href").slice(1);if(!id){e.preventDefault();window._mfScroll?window._mfScroll(0):window.scrollTo({top:0,behavior:"smooth"});return}const target=document.getElementById(id);if(!target)return;e.preventDefault();const y=target.getBoundingClientRect().top+window.scrollY;if(window._mfScroll)window._mfScroll(y);else window.scrollTo({top:y,behavior:"smooth"});});});
 
@@ -282,6 +322,7 @@ if(indexExtra){
   let wheelTotal=0;
   let wheelReset=0;
   const liveStates={website:false,instagram:false};
+  const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
   function renderProject(key){
     const project=projectData[key]||projectData["01"];
@@ -419,6 +460,7 @@ if(indexExtra){
 
     activeIndex=0;
     gallery.scrollTop=0;
+    overlay.scrollTop=0;
     updateCounter();
   }
 
@@ -434,6 +476,7 @@ if(indexExtra){
     overlay.classList.add("active");
     overlay.setAttribute("aria-hidden","false");
     document.body.classList.add("project-open");
+    overlay.scrollTop=0;
     requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add("is-visible")));
     setTimeout(()=>gallery.focus({preventScroll:true}),520);
   }
@@ -455,6 +498,16 @@ if(indexExtra){
     const total=slides.children.length;
     next=Math.max(0,Math.min(total-1,next));
     if(next===activeIndex||wheelLocked)return;
+
+    if(mobileProjectLayout.matches){
+      const targetSlide=slides.children[next];
+      if(!targetSlide)return;
+      activeIndex=next;
+      updateCounter();
+      targetSlide.scrollIntoView({behavior:"smooth",block:"start"});
+      return;
+    }
+
     wheelLocked=true;
     const start=gallery.scrollTop;
     const target=next*gallery.clientHeight;
@@ -484,6 +537,7 @@ if(indexExtra){
   });
 
   gallery.addEventListener("wheel",e=>{
+    if(mobileProjectLayout.matches)return;
     const liveInstagram=e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
     if(liveInstagram)return;
     e.preventDefault();
@@ -500,14 +554,37 @@ if(indexExtra){
   let touchStartY=0;
   let touchStartedInLiveInstagram=false;
   gallery.addEventListener("touchstart",e=>{
+    if(mobileProjectLayout.matches)return;
     touchStartY=e.touches[0].clientY;
     touchStartedInLiveInstagram=!!e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
   },{passive:true});
   gallery.addEventListener("touchend",e=>{
+    if(mobileProjectLayout.matches)return;
     if(touchStartedInLiveInstagram){touchStartedInLiveInstagram=false;return;}
     const endY=e.changedTouches[0].clientY;
     const delta=touchStartY-endY;
     if(Math.abs(delta)>40)scrollToSlide(activeIndex+(delta>0?1:-1));
+  },{passive:true});
+
+  let mobileProjectScrollFrame=0;
+  overlay.addEventListener("scroll",()=>{
+    if(!mobileProjectLayout.matches||!overlay.classList.contains("active"))return;
+    if(mobileProjectScrollFrame)return;
+    mobileProjectScrollFrame=requestAnimationFrame(()=>{
+      mobileProjectScrollFrame=0;
+      const viewportMid=overlay.scrollTop+overlay.clientHeight*.55;
+      const slideList=[...slides.children];
+      if(!slideList.length)return;
+      let closest=0;
+      let distance=Infinity;
+      slideList.forEach((slide,index)=>{
+        const mid=slide.offsetTop+slide.offsetHeight/2;
+        const nextDistance=Math.abs(mid-viewportMid);
+        if(nextDistance<distance){distance=nextDistance;closest=index;}
+      });
+      activeIndex=closest;
+      updateCounter();
+    });
   },{passive:true});
 })();
 
@@ -683,6 +760,45 @@ function positionRollCopies(){document.querySelectorAll(".mf-roll").forEach(row=
 positionRollCopies();
 window.addEventListener("resize",positionRollCopies);
 document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].forEach(event=>{row.addEventListener(event,()=>{requestAnimationFrame(positionRollCopies);[100,200,300,400,500,600,700].forEach(ms=>setTimeout(positionRollCopies,ms));});});});
+
+/* Mobile / small-tablet expertise rows open by tap. The selected explanation
+   appears above its own large type and naturally pushes the rows below down. */
+(function(){
+  const mobileRolls=window.matchMedia("(max-width: 1024px)");
+  const rows=[...document.querySelectorAll(".mf-roll")];
+  if(!rows.length)return;
+  rows.forEach(row=>{
+    row.setAttribute("tabindex","0");
+    row.setAttribute("role","button");
+    row.setAttribute("aria-expanded","false");
+    const toggle=()=>{
+      if(!mobileRolls.matches)return;
+      const opening=!row.classList.contains("is-mobile-open");
+      rows.forEach(other=>{
+        other.classList.remove("is-mobile-open");
+        other.setAttribute("aria-expanded","false");
+      });
+      if(opening){
+        row.classList.add("is-mobile-open");
+        row.setAttribute("aria-expanded","true");
+      }
+    };
+    row.addEventListener("click",toggle);
+    row.addEventListener("keydown",event=>{
+      if(event.key==="Enter"||event.key===" "){
+        event.preventDefault();
+        toggle();
+      }
+    });
+  });
+  mobileRolls.addEventListener?.("change",event=>{
+    if(event.matches)return;
+    rows.forEach(row=>{
+      row.classList.remove("is-mobile-open");
+      row.setAttribute("aria-expanded","false");
+    });
+  });
+})();
 
 /* XP SHAPE — fast particles, two-second hover morphs, lively breathing */
 (function(){
@@ -892,7 +1008,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     world.innerHTML="";
     if(miniWorld)miniWorld.innerHTML="";
     const vw=window.innerWidth,vh=window.innerHeight;
-    const fieldW=vw*2.45,fieldH=vh*2.25;
+    const mobileArt=vw<=1024;
+    const fieldW=vw*(mobileArt?2.9:2.45),fieldH=vh*(mobileArt?2.7:2.25);
     const cols=6,rows=5,cellW=fieldW/cols,cellH=fieldH/rows;
     pieces=files.map((name,i)=>{
       const figure=document.createElement("figure");
@@ -904,7 +1021,9 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       figure.style.setProperty("--tilt",`${(-1+seeded(i+43)*2).toFixed(2)}deg`);
       figure.style.setProperty("--tilt-x",`${(-1+seeded(i+47)*2).toFixed(2)}deg`);
       figure.style.setProperty("--tilt-y",`${(-1+seeded(i+53)*2).toFixed(2)}deg`);
-      const size=Math.round(160+seeded(i+2)*252);
+      const size=mobileArt
+        ? Math.round(88+seeded(i+2)*128)
+        : Math.round(160+seeded(i+2)*252);
       const ratio=.72+seeded(i+31)*.62;
       const depth=.55+seeded(i+68)*.95;
       figure.style.width=size+"px";
@@ -961,13 +1080,14 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   function render(now=performance.now()){
     if(expanded)return;
     const vw=window.innerWidth,vh=window.innerHeight;
-    const spanX=vw*2.45,spanY=vh*2.25;
+    const mobileArt=vw<=1024;
+    const spanX=vw*(mobileArt?2.9:2.45),spanY=vh*(mobileArt?2.7:2.25);
     const t=now*.00012;
     const wholeX=Math.sin(t)*22;
     const wholeY=Math.cos(t*.82)*16;
     const miniRect=miniWorld?.getBoundingClientRect();
     const mw=miniRect?.width||0,mh=miniRect?.height||0;
-    const miniSpanX=mw*2.45,miniSpanY=mh*2.25;
+    const miniSpanX=mw*(mobileArt?2.9:2.45),miniSpanY=mh*(mobileArt?2.7:2.25);
     const scale=mw&&mh?Math.min(mw/vw,mh/vh):0;
     pieces.forEach(piece=>{
       const localX=Math.sin(t*(.7+piece.depth*.45)+piece.phase)*piece.driftX;

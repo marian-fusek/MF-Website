@@ -4126,3 +4126,381 @@ body.mf-preload-locked .mf-loader span {
   max-width: none !important;
   margin: 0 !important;
 }
+
+/* ============================================================
+   V36 — Curator color correction + mobile / small-tablet system
+   Desktop rules above remain unchanged.
+   ============================================================ */
+
+/* Curator media must not inherit the grayscale, scale or forced full-frame
+   dimensions used by regular project photographs. */
+.mf-project-slide-instagram .mf-curator-feed img,
+.mf-project-slide-instagram #curator-feed-default-feed-layout img,
+.mf-project-slide-instagram .crt-post img,
+.mf-project-slide-instagram .crt-grid-post img {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: cover !important;
+  filter: none !important;
+  transform: none !important;
+}
+.mf-project-slide-instagram video {
+  filter: none !important;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --mobile-edge: 18px;
+  }
+
+  html,
+  body {
+    overscroll-behavior-x: none;
+  }
+
+  body {
+    touch-action: pan-y;
+  }
+
+  /* HERO — use the stable mobile viewport so the name stays above browser UI. */
+  .mf-hero {
+    height: 100svh !important;
+    min-height: 100svh !important;
+  }
+  .mf-hero-name {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 8px) !important;
+  }
+  .mf-hero-info {
+    left: var(--mobile-edge) !important;
+    right: var(--mobile-edge) !important;
+    width: auto !important;
+  }
+  .mf-nav {
+    gap: clamp(11px, 3.2vw, 28px) !important;
+    font-size: 10px !important;
+  }
+
+  /* INDEX — give every piece of copy breathing room from the rules. */
+  .mf-work {
+    min-height: auto !important;
+    padding: 10svh var(--mobile-edge) 12svh !important;
+  }
+  .mf-strips {
+    margin-top: 12svh !important;
+  }
+  .mf-strip {
+    min-height: 132px !important;
+    grid-template-columns: 34px minmax(0, 1fr) 28px !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 12px !important;
+    row-gap: 13px !important;
+    padding: 25px 4px 24px !important;
+    align-content: center !important;
+  }
+  .mf-strip-num {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: center;
+  }
+  .mf-strip-title {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center;
+    min-width: 0;
+  }
+  .mf-strip-plus {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end;
+    align-self: center;
+  }
+  .mf-strip-desc {
+    grid-column: 2 / 4 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+    padding-right: 10px;
+    line-height: 1.5 !important;
+  }
+  .mf-strip-meta,
+  .mf-strip-preview,
+  .mf-strip-img {
+    display: none !important;
+  }
+
+  /* PROJECT CASE STUDIES — copy first, then one full-viewport image per snap. */
+  .mf-overlay {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mf-project-shell {
+    position: relative !important;
+    inset: auto !important;
+    display: block !important;
+    width: 100% !important;
+    min-height: 100% !important;
+  }
+  .mf-project-info {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100svh !important;
+    z-index: 2 !important;
+    pointer-events: auto !important;
+    background: #000 !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .mf-project-info-inner {
+    width: 100%;
+    height: auto !important;
+    min-height: 100svh !important;
+    padding: 68px var(--mobile-edge) 34px !important;
+  }
+  .mf-project-title {
+    max-width: 92vw;
+    font-size: clamp(42px, 14vw, 82px) !important;
+    line-height: .88 !important;
+  }
+  .mf-project-intro {
+    margin-top: 18px !important;
+    max-width: 42em !important;
+  }
+  .mf-project-scope-block {
+    margin-top: 28px !important;
+    max-width: 42em !important;
+  }
+  .mf-project-bottom-copy {
+    margin-top: 42px !important;
+    gap: 22px !important;
+    padding-bottom: 0 !important;
+  }
+  .mf-project-long {
+    max-width: 48em !important;
+    font-size: 13px !important;
+    line-height: 1.28 !important;
+  }
+  .mf-project-gallery {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1;
+    transform: none;
+  }
+  .mf-project-slides {
+    width: 100%;
+  }
+  .mf-project-slide {
+    width: 100%;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    padding: 54px 10px 10px !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .mf-project-slide img {
+    object-position: center !important;
+    filter: grayscale(1) contrast(1.08) brightness(.82) !important;
+  }
+  .mf-project-slide-instagram .mf-curator-feed img,
+  .mf-project-slide-instagram #curator-feed-default-feed-layout img,
+  .mf-project-slide-instagram .crt-post img,
+  .mf-project-slide-instagram .crt-grid-post img {
+    filter: none !important;
+  }
+  .mf-project-counter {
+    right: 14px !important;
+    bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+
+  /* BIG TYPE — tap a row to reveal its copy above that same title. */
+  .mf-practice {
+    min-height: auto !important;
+    padding: 12svh 0 !important;
+    overflow: visible !important;
+  }
+  .mf-roll-list {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    justify-content: flex-start !important;
+    overflow: visible !important;
+  }
+  .mf-roll {
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+    column-gap: 3.2vw !important;
+    row-gap: 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    padding: 8px 10px !important;
+    font-size: clamp(42px, 14vw, 104px) !important;
+    line-height: .76 !important;
+    cursor: pointer;
+    outline: none;
+  }
+  .mf-roll-left,
+  .mf-roll-right {
+    grid-row: 2 !important;
+    white-space: nowrap;
+  }
+  .mf-roll-copy {
+    position: relative !important;
+    inset: auto !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: min(88vw, 560px) !important;
+    max-width: none !important;
+    max-height: 0;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: hidden;
+    opacity: 0 !important;
+    transform: translateY(8px) !important;
+    text-align: center;
+    pointer-events: none;
+    transition:
+      max-height .72s var(--ease),
+      opacity .32s ease,
+      transform .72s var(--ease),
+      margin .72s var(--ease) !important;
+  }
+  .mf-roll:hover .mf-roll-copy {
+    opacity: 0 !important;
+  }
+  .mf-roll.is-mobile-open .mf-roll-copy,
+  .mf-roll.is-mobile-open:hover .mf-roll-copy {
+    max-height: 120px;
+    margin-bottom: 18px !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* ART — preserve the desktop sense of scale instead of filling the phone. */
+  .mf-art-showcase {
+    padding-inline: var(--mobile-edge) !important;
+  }
+  .mf-art-preview-frame {
+    min-height: 56svh !important;
+  }
+  .mf-art-piece:not(.is-expanded) {
+    max-width: 55vw !important;
+  }
+  .mf-art-piece--mini {
+    max-width: 42vw !important;
+  }
+  .mf-art-intro {
+    width: min(84vw, 520px) !important;
+  }
+
+  /* FOOTER — navigation at top, socials centered, signature across the bottom. */
+  .mf-footer {
+    position: relative !important;
+    width: 100% !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    padding: 0 8px !important;
+    overflow: hidden;
+  }
+  .mf-footer-inner {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    display: block !important;
+  }
+  .mf-footer-links {
+    position: absolute !important;
+    top: 11svh !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    gap: clamp(20px, 7vw, 48px) !important;
+    margin: 0 !important;
+  }
+  .mf-footer-contact {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    display: flex !important;
+    width: min(92vw, 680px) !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: clamp(18px, 6vw, 54px) !important;
+    margin: 0 !important;
+    text-align: center !important;
+  }
+  .mf-footer-name {
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 9svh !important;
+    width: calc(100vw - 16px) !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    font-size: clamp(48px, 15.2vw, 118px) !important;
+    line-height: .82 !important;
+    letter-spacing: -.075em !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  .mf-footer-bottom {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: max(14px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+  }
+  .mf-footer-typewriter {
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: max(14px, env(safe-area-inset-bottom)) !important;
+    width: min(58vw, 520px) !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .mf-nav-contact {
+    display: none !important;
+  }
+  .mf-project-info-inner {
+    padding-top: 62px !important;
+  }
+  .mf-project-title {
+    font-size: clamp(40px, 15vw, 68px) !important;
+  }
+  .mf-footer-contact {
+    flex-wrap: wrap !important;
+    row-gap: 18px !important;
+  }
+  .mf-footer-name {
+    font-size: clamp(46px, 15vw, 72px) !important;
+  }
+  .mf-footer-typewriter {
+    width: 54vw !important;
+    font-size: 7px !important;
+  }
+}
