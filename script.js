@@ -1,6 +1,38 @@
 const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
+/* Mobile Safari can occasionally reload a graphics-heavy tab under memory pressure.
+   Preserve the current vertical position so a recovery does not jump back to the hero. */
+(function(){
+  const mobile=window.matchMedia("(max-width: 1024px), (pointer: coarse)");
+  if(!mobile.matches)return;
+  const key="mfMobileScrollY";
+  let timer=0;
+  const save=()=>{
+    clearTimeout(timer);
+    timer=setTimeout(()=>{
+      try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}
+    },120);
+  };
+  window.addEventListener("scroll",save,{passive:true});
+  window.addEventListener("pagehide",()=>{
+    clearTimeout(timer);
+    try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}
+  });
+  window._mfRestoreSavedMobileScroll=()=>{
+    const nav=performance.getEntriesByType?.("navigation")?.[0];
+    if(!nav || !["reload","back_forward"].includes(nav.type))return;
+    let saved=0;
+    try{saved=Number(sessionStorage.getItem(key)||0);}catch(error){}
+    if(saved>8){
+      const restore=()=>window.scrollTo({top:saved,left:0,behavior:"auto"});
+      setTimeout(restore,80);
+      setTimeout(restore,520);
+      setTimeout(restore,1900);
+    }
+  };
+})();
+
 const loader=document.getElementById("mfLoader");
 function startMfSite(){
   document.body.classList.remove("mf-preload-locked");
@@ -12,6 +44,7 @@ function startMfSite(){
     spans.forEach(span=>{span.style.animation="";span.style.transform="";});
     setTimeout(()=>loader.classList.add("done"),1800);
   }
+  window._mfRestoreSavedMobileScroll?.();
 }
 
 (function(){
@@ -174,9 +207,10 @@ if(indexExtra){
   const previewImages={
     "01":[
       "/images/projects/miunae/01-miunae-logo.jpg",
+      "/images/projects/miunae/02-miunae-web.jpg",
+      "/images/projects/miunae/04-miunae-insta.jpg",
       "/images/projects/miunae/04-miunae-all.jpg",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=76"
+      "/images/projects/miunae/04-miunae-brandkitjpg"
     ],
     "02":[
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
@@ -220,6 +254,13 @@ if(indexExtra){
       frame.style.setProperty('--preview-order',i);
       const img=document.createElement('img');
       img.src=src; img.alt=''; img.loading='lazy'; img.decoding='async';
+      if(src.endsWith("04-miunae-brandkitjpg")){
+        img.addEventListener("error",()=>{
+          if(img.dataset.fallbackTried)return;
+          img.dataset.fallbackTried="1";
+          img.src="/images/projects/miunae/04-miunae-brandkit.jpg";
+        });
+      }
       frame.appendChild(img); preview.appendChild(frame);
     });
     const more=Math.max(0,list.length-3);
@@ -769,7 +810,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
 })();
 
 /* PRACTICE ROLL */
-function positionRollCopies(){document.querySelectorAll(".mf-roll").forEach(row=>{const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");if(!left||!right)return;const rowRect=row.getBoundingClientRect(),leftRect=left.getBoundingClientRect(),rightRect=right.getBoundingClientRect();const center=((leftRect.right+rightRect.left)/2)-rowRect.left;row.style.setProperty("--copy-x",center+"px");});}
+function positionRollCopies(){
+  if(window.matchMedia("(max-width: 1024px), (pointer: coarse)").matches)return;
+  document.querySelectorAll(".mf-roll").forEach(row=>{const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");if(!left||!right)return;const rowRect=row.getBoundingClientRect(),leftRect=left.getBoundingClientRect(),rightRect=right.getBoundingClientRect();const center=((leftRect.right+rightRect.left)/2)-rowRect.left;row.style.setProperty("--copy-x",center+"px");});
+}
 positionRollCopies();
 window.addEventListener("resize",positionRollCopies);
 document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].forEach(event=>{row.addEventListener(event,()=>{requestAnimationFrame(positionRollCopies);[100,200,300,400,500,600,700].forEach(ms=>setTimeout(positionRollCopies,ms));});});});
@@ -813,11 +857,42 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   });
 })();
 
+/* Mobile big-type fitting: size each pair independently so every line is centered
+   and fills the available width without clipping. Height-only browser-bar changes
+   do not trigger a recalculation. */
+(function(){
+  const mobile=window.matchMedia("(max-width: 1024px)");
+  const rows=[...document.querySelectorAll(".mf-roll")];
+  if(!rows.length)return;
+  let lastWidth=0,resizeTimer=0;
+  function fit(){
+    if(!mobile.matches){rows.forEach(row=>row.style.removeProperty("font-size"));return;}
+    const width=Math.round(document.documentElement.clientWidth||window.innerWidth);
+    if(Math.abs(width-lastWidth)<3 && lastWidth)return;
+    lastWidth=width;
+    const available=Math.max(260,width-24);
+    const gap=Math.max(9,width*.03);
+    rows.forEach(row=>{
+      const left=row.querySelector(".mf-roll-left");
+      const right=row.querySelector(".mf-roll-right");
+      if(!left||!right)return;
+      row.style.setProperty("font-size","100px","important");
+      const natural=left.getBoundingClientRect().width+right.getBoundingClientRect().width+gap;
+      const size=Math.max(30,Math.min(104,100*available/Math.max(natural,1)));
+      row.style.setProperty("font-size",`${size.toFixed(2)}px`,"important");
+    });
+  }
+  const queue=()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(fit,90);};
+  if(document.fonts?.ready)document.fonts.ready.then(fit);else setTimeout(fit,220);
+  window.addEventListener("resize",queue,{passive:true});
+  mobile.addEventListener?.("change",()=>{lastWidth=0;fit();});
+})();
+
 /* XP SHAPE — fast particles, two-second hover morphs, lively breathing */
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=760;
+  const COUNT=window.matchMedia("(max-width: 1024px)").matches?520:760;
   const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"fourStar",symbio:"sinusoid",fg:"spiral"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
@@ -911,7 +986,21 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     };
   };
 
-  new p5(sketch,container);
+  const xpCanvas=new p5(sketch,container);
+  const xpSection=document.getElementById("xp");
+  let xpVisible=true;
+  const syncXpLoop=()=>{
+    if(xpVisible&&!document.hidden)xpCanvas.loop();
+    else xpCanvas.noLoop();
+  };
+  if(xpSection){
+    const xpObserver=new IntersectionObserver(entries=>{
+      xpVisible=!!entries[0]?.isIntersecting;
+      syncXpLoop();
+    },{rootMargin:"20% 0px",threshold:0});
+    xpObserver.observe(xpSection);
+  }
+  document.addEventListener("visibilitychange",syncXpLoop);
   const track=document.getElementById("timelineItems");
   if(track)track.querySelectorAll(".mf-xp-card").forEach(card=>{
     const shape=SHAPE_MAP[card.dataset.xpEffect]||"circle";
@@ -1123,8 +1212,15 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     });
   }
   let artMotionFrame=0;
+  let miniVisible=!miniWorld;
+  if(miniWorld){
+    const miniObserver=new IntersectionObserver(entries=>{
+      miniVisible=!!entries[0]?.isIntersecting;
+    },{rootMargin:"15% 0px",threshold:0});
+    miniObserver.observe(miniWorld);
+  }
   function animateArt(now){
-    if(!expanded && (miniWorld || overlay.classList.contains("active"))) render(now);
+    if(!document.hidden&&!expanded&&(miniVisible||overlay.classList.contains("active")))render(now);
     artMotionFrame=requestAnimationFrame(animateArt);
   }
   requestAnimationFrame(()=>{

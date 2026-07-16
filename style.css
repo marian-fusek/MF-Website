@@ -4641,3 +4641,70 @@ body.project-open .mf-nav-art {
     font-size: 9px !important;
   }
 }
+
+/* ============================================================
+   V38 — color project media + mobile fitting/stability corrections
+   ============================================================ */
+
+/* Project case-study imagery and INDEX preview thumbnails retain source color. */
+.mf-project-slide > img,
+.mf-strip-preview-frame img {
+  filter: none !important;
+}
+
+@media (max-width: 1024px) {
+  /* Keep every large practice line centered and unclipped. JS assigns the
+     largest fitting font size to each pair independently. */
+  .mf-roll {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+    padding-inline: 12px !important;
+    justify-content: center !important;
+    justify-items: center !important;
+    text-align: center !important;
+    overflow: visible !important;
+  }
+  .mf-roll-left,
+  .mf-roll-right {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+    text-align: center !important;
+  }
+  .mf-roll-copy {
+    width: min(88vw, 560px) !important;
+    text-align: center !important;
+  }
+  .mf-roll.is-mobile-open .mf-roll-copy,
+  .mf-roll.is-mobile-open:hover .mf-roll-copy {
+    max-height: 180px !important;
+    margin-top: 30px !important;
+    margin-bottom: 54px !important;
+  }
+
+  /* Mobile case-study media stays in full color. */
+  .mf-project-slide > img {
+    filter: none !important;
+  }
+
+  /* Touch screens do not need reserved space for hover arrows. */
+  .mf-footer-contact .mf-menu-item::after {
+    content: none !important;
+    display: none !important;
+  }
+  .mf-footer-contact .mf-menu-item {
+    gap: 0 !important;
+  }
+
+  /* Re-centre the entire variable wordmark whenever letter widths change. */
+  .mf-footer-name {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  .mf-footer-name .footer-vp-char {
+    transform-origin: center center !important;
+  }
+}
