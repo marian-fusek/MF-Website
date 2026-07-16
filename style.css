@@ -4708,3 +4708,312 @@ body.project-open .mf-nav-art {
     transform-origin: center center !important;
   }
 }
+
+/* ============================================================
+   V39 — project navigation, mobile media controls, GoBaller deck
+   ============================================================ */
+
+/* Project changes reuse one shell: the departing case study moves left and the
+   replacement enters from the right, so overlays can never stack. */
+.mf-project-shell {
+  will-change: transform, opacity;
+  transition: transform .74s var(--ease), opacity .48s ease;
+}
+.mf-project-shell.is-switching-out {
+  transform: translate3d(-104%,0,0);
+  opacity: 0;
+}
+.mf-project-shell.is-switching-in {
+  transform: translate3d(104%,0,0);
+  opacity: 0;
+  transition: none !important;
+}
+
+/* Desktop controls sit on the navigation baseline, aligned to the image edge. */
+.mf-project-controls-hint {
+  position: fixed;
+  z-index: 325;
+  top: 18px;
+  left: max(270px, 24vw);
+  color: rgba(255,255,255,.58);
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-5px);
+  pointer-events: none;
+  transition: opacity .42s ease .25s, transform .58s var(--ease) .25s;
+}
+.mf-overlay.is-visible .mf-project-controls-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Static image wrapper supports mobile crop panning and tap-to-fit without
+   changing iframe or Curator slides. */
+.mf-project-image-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+.mf-project-image-viewport > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: var(--image-x, 50%) 50% !important;
+  filter: none !important;
+}
+
+/* Final project card. */
+.mf-project-end-card {
+  --end-arrow-y: 50%;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(244,244,244,.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #050505;
+}
+.mf-project-end-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.1vh, 24px);
+}
+.mf-project-end-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(255,255,255,.76);
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(25px, 3.1vw, 58px);
+  line-height: .92;
+  letter-spacing: -.045em;
+  font-weight: 400;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .38s ease, transform .55s var(--ease);
+}
+.mf-project-end-link:hover {
+  color: #fff;
+  transform: translateX(-5px);
+}
+.mf-project-end-arrow {
+  position: absolute;
+  right: clamp(30px, 6vw, 108px);
+  top: var(--end-arrow-y);
+  color: #fff;
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(28px, 4vw, 68px);
+  line-height: 1;
+  opacity: 0;
+  transform: translate3d(var(--arrow-shift-x,0),calc(-50% + var(--arrow-shift-y,0px)),0);
+  transition: top .55s var(--ease), opacity .32s ease, transform .2s ease-out;
+  pointer-events: none;
+}
+.mf-project-end-card.is-project-hovered .mf-project-end-arrow { opacity: 1; }
+.mf-project-exit-button {
+  position: relative;
+  margin-top: clamp(34px, 6vh, 72px);
+  min-width: 190px;
+  min-height: 44px;
+  padding: 12px 22px;
+  border: 1px solid rgba(244,244,244,.2);
+  background: transparent;
+  color: rgba(255,255,255,.72);
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .07em;
+  text-transform: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color .38s ease, background .48s var(--ease), border-color .38s ease;
+}
+.mf-project-exit-button span {
+  display: block;
+  transition: opacity .3s ease, transform .48s var(--ease);
+}
+.mf-project-exit-button span:last-child {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: translateY(8px);
+}
+.mf-project-exit-button:hover {
+  color: #fff;
+  background: rgba(244,244,244,.09);
+  border-color: rgba(244,244,244,.42);
+}
+.mf-project-exit-button:hover span:first-child { opacity: 0; transform: translateY(-8px); }
+.mf-project-exit-button:hover span:last-child { opacity: 1; transform: translateY(0); }
+
+/* GoBaller frame-two carousel. */
+.mf-goballer-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #020402;
+  isolation: isolate;
+}
+.mf-carousel-background {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  filter: none !important;
+  transform: none !important;
+  z-index: 0;
+}
+.mf-carousel-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.mf-carousel-card {
+  position: absolute;
+  width: auto !important;
+  height: auto !important;
+  max-width: min(72%, 1100px) !important;
+  max-height: 72% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  filter: none !important;
+  transform: translate3d(0,0,0);
+  opacity: 1;
+  box-shadow: 0 22px 62px rgba(0,0,0,.36);
+  will-change: transform, filter, opacity;
+}
+.mf-carousel-card-current {
+  z-index: 3;
+  transition: transform .72s var(--ease), filter .72s var(--ease), opacity .45s ease;
+}
+.mf-carousel-card-next {
+  z-index: 4;
+  opacity: 0;
+  transition: transform .72s var(--ease), filter .72s var(--ease), opacity .24s ease;
+}
+.mf-carousel-card-next.is-ready { opacity: 1; }
+.mf-carousel-card-next.from-right { transform: translate3d(118%,0,0) scaleX(.98); filter: blur(11px); }
+.mf-carousel-card-next.from-left { transform: translate3d(-118%,0,0) scaleX(.98); filter: blur(11px); }
+.mf-carousel-card-next.is-entering { transform: translate3d(0,0,0) scaleX(1); filter: blur(0); }
+.mf-carousel-card-current.to-left { transform: translate3d(-118%,0,0) scaleX(1.035); filter: blur(9px); opacity: .45; }
+.mf-carousel-card-current.to-right { transform: translate3d(118%,0,0) scaleX(1.035); filter: blur(9px); opacity: .45; }
+.mf-carousel-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 8;
+  width: 35%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: none;
+}
+.mf-carousel-zone-left { left: 0; }
+.mf-carousel-zone-right { right: 0; }
+.mf-carousel-cursor {
+  position: absolute;
+  z-index: 12;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-999px,-999px,0);
+  transition: opacity .2s ease;
+}
+.mf-carousel-cursor.is-visible { opacity: 1; }
+.mf-carousel-cursor b {
+  font-family: "Geist", Arial, sans-serif;
+  font-size: 28px;
+  line-height: .8;
+  font-weight: 400;
+}
+.mf-carousel-cursor span {
+  font-family: "Geist Mono", monospace;
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: .06em;
+}
+@keyframes mfCarouselHintCurrent {
+  0% { transform: translate3d(20%,0,0) scale(.985); filter: blur(11px); }
+  30% { transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+  58% { transform: translate3d(-18%,0,0) scaleX(1.025); filter: blur(4px); }
+  78% { transform: translate3d(-12%,0,0) scaleX(1.012); filter: blur(1.5px); }
+  100% { transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+}
+@keyframes mfCarouselHintNext {
+  0%,28% { transform: translate3d(112%,0,0); opacity: 0; filter: blur(10px); }
+  55%,75% { transform: translate3d(72%,0,0); opacity: .82; filter: blur(4px); }
+  100% { transform: translate3d(112%,0,0); opacity: 0; filter: blur(10px); }
+}
+.mf-goballer-carousel.is-hinting .mf-carousel-card-current { animation: mfCarouselHintCurrent 2.35s var(--ease) both; }
+.mf-goballer-carousel.is-hinting .mf-carousel-card-next { animation: mfCarouselHintNext 2.35s var(--ease) both; }
+
+@media (max-width: 1024px) {
+  .mf-project-controls-hint { display: none !important; }
+
+  /* Every tapped expertise description gets equal air above and below. */
+  .mf-roll.is-mobile-open .mf-roll-copy,
+  .mf-roll.is-mobile-open:hover .mf-roll-copy {
+    margin-top: 36px !important;
+    margin-bottom: 36px !important;
+  }
+
+  /* Static case-study images open in the existing crop. Drag horizontally to
+     inspect the crop; tap toggles a full-image contain view on black. */
+  .mf-project-image-viewport {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .mf-project-image-viewport > img {
+    transition: object-position .16s ease-out, transform .62s var(--ease) !important;
+  }
+  .mf-project-image-viewport.is-fit > img {
+    object-fit: contain !important;
+    object-position: 50% 50% !important;
+  }
+
+  .mf-project-end-link {
+    font-size: clamp(24px, 8.2vw, 54px);
+  }
+  .mf-project-end-arrow { display: none; }
+  .mf-project-exit-button { min-width: min(74vw, 280px); }
+  .mf-project-exit-button:hover span:first-child { opacity: 1; transform: none; }
+  .mf-project-exit-button:hover span:last-child { opacity: 0; transform: translateY(8px); }
+
+  .mf-goballer-carousel { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .mf-carousel-zone,.mf-carousel-cursor { display: none !important; }
+  .mf-carousel-card {
+    max-width: none !important;
+    max-height: none !important;
+    height: 86% !important;
+    width: auto !important;
+  }
+  .mf-goballer-carousel.is-fit .mf-carousel-card {
+    width: auto !important;
+    height: auto !important;
+    max-width: 90% !important;
+    max-height: 82% !important;
+    object-fit: contain !important;
+  }
+}

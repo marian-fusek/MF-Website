@@ -1,36 +1,36 @@
 const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
-/* Mobile Safari can occasionally reload a graphics-heavy tab under memory pressure.
-   Preserve the current vertical position so a recovery does not jump back to the hero. */
+/* Mobile Safari may reload a graphics-heavy tab under memory pressure.
+   Restore the same-tab position after any recovery, not only when the browser
+   reports the navigation as a formal reload. */
 (function(){
   const mobile=window.matchMedia("(max-width: 1024px), (pointer: coarse)");
   if(!mobile.matches)return;
-  const key="mfMobileScrollY";
-  let timer=0;
+  try{history.scrollRestoration="manual";}catch(error){}
+  const key="mfMobileScrollY",enteredKey="mfMobileEntered";
+  let saveTimer=0,restoreTimers=[];
+  let hadEntered=false;
+  try{hadEntered=sessionStorage.getItem(enteredKey)==="1";}catch(error){}
   const save=()=>{
-    clearTimeout(timer);
-    timer=setTimeout(()=>{
-      try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}
-    },120);
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}},80);
   };
+  const cancelRestore=()=>{restoreTimers.forEach(clearTimeout);restoreTimers=[];};
   window.addEventListener("scroll",save,{passive:true});
-  window.addEventListener("pagehide",()=>{
-    clearTimeout(timer);
-    try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}
-  });
+  window.addEventListener("pagehide",()=>{clearTimeout(saveTimer);try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){};},{passive:true});
+  ["touchstart","pointerdown","wheel"].forEach(type=>window.addEventListener(type,cancelRestore,{passive:true}));
   window._mfRestoreSavedMobileScroll=()=>{
-    const nav=performance.getEntriesByType?.("navigation")?.[0];
-    if(!nav || !["reload","back_forward"].includes(nav.type))return;
+    if(!hadEntered)return;
     let saved=0;
     try{saved=Number(sessionStorage.getItem(key)||0);}catch(error){}
-    if(saved>8){
-      const restore=()=>window.scrollTo({top:saved,left:0,behavior:"auto"});
-      setTimeout(restore,80);
-      setTimeout(restore,520);
-      setTimeout(restore,1900);
-    }
+    if(saved<=8)return;
+    cancelRestore();
+    const restore=()=>window.scrollTo({top:saved,left:0,behavior:"auto"});
+    [60,260,760,1600,2800].forEach(delay=>restoreTimers.push(setTimeout(restore,delay)));
   };
+  window._mfMarkMobileEntered=()=>{hadEntered=true;try{sessionStorage.setItem(enteredKey,"1");}catch(error){}};
+  window.addEventListener("pageshow",event=>{if(event.persisted)setTimeout(()=>window._mfRestoreSavedMobileScroll?.(),40);});
 })();
 
 const loader=document.getElementById("mfLoader");
@@ -45,6 +45,7 @@ function startMfSite(){
     setTimeout(()=>loader.classList.add("done"),1800);
   }
   window._mfRestoreSavedMobileScroll?.();
+  window._mfMarkMobileEntered?.();
 }
 
 (function(){
@@ -208,9 +209,9 @@ if(indexExtra){
     "01":[
       "/images/projects/miunae/01-miunae-logo.jpg",
       "/images/projects/miunae/02-miunae-web.jpg",
-      "/images/projects/miunae/04-miunae-insta.jpg",
+      "/images/projects/miunae/03-miunae-insta.jpg",
       "/images/projects/miunae/04-miunae-all.jpg",
-      "/images/projects/miunae/04-miunae-brandkitjpg"
+      "/images/projects/miunae/05-miunae-brandkit.jpg"
     ],
     "02":[
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
@@ -254,13 +255,6 @@ if(indexExtra){
       frame.style.setProperty('--preview-order',i);
       const img=document.createElement('img');
       img.src=src; img.alt=''; img.loading='lazy'; img.decoding='async';
-      if(src.endsWith("04-miunae-brandkitjpg")){
-        img.addEventListener("error",()=>{
-          if(img.dataset.fallbackTried)return;
-          img.dataset.fallbackTried="1";
-          img.src="/images/projects/miunae/04-miunae-brandkit.jpg";
-        });
-      }
       frame.appendChild(img); preview.appendChild(frame);
     });
     const more=Math.max(0,list.length-3);
@@ -278,10 +272,20 @@ if(indexExtra){
 /* PROJECT OVERLAYS */
 (function(){
   const overlay=document.getElementById("mfOverlay");
+  const shell=overlay?.querySelector(".mf-project-shell");
   const gallery=document.getElementById("projectGallery");
   const slides=document.getElementById("projectSlides");
   const closeButton=overlay?.querySelector(".mf-close");
-  if(!overlay||!gallery||!slides||!closeButton)return;
+  const controlsHint=document.getElementById("projectControlsHint");
+  if(!overlay||!shell||!gallery||!slides||!closeButton)return;
+
+  const goballerCards=[
+    "01-0.jpg","01-1.jpg","01-2.jpg",
+    "02-0.jpg","02-1.jpg","02-2.jpg","02-3.jpg","02-4.jpg","02-5.jpg","02-6.jpg","02-7.jpg","02-8.jpg",
+    "03-0.jpg","03-1.jpg","03-2.jpg",
+    "04-0.jpg","04-1.jpg","04-2.jpg","04-3.jpg","04-4.jpg","04-5.jpg",
+    "05-0.jpg"
+  ].map(name=>`/images/projects/goballer/brand/${name}`);
 
   const projectData={
     "01":{
@@ -306,7 +310,7 @@ if(indexExtra){
       approach:"I organized the product around progression, repetition and visible momentum. The identity borrows energy from sport without relying on predictable visual clichés. Every screen was shaped to keep the next useful action obvious while preserving a strong, ownable character.",
       images:[
         "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=88",
+        {type:"carousel",background:"/images/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -352,6 +356,7 @@ if(indexExtra){
     }
   };
 
+  const projectOrder=Object.keys(projectData);
   const fields={
     index:document.getElementById("projectIndex"),
     title:document.getElementById("projectTitle"),
@@ -362,14 +367,93 @@ if(indexExtra){
     counter:document.getElementById("projectCounter")
   };
 
+  let currentProjectKey="01";
   let activeIndex=0;
   let wheelLocked=false;
   let wheelTotal=0;
   let wheelReset=0;
+  let projectSwitching=false;
+  let currentCarousel=null;
+  const carouselHintsShown=new Set();
   const liveStates={website:false,instagram:false,brandKit:false};
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
+  const esc=s=>String(s).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
+
+  function liveLabel(key,active){
+    if(key==="instagram"){
+      return active
+        ? '<span class="mf-live-toggle-label">EXIT THE INSTA</span>'
+        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> <span class="mf-live-handle">@miunae.beauty</span></span>';
+    }
+    if(key==="brandKit"){
+      return active
+        ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM / BRAND-KIT</span>';
+    }
+    return active
+      ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+      : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
+  }
+
+  function renderEndCard(key,slideIndex){
+    const remaining=projectOrder.filter(other=>other!==key);
+    return `<figure class="mf-project-slide mf-project-end-slide" data-slide="${slideIndex}">
+      <div class="mf-project-end-card">
+        <div class="mf-project-end-list" aria-label="More projects">
+          ${remaining.map(other=>`<button class="mf-project-end-link" type="button" data-project-key="${other}">${esc(projectData[other].title)}</button>`).join("")}
+        </div>
+        <div class="mf-project-end-arrow" aria-hidden="true">→</div>
+        <button class="mf-project-exit-button" type="button"><span>Get me outta here!</span><span>[Screaming noises]</span></button>
+      </div>
+    </figure>`;
+  }
+
+  function renderMedia(project,media,i){
+    if(media&&typeof media==="object"&&media.type==="iframe"){
+      const key=media.liveKey||"website";
+      const active=!!liveStates[key];
+      const loaderCopy=key==="brandKit"?"LOADING MIUNĀE BRAND KIT":"LOADING MIUNĀE.COM";
+      return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}" data-live-key="${key}">
+        <div class="mf-live-site">
+          <div class="mf-live-loader" aria-hidden="true"><div class="mf-live-loader-copy">${loaderCopy}<span>_</span></div><div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <iframe src="${esc(media.src)}" title="${esc(media.title||project.title+' live website')}" loading="eager" allow="fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <div class="mf-live-shield" aria-hidden="true"></div>
+          <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">${liveLabel(key,active)}</button>
+        </div>
+      </figure>`;
+    }
+    if(media&&typeof media==="object"&&media.type==="curator"){
+      const key=media.liveKey||"instagram";
+      const active=!!liveStates[key];
+      return `<figure class="mf-project-slide mf-project-slide-live mf-project-slide-instagram" data-slide="${i}" data-live-key="${key}" data-curator-src="${esc(media.src)}">
+        <div class="mf-live-site mf-instagram-live-site">
+          <div class="mf-live-loader" aria-hidden="true"><div class="mf-live-loader-copy">LOADING @MIUNAE.BEAUTY<span>_</span></div><div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="mf-instagram-embed-host" aria-label="${esc(media.title||'MIUNĀE Instagram feed')}"><div id="curator-feed-default-feed-layout" class="mf-curator-feed"><a href="https://curator.io" target="_blank" rel="noopener" class="crt-logo crt-tag">Powered by Curator.io</a></div></div>
+          <div class="mf-live-shield" aria-hidden="true"></div>
+          <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">${liveLabel(key,active)}</button>
+        </div>
+      </figure>`;
+    }
+    if(media&&typeof media==="object"&&media.type==="carousel"){
+      return `<figure class="mf-project-slide mf-project-slide-carousel" data-slide="${i}" data-carousel="true">
+        <div class="mf-goballer-carousel" aria-label="${esc(media.title||'Project carousel')}">
+          <img class="mf-carousel-background" src="${esc(media.background)}" alt="" draggable="false">
+          <div class="mf-carousel-stage">
+            <img class="mf-carousel-card mf-carousel-card-current" src="${esc(media.cards[0])}" alt="GoBaller visual 1" draggable="false">
+            <img class="mf-carousel-card mf-carousel-card-next" src="${esc(media.cards[1]||media.cards[0])}" alt="" draggable="false" aria-hidden="true">
+          </div>
+          <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous carousel image"></button>
+          <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next carousel image"></button>
+          <div class="mf-carousel-cursor" aria-hidden="true"><b>→</b><span># 02</span></div>
+        </div>
+      </figure>`;
+    }
+    return `<figure class="mf-project-slide mf-project-slide-image" data-slide="${i}"><div class="mf-project-image-viewport"><img src="${esc(media)}" alt="${esc(project.title)} project visual ${i+1}" loading="${i===0?'eager':'lazy'}" draggable="false"></div></figure>`;
+  }
+
   function renderProject(key){
+    currentProjectKey=key;
     const project=projectData[key]||projectData["01"];
     fields.index.textContent=`PROJECT ${key}`;
     fields.title.textContent=project.title;
@@ -377,144 +461,193 @@ if(indexExtra){
     fields.scope.textContent=project.scope;
     fields.context.textContent=project.context;
     fields.approach.textContent=project.approach;
-    function liveLabel(key,active){
-      if(key==="instagram"){
-        return active
-          ? '<span class="mf-live-toggle-label">EXIT THE INSTA</span>'
-          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> <span class="mf-live-handle">@miunae.beauty</span></span>';
-      }
-      if(key==="brandKit"){
-        return active
-          ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
-          : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM / BRAND-KIT</span>';
-      }
-      return active
-        ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
-        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM</span>';
-    }
+    slides.innerHTML=project.images.map((media,i)=>renderMedia(project,media,i)).join("")+renderEndCard(key,project.images.length);
 
-    slides.innerHTML=project.images.map((media,i)=>{
-      if(media && typeof media==="object" && media.type==="iframe"){
-        const key=media.liveKey||"website";
-        const active=!!liveStates[key];
-        const loaderCopy=key==="brandKit"?"LOADING MIUNĀE BRAND KIT":"LOADING MIUNĀE.COM";
-        return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}" data-live-key="${key}">
-          <div class="mf-live-site">
-            <div class="mf-live-loader" aria-hidden="true">
-              <div class="mf-live-loader-copy">${loaderCopy}<span>_</span></div>
-              <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-            <iframe
-              src="${media.src}"
-              title="${media.title||project.title+' live website'}"
-              loading="eager"
-              allow="fullscreen"
-              referrerpolicy="strict-origin-when-cross-origin"
-            ></iframe>
-            <div class="mf-live-shield" aria-hidden="true"></div>
-            <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
-              ${liveLabel(key,active)}
-            </button>
-          </div>
-        </figure>`;
-      }
-      if(media && typeof media==="object" && media.type==="curator"){
-        const key=media.liveKey||"instagram";
-        const active=!!liveStates[key];
-        return `<figure class="mf-project-slide mf-project-slide-live mf-project-slide-instagram" data-slide="${i}" data-live-key="${key}" data-curator-src="${media.src}">
-          <div class="mf-live-site mf-instagram-live-site">
-            <div class="mf-live-loader" aria-hidden="true">
-              <div class="mf-live-loader-copy">LOADING @MIUNAE.BEAUTY<span>_</span></div>
-              <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-            <div class="mf-instagram-embed-host" aria-label="${media.title||'MIUNĀE Instagram feed'}">
-              <div id="curator-feed-default-feed-layout" class="mf-curator-feed">
-                <a href="https://curator.io" target="_blank" rel="noopener" class="crt-logo crt-tag">Powered by Curator.io</a>
-              </div>
-            </div>
-            <div class="mf-live-shield" aria-hidden="true"></div>
-            <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
-              ${liveLabel(key,active)}
-            </button>
-          </div>
-        </figure>`;
-      }
-      return `<figure class="mf-project-slide" data-slide="${i}"><img src="${media}" alt="${project.title} project visual ${i+1}" loading="${i===0?'eager':'lazy'}"></figure>`;
-    }).join("");
+    setupLiveSlides();
+    setupCurator();
+    setupStaticImageSlides();
+    setupCarousels(project);
+    setupEndCard();
 
-    function applyLiveState(slide,active){
-      const key=slide.dataset.liveKey||"website";
-      const frame=slide.querySelector("iframe");
-      const host=slide.querySelector(".mf-instagram-embed-host");
-      const toggle=slide.querySelector(".mf-live-toggle");
-      liveStates[key]=active;
-      slide.classList.toggle("is-browsing",active);
-      slide.classList.toggle("is-paused",!active);
-      if(frame)frame.style.pointerEvents=active?"auto":"none";
-      if(host)host.style.pointerEvents=active?"auto":"none";
-      if(toggle){
-        toggle.setAttribute("aria-pressed",active?"true":"false");
-        toggle.innerHTML=liveLabel(key,active);
-      }
-    }
+    activeIndex=0;
+    currentCarousel=null;
+    gallery.scrollTop=0;
+    overlay.scrollTop=0;
+    updateCounter();
+    updateActiveExtras();
+  }
 
+  function applyLiveState(slide,active){
+    const key=slide.dataset.liveKey||"website";
+    const frame=slide.querySelector("iframe");
+    const host=slide.querySelector(".mf-instagram-embed-host");
+    const toggle=slide.querySelector(".mf-live-toggle");
+    liveStates[key]=active;
+    slide.classList.toggle("is-browsing",active);
+    slide.classList.toggle("is-paused",!active);
+    if(frame)frame.style.pointerEvents=active?"auto":"none";
+    if(host)host.style.pointerEvents=active?"auto":"none";
+    if(toggle){toggle.setAttribute("aria-pressed",active?"true":"false");toggle.innerHTML=liveLabel(key,active);}
+  }
+
+  function setupLiveSlides(){
     slides.querySelectorAll(".mf-project-slide-live").forEach(slide=>{
       const key=slide.dataset.liveKey||"website";
       const frame=slide.querySelector("iframe");
       const toggle=slide.querySelector(".mf-live-toggle");
-      if(frame){
-        frame.addEventListener("load",()=>slide.classList.add("is-loaded"),{once:true});
-      }
-      if(toggle){
-        toggle.addEventListener("click",event=>{
-          event.preventDefault();
-          event.stopPropagation();
-          applyLiveState(slide,!slide.classList.contains("is-browsing"));
-        });
-      }
+      if(frame)frame.addEventListener("load",()=>slide.classList.add("is-loaded"),{once:true});
+      toggle?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();applyLiveState(slide,!slide.classList.contains("is-browsing"));});
       applyLiveState(slide,!!liveStates[key]);
     });
+  }
 
+  function setupCurator(){
     const instagramSlide=slides.querySelector('.mf-project-slide-instagram');
-    if(instagramSlide){
-      const curatorHost=instagramSlide.querySelector('#curator-feed-default-feed-layout');
-      const scriptSrc=instagramSlide.dataset.curatorSrc;
-      let finished=false;
-      const finish=()=>{
-        if(finished)return;
-        finished=true;
-        instagramSlide.classList.add('is-loaded');
-        applyLiveState(instagramSlide,!!liveStates.instagram);
+    if(!instagramSlide)return;
+    const curatorHost=instagramSlide.querySelector('#curator-feed-default-feed-layout');
+    const scriptSrc=instagramSlide.dataset.curatorSrc;
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;instagramSlide.classList.add('is-loaded');applyLiveState(instagramSlide,!!liveStates.instagram);};
+    if(!curatorHost||!scriptSrc){finish();return;}
+    const observer=new MutationObserver(()=>{const rendered=curatorHost.querySelector('.crt-feed, .crt-post, .crt-grid-post, iframe')||curatorHost.children.length>1;if(rendered){observer.disconnect();finish();}});
+    observer.observe(curatorHost,{childList:true,subtree:true});
+    document.querySelectorAll('script[data-mf-curator-runtime]').forEach(node=>node.remove());
+    const curatorScript=document.createElement('script');
+    curatorScript.async=true;curatorScript.charset='UTF-8';curatorScript.src=scriptSrc;curatorScript.dataset.mfCuratorRuntime='true';
+    curatorScript.addEventListener('load',()=>setTimeout(finish,900),{once:true});curatorScript.addEventListener('error',finish,{once:true});
+    const firstScript=document.getElementsByTagName('script')[0];firstScript.parentNode.insertBefore(curatorScript,firstScript);
+    setTimeout(()=>{observer.disconnect();finish();},5200);
+  }
+
+  function setupStaticImageSlides(){
+    if(!mobileProjectLayout.matches)return;
+    slides.querySelectorAll('.mf-project-slide-image .mf-project-image-viewport').forEach(viewport=>{
+      const img=viewport.querySelector('img');
+      let downX=0,downY=0,startPosition=50,moved=false,dragging=false,isDown=false;
+      viewport.style.setProperty('--image-x','50%');
+      viewport.addEventListener('pointerdown',event=>{
+        isDown=true;downX=event.clientX;downY=event.clientY;startPosition=Number(viewport.dataset.position||50);moved=false;dragging=false;
+        viewport.setPointerCapture?.(event.pointerId);
+      });
+      viewport.addEventListener('pointermove',event=>{
+        if(!isDown)return;
+        const dx=event.clientX-downX,dy=event.clientY-downY;
+        if(Math.abs(dx)+Math.abs(dy)>7)moved=true;
+        if(viewport.classList.contains('is-fit'))return;
+        if(Math.abs(dx)>Math.abs(dy)+4){
+          dragging=true;
+          const next=Math.max(0,Math.min(100,startPosition-dx/Math.max(1,viewport.clientWidth)*100));
+          viewport.dataset.position=String(next);
+          viewport.style.setProperty('--image-x',`${next}%`);
+        }
+      });
+      const end=event=>{
+        if(!isDown)return;
+        isDown=false;
+        try{viewport.releasePointerCapture?.(event.pointerId);}catch(_){ }
+        if(!moved&&!dragging){viewport.classList.toggle('is-fit');viewport.dataset.position='50';viewport.style.setProperty('--image-x','50%');}
       };
+      viewport.addEventListener('pointerup',end);
+      viewport.addEventListener('pointercancel',end);
+      img.addEventListener('dragstart',event=>event.preventDefault());
+    });
+  }
 
-      if(curatorHost && scriptSrc){
-        const observer=new MutationObserver(()=>{
-          const rendered=curatorHost.querySelector('.crt-feed, .crt-post, .crt-grid-post, iframe') || curatorHost.children.length>1;
-          if(rendered){observer.disconnect();finish();}
+  function setupCarousels(project){
+    slides.querySelectorAll('.mf-project-slide-carousel').forEach(slide=>{
+      const media=project.images[Number(slide.dataset.slide)];
+      if(!media||media.type!=="carousel")return;
+      const root=slide.querySelector('.mf-goballer-carousel');
+      const current=root.querySelector('.mf-carousel-card-current');
+      const nextCard=root.querySelector('.mf-carousel-card-next');
+      const leftZone=root.querySelector('.mf-carousel-zone-left');
+      const rightZone=root.querySelector('.mf-carousel-zone-right');
+      const cursor=root.querySelector('.mf-carousel-cursor');
+      let index=0,animating=false;
+      const cards=media.cards;
+      const wrap=n=>(n%cards.length+cards.length)%cards.length;
+      const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
+      const updateAlt=()=>{current.alt=`GoBaller visual ${index+1}`;};
+      const move=direction=>{
+        if(animating)return;
+        animating=true;
+        const target=wrap(index+direction);
+        nextCard.src=cards[target];
+        nextCard.className=`mf-carousel-card mf-carousel-card-next is-ready ${direction>0?'from-right':'from-left'}`;
+        current.className=`mf-carousel-card mf-carousel-card-current ${direction>0?'to-left':'to-right'}`;
+        requestAnimationFrame(()=>requestAnimationFrame(()=>nextCard.classList.add('is-entering')));
+        setTimeout(()=>{
+          index=target;
+          current.src=cards[index];
+          current.className='mf-carousel-card mf-carousel-card-current';
+          nextCard.className='mf-carousel-card mf-carousel-card-next';
+          updateAlt();
+          animating=false;
+          if(cursor.classList.contains('is-visible')){
+            const zone=cursor.dataset.zone;
+            cursor.querySelector('span').textContent=zone==='left'?label(index-1):label(index+1);
+          }
+        },760);
+      };
+      const api={root,slide,move,get index(){return index;},hint(){if(carouselHintsShown.has(currentProjectKey))return;carouselHintsShown.add(currentProjectKey);root.classList.add('is-hinting');setTimeout(()=>root.classList.remove('is-hinting'),2500);}};
+      root._mfCarousel=api;
+      leftZone.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();move(-1);});
+      rightZone.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();move(1);});
+      root.addEventListener('pointermove',event=>{
+        if(mobileProjectLayout.matches)return;
+        const r=root.getBoundingClientRect(),x=event.clientX-r.left;
+        const zone=x<r.width*.35?'left':x>r.width*.65?'right':'';
+        if(!zone){cursor.classList.remove('is-visible');return;}
+        cursor.dataset.zone=zone;
+        cursor.querySelector('b').textContent=zone==='left'?'←':'→';
+        cursor.querySelector('span').textContent=zone==='left'?label(index-1):label(index+1);
+        cursor.style.transform=`translate3d(${event.clientX-r.left}px,${event.clientY-r.top}px,0)`;
+        cursor.classList.add('is-visible');
+      });
+      root.addEventListener('pointerleave',()=>cursor.classList.remove('is-visible'));
+
+      if(mobileProjectLayout.matches){
+        let startX=0,startY=0,moved=false,isDown=false;
+        root.addEventListener('pointerdown',event=>{isDown=true;startX=event.clientX;startY=event.clientY;moved=false;root.setPointerCapture?.(event.pointerId);});
+        root.addEventListener('pointermove',event=>{if(!isDown)return;if(Math.abs(event.clientX-startX)+Math.abs(event.clientY-startY)>8)moved=true;});
+        root.addEventListener('pointerup',event=>{
+          if(!isDown)return;
+          isDown=false;
+          const dx=event.clientX-startX,dy=event.clientY-startY;
+          try{root.releasePointerCapture?.(event.pointerId);}catch(_){ }
+          if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)){move(dx<0?1:-1);return;}
+          if(!moved)root.classList.toggle('is-fit');
         });
-        observer.observe(curatorHost,{childList:true,subtree:true});
-
-        /* Curator initializes by finding its published feed container in the DOM. */
-        document.querySelectorAll('script[data-mf-curator-runtime]').forEach(node=>node.remove());
-        const curatorScript=document.createElement('script');
-        curatorScript.async=true;
-        curatorScript.charset='UTF-8';
-        curatorScript.src=scriptSrc;
-        curatorScript.dataset.mfCuratorRuntime='true';
-        curatorScript.addEventListener('load',()=>setTimeout(finish,900),{once:true});
-        curatorScript.addEventListener('error',finish,{once:true});
-        const firstScript=document.getElementsByTagName('script')[0];
-        firstScript.parentNode.insertBefore(curatorScript,firstScript);
-        setTimeout(()=>{observer.disconnect();finish();},5200);
-      }else{
-        finish();
       }
-    }
+    });
+  }
 
-    activeIndex=0;
-    gallery.scrollTop=0;
-    overlay.scrollTop=0;
-    updateCounter();
+  function setupEndCard(){
+    const endCard=slides.querySelector('.mf-project-end-card');
+    if(!endCard)return;
+    const arrow=endCard.querySelector('.mf-project-end-arrow');
+    endCard.querySelectorAll('.mf-project-end-link').forEach(link=>{
+      link.addEventListener('click',()=>switchProject(link.dataset.projectKey));
+      link.addEventListener('pointerenter',()=>{
+        if(mobileProjectLayout.matches)return;
+        const cardRect=endCard.getBoundingClientRect(),linkRect=link.getBoundingClientRect();
+        endCard.style.setProperty('--end-arrow-y',`${linkRect.top-cardRect.top+linkRect.height/2}px`);
+        endCard.classList.add('is-project-hovered');
+      });
+      link.addEventListener('pointermove',event=>{
+        if(mobileProjectLayout.matches)return;
+        const r=link.getBoundingClientRect();
+        const x=(event.clientX-r.left-r.width/2)*.045;
+        const y=(event.clientY-r.top-r.height/2)*.12;
+        arrow.style.setProperty('--arrow-shift-x',`${x}px`);
+        arrow.style.setProperty('--arrow-shift-y',`${y}px`);
+      });
+      link.addEventListener('pointerleave',()=>{endCard.classList.remove('is-project-hovered');arrow.style.removeProperty('--arrow-shift-x');arrow.style.removeProperty('--arrow-shift-y');});
+    });
+    endCard.querySelector('.mf-project-exit-button')?.addEventListener('click',()=>closeProject(()=>{
+      const work=document.getElementById('work');
+      if(work){const y=work.getBoundingClientRect().top+window.scrollY;window._mfScroll?window._mfScroll(y):window.scrollTo({top:y,behavior:'smooth'});}
+    }));
   }
 
   function updateCounter(){
@@ -522,8 +655,18 @@ if(indexExtra){
     fields.counter.textContent=`${String(activeIndex+1).padStart(2,"0")} / ${String(total).padStart(2,"0")}`;
   }
 
-  function openProject(strip){
-    const key=strip.dataset.index||"01";
+  function updateActiveExtras(){
+    const activeSlide=slides.children[activeIndex];
+    currentCarousel=activeSlide?.querySelector('.mf-goballer-carousel')?._mfCarousel||null;
+    if(controlsHint){
+      controlsHint.innerHTML=currentCarousel?'↑ ↓ ← → [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And telekinesis':'↑ ↓ [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And your free will';
+      controlsHint.classList.toggle('is-carousel',!!currentCarousel);
+    }
+    currentCarousel?.hint();
+  }
+
+  function openProject(stripOrKey){
+    const key=typeof stripOrKey==='string'?stripOrKey:(stripOrKey?.dataset.index||'01');
     Object.keys(liveStates).forEach(liveKey=>{liveStates[liveKey]=false;});
     renderProject(key);
     overlay.classList.remove("is-closing");
@@ -535,7 +678,22 @@ if(indexExtra){
     setTimeout(()=>gallery.focus({preventScroll:true}),520);
   }
 
-  function closeProject(){
+  function switchProject(nextKey){
+    if(projectSwitching||nextKey===currentProjectKey||!projectData[nextKey])return;
+    projectSwitching=true;
+    shell.classList.add('is-switching-out');
+    setTimeout(()=>{
+      Object.keys(liveStates).forEach(liveKey=>{liveStates[liveKey]=false;});
+      renderProject(nextKey);
+      shell.classList.remove('is-switching-out');
+      shell.classList.add('is-switching-in');
+      void shell.offsetWidth;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>shell.classList.remove('is-switching-in')));
+      setTimeout(()=>{projectSwitching=false;},760);
+    },520);
+  }
+
+  function closeProject(afterClose){
     if(!overlay.classList.contains("active"))return;
     overlay.classList.add("is-closing");
     overlay.classList.remove("is-visible");
@@ -544,6 +702,8 @@ if(indexExtra){
       overlay.setAttribute("aria-hidden","true");
       document.body.classList.remove("project-open");
       slides.innerHTML="";
+      currentCarousel=null;
+      if(typeof afterClose==='function')afterClose();
     },620);
   }
 
@@ -552,71 +712,58 @@ if(indexExtra){
     const total=slides.children.length;
     next=Math.max(0,Math.min(total-1,next));
     if(next===activeIndex||wheelLocked)return;
-
     if(mobileProjectLayout.matches){
       const targetSlide=slides.children[next];
       if(!targetSlide)return;
-      activeIndex=next;
-      updateCounter();
+      activeIndex=next;updateCounter();updateActiveExtras();
       targetSlide.scrollIntoView({behavior:"smooth",block:"start"});
       return;
     }
-
     wheelLocked=true;
-    const start=gallery.scrollTop;
-    const target=next*gallery.clientHeight;
-    const delta=target-start;
-    const duration=760;
-    const began=performance.now();
+    const start=gallery.scrollTop,target=next*gallery.clientHeight,delta=target-start,duration=760,began=performance.now();
     function frame(now){
       const t=Math.min(1,(now-began)/duration);
       gallery.scrollTop=start+delta*easeInOutCubic(t);
       if(t<1)requestAnimationFrame(frame);
-      else{
-        activeIndex=next;
-        updateCounter();
-        wheelLocked=false;
-      }
+      else{activeIndex=next;updateCounter();updateActiveExtras();wheelLocked=false;}
     }
     requestAnimationFrame(frame);
   }
 
   document.querySelectorAll(".mf-strip").forEach(strip=>strip.addEventListener("click",()=>openProject(strip)));
-  closeButton.addEventListener("click",closeProject);
-  document.addEventListener("keydown",e=>{
+  closeButton.addEventListener("click",()=>closeProject());
+  document.addEventListener("keydown",event=>{
     if(!overlay.classList.contains("active"))return;
-    if(e.key==="Escape")closeProject();
-    if(e.key==="ArrowDown"||e.key==="PageDown"){e.preventDefault();scrollToSlide(activeIndex+1);}
-    if(e.key==="ArrowUp"||e.key==="PageUp"){e.preventDefault();scrollToSlide(activeIndex-1);}
+    if(event.key==="Escape"){closeProject();return;}
+    if(currentCarousel&&(event.key==="ArrowLeft"||event.key==="ArrowRight")){
+      event.preventDefault();currentCarousel.move(event.key==="ArrowRight"?1:-1);return;
+    }
+    if(event.key==="ArrowDown"||event.key==="PageDown"){event.preventDefault();scrollToSlide(activeIndex+1);}
+    if(event.key==="ArrowUp"||event.key==="PageUp"){event.preventDefault();scrollToSlide(activeIndex-1);}
   });
 
-  gallery.addEventListener("wheel",e=>{
+  gallery.addEventListener("wheel",event=>{
     if(mobileProjectLayout.matches)return;
-    const liveInstagram=e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
-    if(liveInstagram)return;
-    e.preventDefault();
+    if(event.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host"))return;
+    if(event.target.closest?.(".mf-project-slide-live.is-browsing iframe"))return;
+    event.preventDefault();
     if(wheelLocked)return;
-    wheelTotal+=e.deltaY;
-    clearTimeout(wheelReset);
-    wheelReset=setTimeout(()=>wheelTotal=0,140);
+    wheelTotal+=event.deltaY;
+    clearTimeout(wheelReset);wheelReset=setTimeout(()=>wheelTotal=0,140);
     if(Math.abs(wheelTotal)<34)return;
-    const direction=wheelTotal>0?1:-1;
-    wheelTotal=0;
-    scrollToSlide(activeIndex+direction);
+    const direction=wheelTotal>0?1:-1;wheelTotal=0;scrollToSlide(activeIndex+direction);
   },{passive:false});
 
-  let touchStartY=0;
-  let touchStartedInLiveInstagram=false;
-  gallery.addEventListener("touchstart",e=>{
+  let touchStartY=0,touchStartedInInteractive=false;
+  gallery.addEventListener("touchstart",event=>{
     if(mobileProjectLayout.matches)return;
-    touchStartY=e.touches[0].clientY;
-    touchStartedInLiveInstagram=!!e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
+    touchStartY=event.touches[0].clientY;
+    touchStartedInInteractive=!!event.target.closest?.(".mf-project-slide-live.is-browsing");
   },{passive:true});
-  gallery.addEventListener("touchend",e=>{
+  gallery.addEventListener("touchend",event=>{
     if(mobileProjectLayout.matches)return;
-    if(touchStartedInLiveInstagram){touchStartedInLiveInstagram=false;return;}
-    const endY=e.changedTouches[0].clientY;
-    const delta=touchStartY-endY;
+    if(touchStartedInInteractive){touchStartedInInteractive=false;return;}
+    const delta=touchStartY-event.changedTouches[0].clientY;
     if(Math.abs(delta)>40)scrollToSlide(activeIndex+(delta>0?1:-1));
   },{passive:true});
 
@@ -628,20 +775,14 @@ if(indexExtra){
       mobileProjectScrollFrame=0;
       const viewportMid=overlay.scrollTop+overlay.clientHeight*.55;
       const slideList=[...slides.children];
-      if(!slideList.length)return;
-      let closest=0;
-      let distance=Infinity;
-      slideList.forEach((slide,index)=>{
-        const mid=slide.offsetTop+slide.offsetHeight/2;
-        const nextDistance=Math.abs(mid-viewportMid);
-        if(nextDistance<distance){distance=nextDistance;closest=index;}
-      });
-      activeIndex=closest;
-      updateCounter();
+      let closest=0,distance=Infinity;
+      slideList.forEach((slide,index)=>{const mid=slide.offsetTop+slide.offsetHeight/2,nextDistance=Math.abs(mid-viewportMid);if(nextDistance<distance){distance=nextDistance;closest=index;}});
+      if(activeIndex!==closest){activeIndex=closest;updateCounter();updateActiveExtras();}
     });
   },{passive:true});
-})();
 
+  window._mfOpenProject=openProject;
+})();
 function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,isMobile=viewport<=1024,leftPad=isMobile?8:-22,rightPad=isMobile?8:30,scale=(viewport-leftPad-rightPad)/width,offset=leftPad;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scaleHeroName);else setTimeout(scaleHeroName,200);scaleHeroName();window.addEventListener("resize",scaleHeroName);
 
@@ -857,9 +998,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   });
 })();
 
-/* Mobile big-type fitting: size each pair independently so every line is centered
-   and fills the available width without clipping. Height-only browser-bar changes
-   do not trigger a recalculation. */
+/* Mobile big-type fitting: one shared size based on the longest title pair. */
 (function(){
   const mobile=window.matchMedia("(max-width: 1024px)");
   const rows=[...document.querySelectorAll(".mf-roll")];
@@ -868,19 +1007,19 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   function fit(){
     if(!mobile.matches){rows.forEach(row=>row.style.removeProperty("font-size"));return;}
     const width=Math.round(document.documentElement.clientWidth||window.innerWidth);
-    if(Math.abs(width-lastWidth)<3 && lastWidth)return;
+    if(Math.abs(width-lastWidth)<3&&lastWidth)return;
     lastWidth=width;
-    const available=Math.max(260,width-24);
-    const gap=Math.max(9,width*.03);
+    const available=Math.max(250,width-24);
+    const gap=Math.max(8,width*.03);
+    let widest=1;
     rows.forEach(row=>{
-      const left=row.querySelector(".mf-roll-left");
-      const right=row.querySelector(".mf-roll-right");
+      const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");
       if(!left||!right)return;
       row.style.setProperty("font-size","100px","important");
-      const natural=left.getBoundingClientRect().width+right.getBoundingClientRect().width+gap;
-      const size=Math.max(30,Math.min(104,100*available/Math.max(natural,1)));
-      row.style.setProperty("font-size",`${size.toFixed(2)}px`,"important");
+      widest=Math.max(widest,left.getBoundingClientRect().width+right.getBoundingClientRect().width+gap);
     });
+    const shared=Math.max(28,Math.min(104,100*available/widest));
+    rows.forEach(row=>row.style.setProperty("font-size",`${shared.toFixed(2)}px`,"important"));
   }
   const queue=()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(fit,90);};
   if(document.fonts?.ready)document.fonts.ready.then(fit);else setTimeout(fit,220);
