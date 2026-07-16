@@ -5017,3 +5017,187 @@ body.project-open .mf-nav-art {
     object-fit: contain !important;
   }
 }
+
+/* ============================================================
+   V40 — project navigation, GoBaller carousel and mobile polish
+   ============================================================ */
+
+/* Project media is always shown in its source color. */
+.mf-overlay .mf-project-slide img,
+.mf-overlay .mf-project-image-viewport > img,
+.mf-overlay .mf-carousel-background,
+.mf-overlay .mf-carousel-card,
+.mf-strip-preview-frame img {
+  filter: none !important;
+}
+
+/* Final project navigation: tighter mixed-case names, mirrored arrows, no frame. */
+.mf-project-end-card {
+  border: 0 !important;
+}
+.mf-project-end-list {
+  gap: clamp(5px, 1vh, 11px) !important;
+}
+.mf-project-end-link {
+  text-transform: none !important;
+  line-height: .88 !important;
+}
+.mf-project-end-link:hover {
+  transform: none !important;
+}
+.mf-project-end-arrow-left {
+  left: clamp(30px, 6vw, 108px) !important;
+  right: auto !important;
+}
+.mf-project-end-arrow-right {
+  right: clamp(30px, 6vw, 108px) !important;
+  left: auto !important;
+}
+.mf-project-exit-button {
+  text-transform: uppercase !important;
+}
+
+/* GoBaller deck: larger screens, fully colored field and reliable cursor zones. */
+.mf-carousel-card {
+  max-width: min(86.4%, 1320px) !important;
+  max-height: 86.4% !important;
+}
+.mf-carousel-zone {
+  width: 50% !important;
+}
+.mf-carousel-cursor-inner {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  will-change: transform, opacity;
+}
+.mf-carousel-swipe-hint {
+  display: none;
+}
+.mf-goballer-carousel.is-hinting .mf-carousel-card-current,
+.mf-goballer-carousel.is-hinting .mf-carousel-card-next {
+  animation: none !important;
+}
+
+/* MF ART title now matches the other section labels. */
+.mf-art-showcase-copy h2 {
+  min-height: 1em;
+  margin: 0 !important;
+  font-size: var(--section-title) !important;
+  line-height: .9 !important;
+  letter-spacing: -.055em !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  transition: opacity .24s ease, transform .32s var(--ease);
+  will-change: opacity, transform;
+}
+.mf-art-showcase-copy h2 .mf-art-mark {
+  display: inline-block;
+  transition: opacity .11s linear;
+}
+.mf-art-showcase-copy h2 .mf-art-mark-in {
+  animation: mfArtMarkIn .32s var(--ease) both;
+}
+@keyframes mfArtMarkIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  /* Mobile big type: a single shared size and a normal word space. */
+  .mf-roll {
+    column-gap: .22em !important;
+  }
+  .mf-roll.is-mobile-open .mf-roll-copy,
+  .mf-roll.is-mobile-open:hover .mf-roll-copy {
+    margin-top: 34px !important;
+    margin-bottom: 34px !important;
+  }
+
+  /* End-card names remain close and are selected with a simple tap. */
+  .mf-project-end-list {
+    gap: 6px !important;
+  }
+  .mf-project-end-link {
+    line-height: .9 !important;
+  }
+  .mf-project-end-arrow {
+    display: none !important;
+  }
+
+  /* GoBaller mobile starts in a fully visible, swipeable preview state. */
+  .mf-goballer-carousel {
+    touch-action: pan-y !important;
+  }
+  .mf-carousel-background {
+    filter: none !important;
+  }
+  .mf-carousel-card {
+    width: auto !important;
+    height: auto !important;
+    max-width: 90% !important;
+    max-height: 78% !important;
+    object-fit: contain !important;
+    transform: translate3d(0,0,0) scale(1);
+    filter: none !important;
+  }
+  .mf-goballer-carousel.is-expanded .mf-carousel-card-current {
+    max-width: 96% !important;
+    max-height: 92% !important;
+    transform: translate3d(var(--carousel-pan-x, 0px),0,0) scale(1.36) !important;
+    transition: transform .18s ease-out !important;
+  }
+  .mf-goballer-carousel.is-expanded .mf-carousel-swipe-hint {
+    opacity: 0 !important;
+  }
+  .mf-carousel-swipe-hint {
+    position: absolute;
+    z-index: 12;
+    left: 50%;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,.72);
+    font-family: "Geist Mono", monospace;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: .08em;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .mf-carousel-swipe-hint span {
+    font-family: "Geist", Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+  }
+  .mf-carousel-swipe-hint b {
+    font-weight: 400;
+  }
+
+  /* Keep the ART section hierarchy compact enough to fit one mobile viewport. */
+  .mf-art-showcase {
+    min-height: 100svh !important;
+    padding-top: 8svh !important;
+    padding-bottom: 7svh !important;
+  }
+  .mf-art-showcase-inner {
+    min-height: 84svh !important;
+    padding-top: 5svh !important;
+    gap: 18px !important;
+  }
+  .mf-art-showcase-copy {
+    min-height: 25svh !important;
+  }
+  .mf-art-showcase-bottom {
+    margin-top: 22px !important;
+  }
+  .mf-art-showcase-bottom .mf-art-showcase-tags {
+    margin-bottom: 12px !important;
+  }
+  .mf-art-preview-frame {
+    min-height: 48svh !important;
+  }
+}

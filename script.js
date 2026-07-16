@@ -254,7 +254,7 @@ if(indexExtra){
       frame.className='mf-strip-preview-frame';
       frame.style.setProperty('--preview-order',i);
       const img=document.createElement('img');
-      img.src=src; img.alt=''; img.loading='lazy'; img.decoding='async';
+      img.src=src; img.alt=''; img.loading='eager'; img.decoding='async'; img.onerror=()=>{img.onerror=null;img.src=src.startsWith('/')?'.'+src:src;};
       frame.appendChild(img); preview.appendChild(frame);
     });
     const more=Math.max(0,list.length-3);
@@ -374,7 +374,6 @@ if(indexExtra){
   let wheelReset=0;
   let projectSwitching=false;
   let currentCarousel=null;
-  const carouselHintsShown=new Set();
   const liveStates={website:false,instagram:false,brandKit:false};
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
@@ -403,7 +402,8 @@ if(indexExtra){
         <div class="mf-project-end-list" aria-label="More projects">
           ${remaining.map(other=>`<button class="mf-project-end-link" type="button" data-project-key="${other}">${esc(projectData[other].title)}</button>`).join("")}
         </div>
-        <div class="mf-project-end-arrow" aria-hidden="true">→</div>
+        <div class="mf-project-end-arrow mf-project-end-arrow-left" aria-hidden="true">←</div>
+        <div class="mf-project-end-arrow mf-project-end-arrow-right" aria-hidden="true">→</div>
         <button class="mf-project-exit-button" type="button"><span>Get me outta here!</span><span>[Screaming noises]</span></button>
       </div>
     </figure>`;
@@ -445,7 +445,8 @@ if(indexExtra){
           </div>
           <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous carousel image"></button>
           <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next carousel image"></button>
-          <div class="mf-carousel-cursor" aria-hidden="true"><b>→</b><span># 02</span></div>
+          <div class="mf-carousel-cursor" aria-hidden="true"><div class="mf-carousel-cursor-inner"><b>→</b><span># 02</span></div></div>
+          <div class="mf-carousel-swipe-hint" aria-hidden="true"><span>←</span><b>SWIPE</b><span>→</span></div>
         </div>
       </figure>`;
     }
@@ -563,61 +564,117 @@ if(indexExtra){
       const leftZone=root.querySelector('.mf-carousel-zone-left');
       const rightZone=root.querySelector('.mf-carousel-zone-right');
       const cursor=root.querySelector('.mf-carousel-cursor');
+      const cursorInner=cursor.querySelector('.mf-carousel-cursor-inner');
       let index=0,animating=false;
       const cards=media.cards;
       const wrap=n=>(n%cards.length+cards.length)%cards.length;
       const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
       const updateAlt=()=>{current.alt=`GoBaller visual ${index+1}`;};
-      const move=direction=>{
+      const preload=src=>new Promise(resolve=>{
+        nextCard.onload=()=>resolve();
+        nextCard.onerror=()=>resolve();
+        nextCard.src=src;
+        if(nextCard.complete)resolve();
+      });
+      const cursorPulse=(direction,target)=>{
+        if(mobileProjectLayout.matches||!cursor.classList.contains('is-visible'))return;
+        const distance=direction>0?5:-5;
+        const zone=cursor.dataset.zone||'right';
+        const afterLabel=zone==='left'?label(target-1):label(target+1);
+        const out=cursorInner.animate([
+          {opacity:1,transform:'translateX(0)'},
+          {opacity:0,transform:`translateX(${distance}px)`}
+        ],{duration:150,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+        out.finished.catch(()=>{}).then(()=>{
+          cursorInner.querySelector('span').textContent=afterLabel;
+          cursorInner.animate([
+            {opacity:0,transform:`translateX(${-distance}px)`},
+            {opacity:1,transform:'translateX(0)'}
+          ],{duration:260,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+        });
+      };
+      const move=async direction=>{
         if(animating)return;
         animating=true;
+        root.classList.remove('is-expanded');
+        root.style.setProperty('--carousel-pan-x','0px');
         const target=wrap(index+direction);
-        nextCard.src=cards[target];
-        nextCard.className=`mf-carousel-card mf-carousel-card-next is-ready ${direction>0?'from-right':'from-left'}`;
-        current.className=`mf-carousel-card mf-carousel-card-current ${direction>0?'to-left':'to-right'}`;
-        requestAnimationFrame(()=>requestAnimationFrame(()=>nextCard.classList.add('is-entering')));
-        setTimeout(()=>{
-          index=target;
-          current.src=cards[index];
-          current.className='mf-carousel-card mf-carousel-card-current';
-          nextCard.className='mf-carousel-card mf-carousel-card-next';
-          updateAlt();
-          animating=false;
-          if(cursor.classList.contains('is-visible')){
-            const zone=cursor.dataset.zone;
-            cursor.querySelector('span').textContent=zone==='left'?label(index-1):label(index+1);
-          }
-        },760);
+        await preload(cards[target]);
+        const width=root.clientWidth||window.innerWidth;
+        const travel=Math.max(260,width*1.04)*(direction>0?1:-1);
+        nextCard.style.opacity='1';
+        nextCard.style.transform=`translate3d(${travel}px,0,0) scale(.92)`;
+        nextCard.style.filter='blur(14px)';
+        nextCard.style.zIndex='4';
+        current.style.zIndex='3';
+        cursorPulse(direction,target);
+        const outgoing=current.animate([
+          {transform:'translate3d(0,0,0) scale(1)',filter:'blur(0px)',opacity:1},
+          {transform:`translate3d(${-travel}px,0,0) scale(1.055)`,filter:'blur(10px)',opacity:.12}
+        ],{duration:760,easing:'cubic-bezier(.76,0,.24,1)',fill:'forwards'});
+        const incoming=nextCard.animate([
+          {transform:`translate3d(${travel}px,0,0) scale(.92)`,filter:'blur(14px)',opacity:.12},
+          {transform:'translate3d(0,0,0) scale(1)',filter:'blur(0px)',opacity:1}
+        ],{duration:820,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+        await Promise.allSettled([outgoing.finished,incoming.finished]);
+        index=target;
+        current.src=cards[index];
+        current.className='mf-carousel-card mf-carousel-card-current';
+        current.removeAttribute('style');
+        nextCard.className='mf-carousel-card mf-carousel-card-next';
+        nextCard.removeAttribute('style');
+        updateAlt();
+        animating=false;
       };
-      const api={root,slide,move,get index(){return index;},hint(){if(carouselHintsShown.has(currentProjectKey))return;carouselHintsShown.add(currentProjectKey);root.classList.add('is-hinting');setTimeout(()=>root.classList.remove('is-hinting'),2500);}};
+      const api={root,slide,move,get index(){return index;}};
       root._mfCarousel=api;
       leftZone.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();move(-1);});
       rightZone.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();move(1);});
       root.addEventListener('pointermove',event=>{
         if(mobileProjectLayout.matches)return;
         const r=root.getBoundingClientRect(),x=event.clientX-r.left;
-        const zone=x<r.width*.35?'left':x>r.width*.65?'right':'';
-        if(!zone){cursor.classList.remove('is-visible');return;}
+        const zone=x<r.width*.5?'left':'right';
         cursor.dataset.zone=zone;
-        cursor.querySelector('b').textContent=zone==='left'?'←':'→';
-        cursor.querySelector('span').textContent=zone==='left'?label(index-1):label(index+1);
+        cursorInner.querySelector('b').textContent=zone==='left'?'←':'→';
+        cursorInner.querySelector('span').textContent=zone==='left'?label(index-1):label(index+1);
         cursor.style.transform=`translate3d(${event.clientX-r.left}px,${event.clientY-r.top}px,0)`;
         cursor.classList.add('is-visible');
       });
       root.addEventListener('pointerleave',()=>cursor.classList.remove('is-visible'));
 
       if(mobileProjectLayout.matches){
-        let startX=0,startY=0,moved=false,isDown=false;
-        root.addEventListener('pointerdown',event=>{isDown=true;startX=event.clientX;startY=event.clientY;moved=false;root.setPointerCapture?.(event.pointerId);});
-        root.addEventListener('pointermove',event=>{if(!isDown)return;if(Math.abs(event.clientX-startX)+Math.abs(event.clientY-startY)>8)moved=true;});
+        let startX=0,startY=0,lastX=0,moved=false,isDown=false,panStart=0;
+        root.style.setProperty('--carousel-pan-x','0px');
+        root.addEventListener('pointerdown',event=>{
+          isDown=true;startX=lastX=event.clientX;startY=event.clientY;moved=false;
+          panStart=Number(root.dataset.panX||0);
+          root.setPointerCapture?.(event.pointerId);
+        });
+        root.addEventListener('pointermove',event=>{
+          if(!isDown)return;
+          const dx=event.clientX-startX,dy=event.clientY-startY;
+          if(Math.abs(dx)+Math.abs(dy)>8)moved=true;
+          if(root.classList.contains('is-expanded')&&Math.abs(dx)>Math.abs(dy)){
+            const limit=root.clientWidth*.28;
+            const pan=Math.max(-limit,Math.min(limit,panStart+dx));
+            root.dataset.panX=String(pan);
+            root.style.setProperty('--carousel-pan-x',`${pan}px`);
+          }
+          lastX=event.clientX;
+        });
         root.addEventListener('pointerup',event=>{
           if(!isDown)return;
           isDown=false;
           const dx=event.clientX-startX,dy=event.clientY-startY;
           try{root.releasePointerCapture?.(event.pointerId);}catch(_){ }
+          if(root.classList.contains('is-expanded')){
+            if(!moved){root.classList.remove('is-expanded');root.dataset.panX='0';root.style.setProperty('--carousel-pan-x','0px');}
+            return;
+          }
           if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)){move(dx<0?1:-1);return;}
-          if(!moved)root.classList.toggle('is-fit');
+          if(!moved){root.classList.add('is-expanded');root.dataset.panX='0';root.style.setProperty('--carousel-pan-x','0px');}
         });
+        root.addEventListener('pointercancel',()=>{isDown=false;});
       }
     });
   }
@@ -625,7 +682,9 @@ if(indexExtra){
   function setupEndCard(){
     const endCard=slides.querySelector('.mf-project-end-card');
     if(!endCard)return;
-    const arrow=endCard.querySelector('.mf-project-end-arrow');
+    const leftArrow=endCard.querySelector('.mf-project-end-arrow-left');
+    const rightArrow=endCard.querySelector('.mf-project-end-arrow-right');
+    const arrows=[leftArrow,rightArrow].filter(Boolean);
     endCard.querySelectorAll('.mf-project-end-link').forEach(link=>{
       link.addEventListener('click',()=>switchProject(link.dataset.projectKey));
       link.addEventListener('pointerenter',()=>{
@@ -639,10 +698,14 @@ if(indexExtra){
         const r=link.getBoundingClientRect();
         const x=(event.clientX-r.left-r.width/2)*.045;
         const y=(event.clientY-r.top-r.height/2)*.12;
-        arrow.style.setProperty('--arrow-shift-x',`${x}px`);
-        arrow.style.setProperty('--arrow-shift-y',`${y}px`);
+        leftArrow?.style.setProperty('--arrow-shift-x',`${-x}px`);
+        rightArrow?.style.setProperty('--arrow-shift-x',`${x}px`);
+        arrows.forEach(arrow=>arrow.style.setProperty('--arrow-shift-y',`${y}px`));
       });
-      link.addEventListener('pointerleave',()=>{endCard.classList.remove('is-project-hovered');arrow.style.removeProperty('--arrow-shift-x');arrow.style.removeProperty('--arrow-shift-y');});
+      link.addEventListener('pointerleave',()=>{
+        endCard.classList.remove('is-project-hovered');
+        arrows.forEach(arrow=>{arrow.style.removeProperty('--arrow-shift-x');arrow.style.removeProperty('--arrow-shift-y');});
+      });
     });
     endCard.querySelector('.mf-project-exit-button')?.addEventListener('click',()=>closeProject(()=>{
       const work=document.getElementById('work');
@@ -662,7 +725,6 @@ if(indexExtra){
       controlsHint.innerHTML=currentCarousel?'↑ ↓ ← → [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And telekinesis':'↑ ↓ [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And your free will';
       controlsHint.classList.toggle('is-carousel',!!currentCarousel);
     }
-    currentCarousel?.hint();
   }
 
   function openProject(stripOrKey){
@@ -1010,7 +1072,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     if(Math.abs(width-lastWidth)<3&&lastWidth)return;
     lastWidth=width;
     const available=Math.max(250,width-24);
-    const gap=Math.max(8,width*.03);
+    const gap=22;
     let widest=1;
     rows.forEach(row=>{
       const left=row.querySelector(".mf-roll-left"),right=row.querySelector(".mf-roll-right");
@@ -1038,7 +1100,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
   const sketch=p=>{
     let particles=[],R=0;
+    let lastCanvasWidth=0;
     p.setup=()=>{
+      p.pixelDensity(window.matchMedia('(max-width: 1024px)').matches?1:Math.min(window.devicePixelRatio||1,2));
+      lastCanvasWidth=container.offsetWidth;
       const cnv=p.createCanvas(container.offsetWidth,container.offsetHeight);
       cnv.parent(container);
       p.colorMode(p.HSB,360,100,100,1);
@@ -1111,7 +1176,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     };
 
     p.windowResized=()=>{
-      p.resizeCanvas(container.offsetWidth,container.offsetHeight);
+      const nextWidth=container.offsetWidth;
+      if(Math.abs(nextWidth-lastCanvasWidth)<4)return;
+      lastCanvasWidth=nextWidth;
+      p.resizeCanvas(nextWidth,container.offsetHeight);
       R=Math.min(p.width,p.height)*.351;
     };
 
@@ -1706,4 +1774,47 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     requestAnimationFrame(()=>glitch.classList.add("show"));
     setTimeout(()=>glitch.remove(),850);
   },3000);
+})();
+
+
+/* MF ART section title — rotating punctuation states. */
+(function(){
+  const title=document.querySelector('.mf-art-showcase-copy h2');
+  if(!title)return;
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const set=(html)=>{title.innerHTML=html;};
+  const fade=async(out=true)=>{
+    title.style.opacity=out?'0':'1';
+    title.style.transform=out?'translateY(-4px)':'translateY(0)';
+    await wait(out?240:320);
+  };
+  async function loop(){
+    while(true){
+      set('MF ART<span class="mf-art-mark">!</span>');
+      title.style.opacity='1';title.style.transform='translateY(0)';
+      await wait(1500);
+      const bang=title.querySelector('.mf-art-mark');
+      for(let i=0;i<3;i++){bang.style.opacity='0';await wait(105);bang.style.opacity='1';await wait(105);}
+      bang.style.opacity='0';await wait(150);
+      set('MF ART<span class="mf-art-mark mf-art-mark-in">?</span>');
+      await wait(1500);
+      const suffix=' HUH?!';
+      let base='MF ART?';
+      for(const ch of suffix){base+=ch;set(base);await wait(62);}
+      await wait(1350);
+      await fade(true);
+      set('MF ART');
+      await fade(false);
+      await wait(420);
+      for(let count=1;count<=3;count++){set('MF ART'+'.'.repeat(count));await wait(170);}
+      await wait(500);
+      for(let count=2;count>=0;count--){set('MF ART'+'.'.repeat(count));await wait(120);}
+      for(let count=1;count<=3;count++){set('MF ART'+'.'.repeat(count));await wait(170);}
+      await wait(2000);
+      await fade(true);
+      set('MF ART!');
+      await fade(false);
+    }
+  }
+  loop();
 })();
