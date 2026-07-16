@@ -5273,3 +5273,107 @@ body.project-open .mf-nav-art {
     letter-spacing: -.08em !important;
   }
 }
+
+/* ============================================================
+   V42 — clean carousel motion, mobile 3×3 grid, literal mobile titles
+   ============================================================ */
+
+.mf-a8 { left: 12%; top: 58%; }
+.mf-a9 { left: 78%; top: 84%; }
+
+/* The GoBaller deck is driven exclusively by the Web Animations API. */
+.mf-carousel-card,
+.mf-carousel-card-current,
+.mf-carousel-card-next {
+  transition: none !important;
+  filter: none !important;
+  will-change: transform, opacity;
+}
+.mf-carousel-card-next {
+  opacity: 0;
+}
+.mf-carousel-cursor {
+  overflow: visible;
+}
+.mf-carousel-cursor-inner {
+  position: relative;
+  z-index: 2;
+}
+.mf-carousel-cursor-ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Project navigation uses the same variable-weight and 50→100% whitening
+   behavior as BIO, while the arrows interpolate independently and smoothly. */
+.mf-project-end-link {
+  color: #fff !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+.mf-project-end-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.mf-project-end-char {
+  display: inline-block;
+  opacity: .5;
+  font-variation-settings: "wght" 400, "opsz" 9;
+  font-weight: 400;
+  will-change: font-variation-settings, font-weight, opacity;
+}
+.mf-project-end-arrow {
+  transition: top .5s var(--ease), opacity .3s ease !important;
+  will-change: transform, top, opacity;
+}
+
+.mf-roll-mobile-label {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  /* Three columns × three rows, retaining the same segmented hover/click
+     interactions supplied by the existing grid scripts. */
+  .mf-grid {
+    background:
+      linear-gradient(to right, transparent calc(33.333% - .5px), var(--line) calc(33.333% - .5px), var(--line) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+      linear-gradient(to right, transparent calc(66.666% - .5px), var(--line) calc(66.666% - .5px), var(--line) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+      linear-gradient(to bottom, transparent calc(33.333% - .5px), var(--line) calc(33.333% - .5px), var(--line) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+      linear-gradient(to bottom, transparent calc(66.666% - .5px), var(--line) calc(66.666% - .5px), var(--line) calc(66.666% + .5px), transparent calc(66.666% + .5px)) !important;
+  }
+
+  /* One literal title string per row: no flex/grid gap can stretch the words. */
+  .mf-roll {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    justify-items: center !important;
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+    font-size: var(--mobile-roll-size, 54px) !important;
+  }
+  .mf-roll-left,
+  .mf-roll-right {
+    display: none !important;
+  }
+  .mf-roll-mobile-label {
+    display: block;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    white-space: nowrap;
+    text-align: center;
+    font: inherit;
+    font-size: var(--mobile-roll-size, 54px) !important;
+    line-height: .74;
+    letter-spacing: -.08em;
+    text-transform: uppercase;
+  }
+  .mf-roll-copy {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+}
