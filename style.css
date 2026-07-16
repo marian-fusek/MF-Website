@@ -4091,3 +4091,38 @@ body.mf-preload-locked .mf-loader span {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
+
+/* ============================================================
+   V35 — Curator.io Instagram feed
+   ============================================================ */
+.mf-instagram-embed-host {
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #000;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.mf-instagram-embed-host::-webkit-scrollbar {
+  display: none;
+}
+
+.mf-curator-feed,
+#curator-feed-default-feed-layout {
+  width: 100%;
+  min-height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #000;
+}
+
+.mf-curator-feed .crt-feed,
+.mf-curator-feed .crt-feed-container,
+.mf-curator-feed .crt-posts {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}

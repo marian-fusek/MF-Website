@@ -208,7 +208,7 @@ if(indexExtra){
       images:[
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=88",
         {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website",liveKey:"website"},
-        {type:"instagram",src:"https://widgets.sociablekit.com/instagram-feed/iframe/25697535",title:"@miunae.beauty live feed",liveKey:"instagram"},
+        {type:"curator",src:"https://cdn.curator.io/published/8bcd46ff-7c2b-4fd0-baa3-8d3df4db1ee3.js",title:"@miunae.beauty live feed",liveKey:"instagram"},
         "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -325,24 +325,19 @@ if(indexExtra){
           </div>
         </figure>`;
       }
-      if(media && typeof media==="object" && media.type==="instagram"){
+      if(media && typeof media==="object" && media.type==="curator"){
         const key=media.liveKey||"instagram";
         const active=!!liveStates[key];
-        return `<figure class="mf-project-slide mf-project-slide-live mf-project-slide-instagram" data-slide="${i}" data-live-key="${key}">
+        return `<figure class="mf-project-slide mf-project-slide-live mf-project-slide-instagram" data-slide="${i}" data-live-key="${key}" data-curator-src="${media.src}">
           <div class="mf-live-site mf-instagram-live-site">
             <div class="mf-live-loader" aria-hidden="true">
               <div class="mf-live-loader-copy">LOADING @MIUNAE.BEAUTY<span>_</span></div>
               <div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
-            <div class="mf-instagram-embed-host">
-              <iframe
-                src="${media.src}"
-                title="${media.title||'MIUNĀE Instagram feed'}"
-                loading="eager"
-                frameborder="0"
-                scrolling="yes"
-                referrerpolicy="strict-origin-when-cross-origin"
-              ></iframe>
+            <div class="mf-instagram-embed-host" aria-label="${media.title||'MIUNĀE Instagram feed'}">
+              <div id="curator-feed-default-feed-layout" class="mf-curator-feed">
+                <a href="https://curator.io" target="_blank" rel="noopener" class="crt-logo crt-tag">Powered by Curator.io</a>
+              </div>
             </div>
             <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">
               ${liveLabel(key,active)}
@@ -388,15 +383,35 @@ if(indexExtra){
 
     const instagramSlide=slides.querySelector('.mf-project-slide-instagram');
     if(instagramSlide){
-      const frame=instagramSlide.querySelector('.mf-instagram-embed-host iframe');
+      const curatorHost=instagramSlide.querySelector('#curator-feed-default-feed-layout');
+      const scriptSrc=instagramSlide.dataset.curatorSrc;
+      let finished=false;
       const finish=()=>{
+        if(finished)return;
+        finished=true;
         instagramSlide.classList.add('is-loaded');
         applyLiveState(instagramSlide,!!liveStates.instagram);
       };
-      if(frame){
-        frame.addEventListener('load',finish,{once:true});
-        /* Keep the loader from hanging if the widget delays its load event. */
-        setTimeout(finish,3200);
+
+      if(curatorHost && scriptSrc){
+        const observer=new MutationObserver(()=>{
+          const rendered=curatorHost.querySelector('.crt-feed, .crt-post, .crt-grid-post, iframe') || curatorHost.children.length>1;
+          if(rendered){observer.disconnect();finish();}
+        });
+        observer.observe(curatorHost,{childList:true,subtree:true});
+
+        /* Curator initializes by finding its published feed container in the DOM. */
+        document.querySelectorAll('script[data-mf-curator-runtime]').forEach(node=>node.remove());
+        const curatorScript=document.createElement('script');
+        curatorScript.async=true;
+        curatorScript.charset='UTF-8';
+        curatorScript.src=scriptSrc;
+        curatorScript.dataset.mfCuratorRuntime='true';
+        curatorScript.addEventListener('load',()=>setTimeout(finish,900),{once:true});
+        curatorScript.addEventListener('error',finish,{once:true});
+        const firstScript=document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(curatorScript,firstScript);
+        setTimeout(()=>{observer.disconnect();finish();},5200);
       }else{
         finish();
       }
@@ -469,6 +484,8 @@ if(indexExtra){
   });
 
   gallery.addEventListener("wheel",e=>{
+    const liveInstagram=e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
+    if(liveInstagram)return;
     e.preventDefault();
     if(wheelLocked)return;
     wheelTotal+=e.deltaY;
@@ -481,8 +498,13 @@ if(indexExtra){
   },{passive:false});
 
   let touchStartY=0;
-  gallery.addEventListener("touchstart",e=>{touchStartY=e.touches[0].clientY;},{passive:true});
+  let touchStartedInLiveInstagram=false;
+  gallery.addEventListener("touchstart",e=>{
+    touchStartY=e.touches[0].clientY;
+    touchStartedInLiveInstagram=!!e.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host");
+  },{passive:true});
   gallery.addEventListener("touchend",e=>{
+    if(touchStartedInLiveInstagram){touchStartedInLiveInstagram=false;return;}
     const endY=e.changedTouches[0].clientY;
     const delta=touchStartY-endY;
     if(Math.abs(delta)>40)scrollToSlide(activeIndex+(delta>0?1:-1));
