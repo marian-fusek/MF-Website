@@ -309,6 +309,7 @@ if(indexExtra){
       context:"GoBaller had to work for ambitious young players, parents and experienced coaches at the same time. The product contained a deep training system, but the interface could not feel technical or intimidating. It needed credibility on the pitch and clarity in the hand.",
       approach:"I organized the product around progression, repetition and visible momentum. The identity borrows energy from sport without relying on predictable visual clichés. Every screen was shaped to keep the next useful action obvious while preserving a strong, ownable character.",
       images:[
+        {type:"video",src:"/vids/goballer/gb.mp4",title:"GoBaller product film"},
         "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88",
         {type:"carousel",background:"/images/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=88",
@@ -402,7 +403,7 @@ if(indexExtra){
         <div class="mf-project-end-list" aria-label="More projects">
           ${remaining.map(other=>`<button class="mf-project-end-link" type="button" data-project-key="${other}">${esc(projectData[other].title)}</button>`).join("")}
         </div>
-        <div class="mf-project-end-arrow mf-project-end-arrow-left" aria-hidden="true">←</div>
+        <div class="mf-project-end-arrow mf-project-end-arrow-left" aria-hidden="true">→</div>
         <div class="mf-project-end-arrow mf-project-end-arrow-right" aria-hidden="true">→</div>
         <button class="mf-project-exit-button" type="button"><span>Get me outta here!</span><span>[Screaming noises]</span></button>
       </div>
@@ -434,6 +435,9 @@ if(indexExtra){
           <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">${liveLabel(key,active)}</button>
         </div>
       </figure>`;
+    }
+    if(media&&typeof media==="object"&&media.type==="video"){
+      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}" title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video></div></figure>`;
     }
     if(media&&typeof media==="object"&&media.type==="carousel"){
       return `<figure class="mf-project-slide mf-project-slide-carousel" data-slide="${i}" data-carousel="true">
@@ -523,7 +527,8 @@ if(indexExtra){
   function setupStaticImageSlides(){
     if(!mobileProjectLayout.matches)return;
     slides.querySelectorAll('.mf-project-slide-image .mf-project-image-viewport').forEach(viewport=>{
-      const img=viewport.querySelector('img');
+      const media=viewport.querySelector('img, video');
+      if(!media)return;
       let downX=0,downY=0,startPosition=50,moved=false,dragging=false,isDown=false;
       viewport.style.setProperty('--image-x','50%');
       viewport.addEventListener('pointerdown',event=>{
@@ -533,7 +538,7 @@ if(indexExtra){
       viewport.addEventListener('pointermove',event=>{
         if(!isDown)return;
         const dx=event.clientX-downX,dy=event.clientY-downY;
-        if(Math.abs(dx)+Math.abs(dy)>7)moved=true;
+        if(Math.abs(dx)+Math.abs(dy)>8)moved=true;
         if(viewport.classList.contains('is-fit'))return;
         if(Math.abs(dx)>Math.abs(dy)+4){
           dragging=true;
@@ -546,11 +551,20 @@ if(indexExtra){
         if(!isDown)return;
         isDown=false;
         try{viewport.releasePointerCapture?.(event.pointerId);}catch(_){ }
-        if(!moved&&!dragging){viewport.classList.toggle('is-fit');viewport.dataset.position='50';viewport.style.setProperty('--image-x','50%');}
+        if(!moved&&!dragging){
+          viewport.classList.toggle('is-fit');
+          viewport.dataset.position='50';
+          viewport.style.setProperty('--image-x','50%');
+        }
       };
       viewport.addEventListener('pointerup',end);
-      viewport.addEventListener('pointercancel',end);
-      img.addEventListener('dragstart',event=>event.preventDefault());
+      viewport.addEventListener('pointercancel',()=>{isDown=false;});
+      media.addEventListener('dragstart',event=>event.preventDefault());
+      if(media.tagName==='VIDEO'){
+        media.muted=true;
+        media.playsInline=true;
+        media.play().catch(()=>{});
+      }
     });
   }
 
@@ -565,7 +579,7 @@ if(indexExtra){
       const rightZone=root.querySelector('.mf-carousel-zone-right');
       const cursor=root.querySelector('.mf-carousel-cursor');
       const cursorInner=cursor.querySelector('.mf-carousel-cursor-inner');
-      let index=0,animating=false;
+      let index=0,animating=false,suppressClick=false;
       const cards=media.cards;
       const wrap=n=>(n%cards.length+cards.length)%cards.length;
       const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
@@ -578,44 +592,53 @@ if(indexExtra){
       });
       const cursorPulse=(direction,target)=>{
         if(mobileProjectLayout.matches||!cursor.classList.contains('is-visible'))return;
-        const distance=direction>0?5:-5;
+        const distance=direction>0?20:-20;
         const zone=cursor.dataset.zone||'right';
         const afterLabel=zone==='left'?label(target-1):label(target+1);
+        cursorInner.getAnimations().forEach(animation=>animation.cancel());
         const out=cursorInner.animate([
           {opacity:1,transform:'translateX(0)'},
           {opacity:0,transform:`translateX(${distance}px)`}
-        ],{duration:150,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+        ],{duration:290,easing:'cubic-bezier(.4,0,.7,1)',fill:'forwards'});
         out.finished.catch(()=>{}).then(()=>{
           cursorInner.querySelector('span').textContent=afterLabel;
+          cursorInner.style.transform='translateX(0)';
           cursorInner.animate([
-            {opacity:0,transform:`translateX(${-distance}px)`},
-            {opacity:1,transform:'translateX(0)'}
-          ],{duration:260,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+            {opacity:0},
+            {opacity:1}
+          ],{duration:145,easing:'ease-out',fill:'forwards'});
         });
       };
       const move=async direction=>{
         if(animating)return;
         animating=true;
+        suppressClick=true;
         root.classList.remove('is-expanded');
+        root.dataset.panX='0';
         root.style.setProperty('--carousel-pan-x','0px');
         const target=wrap(index+direction);
         await preload(cards[target]);
         const width=root.clientWidth||window.innerWidth;
         const travel=Math.max(260,width*1.04)*(direction>0?1:-1);
+        current.getAnimations().forEach(animation=>animation.cancel());
+        nextCard.getAnimations().forEach(animation=>animation.cancel());
         nextCard.style.opacity='1';
-        nextCard.style.transform=`translate3d(${travel}px,0,0) scale(.92)`;
-        nextCard.style.filter='blur(14px)';
+        nextCard.style.transform=`translate3d(${travel}px,0,0) scale(.91)`;
+        nextCard.style.filter='blur(15px)';
         nextCard.style.zIndex='4';
         current.style.zIndex='3';
         cursorPulse(direction,target);
         const outgoing=current.animate([
           {transform:'translate3d(0,0,0) scale(1)',filter:'blur(0px)',opacity:1},
-          {transform:`translate3d(${-travel}px,0,0) scale(1.055)`,filter:'blur(10px)',opacity:.12}
-        ],{duration:760,easing:'cubic-bezier(.76,0,.24,1)',fill:'forwards'});
+          {offset:.7,transform:`translate3d(${-travel*.86}px,0,0) scale(1.035)`,filter:'blur(8px)',opacity:.18},
+          {transform:`translate3d(${-travel}px,0,0) scale(1.055)`,filter:'blur(12px)',opacity:0}
+        ],{duration:510,easing:'cubic-bezier(.55,.02,.76,.4)',fill:'forwards'});
+        await new Promise(resolve=>setTimeout(resolve,70));
         const incoming=nextCard.animate([
-          {transform:`translate3d(${travel}px,0,0) scale(.92)`,filter:'blur(14px)',opacity:.12},
+          {transform:`translate3d(${travel}px,0,0) scale(.91)`,filter:'blur(15px)',opacity:.08},
+          {offset:.72,transform:'translate3d(-1.5%,0,0) scale(1.018)',filter:'blur(1.5px)',opacity:1},
           {transform:'translate3d(0,0,0) scale(1)',filter:'blur(0px)',opacity:1}
-        ],{duration:820,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+        ],{duration:720,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
         await Promise.allSettled([outgoing.finished,incoming.finished]);
         index=target;
         current.src=cards[index];
@@ -625,6 +648,7 @@ if(indexExtra){
         nextCard.removeAttribute('style');
         updateAlt();
         animating=false;
+        setTimeout(()=>{suppressClick=false;},80);
       };
       const api={root,slide,move,get index(){return index;}};
       root._mfCarousel=api;
@@ -643,24 +667,24 @@ if(indexExtra){
       root.addEventListener('pointerleave',()=>cursor.classList.remove('is-visible'));
 
       if(mobileProjectLayout.matches){
-        let startX=0,startY=0,lastX=0,moved=false,isDown=false,panStart=0;
+        let startX=0,startY=0,moved=false,isDown=false,panStart=0;
         root.style.setProperty('--carousel-pan-x','0px');
         root.addEventListener('pointerdown',event=>{
-          isDown=true;startX=lastX=event.clientX;startY=event.clientY;moved=false;
+          if(animating)return;
+          isDown=true;startX=event.clientX;startY=event.clientY;moved=false;
           panStart=Number(root.dataset.panX||0);
           root.setPointerCapture?.(event.pointerId);
         });
         root.addEventListener('pointermove',event=>{
           if(!isDown)return;
           const dx=event.clientX-startX,dy=event.clientY-startY;
-          if(Math.abs(dx)+Math.abs(dy)>8)moved=true;
+          if(Math.abs(dx)+Math.abs(dy)>14)moved=true;
           if(root.classList.contains('is-expanded')&&Math.abs(dx)>Math.abs(dy)){
-            const limit=root.clientWidth*.28;
+            const limit=root.clientWidth*.33;
             const pan=Math.max(-limit,Math.min(limit,panStart+dx));
             root.dataset.panX=String(pan);
             root.style.setProperty('--carousel-pan-x',`${pan}px`);
           }
-          lastX=event.clientX;
         });
         root.addEventListener('pointerup',event=>{
           if(!isDown)return;
@@ -668,11 +692,23 @@ if(indexExtra){
           const dx=event.clientX-startX,dy=event.clientY-startY;
           try{root.releasePointerCapture?.(event.pointerId);}catch(_){ }
           if(root.classList.contains('is-expanded')){
-            if(!moved){root.classList.remove('is-expanded');root.dataset.panX='0';root.style.setProperty('--carousel-pan-x','0px');}
+            if(!moved){
+              root.classList.remove('is-expanded');
+              root.dataset.panX='0';
+              root.style.setProperty('--carousel-pan-x','0px');
+            }
             return;
           }
-          if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)){move(dx<0?1:-1);return;}
-          if(!moved){root.classList.add('is-expanded');root.dataset.panX='0';root.style.setProperty('--carousel-pan-x','0px');}
+          if(Math.abs(dx)>46&&Math.abs(dx)>Math.abs(dy)+10){
+            suppressClick=true;
+            move(dx<0?1:-1);
+            return;
+          }
+          if(!moved&&!suppressClick){
+            root.classList.add('is-expanded');
+            root.dataset.panX='0';
+            root.style.setProperty('--carousel-pan-x','0px');
+          }
         });
         root.addEventListener('pointercancel',()=>{isDown=false;});
       }
@@ -698,9 +734,10 @@ if(indexExtra){
         const r=link.getBoundingClientRect();
         const x=(event.clientX-r.left-r.width/2)*.045;
         const y=(event.clientY-r.top-r.height/2)*.12;
-        leftArrow?.style.setProperty('--arrow-shift-x',`${-x}px`);
-        rightArrow?.style.setProperty('--arrow-shift-x',`${x}px`);
-        arrows.forEach(arrow=>arrow.style.setProperty('--arrow-shift-y',`${y}px`));
+        arrows.forEach(arrow=>{
+          arrow.style.setProperty('--arrow-shift-x',`${x}px`);
+          arrow.style.setProperty('--arrow-shift-y',`${y}px`);
+        });
       });
       link.addEventListener('pointerleave',()=>{
         endCard.classList.remove('is-project-hovered');
@@ -1777,43 +1814,43 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 })();
 
 
-/* MF ART section title — rotating punctuation states. */
+/* MF ART section title — the base title stays fixed while suffixes animate. */
 (function(){
   const title=document.querySelector('.mf-art-showcase-copy h2');
   if(!title)return;
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-  const set=(html)=>{title.innerHTML=html;};
-  const fade=async(out=true)=>{
-    title.style.opacity=out?'0':'1';
-    title.style.transform=out?'translateY(-4px)':'translateY(0)';
-    await wait(out?240:320);
+  title.innerHTML='<span class="mf-art-title-base">MF ART</span><span class="mf-art-title-suffix">!</span>';
+  const suffix=title.querySelector('.mf-art-title-suffix');
+  const set=value=>{suffix.textContent=value;};
+  const fadeTo=async(value)=>{
+    suffix.style.opacity='0';
+    suffix.style.transform='translateY(-3px)';
+    await wait(180);
+    set(value);
+    suffix.style.transform='translateY(3px)';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      suffix.style.opacity='1';
+      suffix.style.transform='translateY(0)';
+    }));
+    await wait(260);
   };
   async function loop(){
     while(true){
-      set('MF ART<span class="mf-art-mark">!</span>');
-      title.style.opacity='1';title.style.transform='translateY(0)';
+      set('!');suffix.style.opacity='1';suffix.style.transform='translateY(0)';
       await wait(1500);
-      const bang=title.querySelector('.mf-art-mark');
-      for(let i=0;i<3;i++){bang.style.opacity='0';await wait(105);bang.style.opacity='1';await wait(105);}
-      bang.style.opacity='0';await wait(150);
-      set('MF ART<span class="mf-art-mark mf-art-mark-in">?</span>');
+      for(let i=0;i<3;i++){suffix.style.opacity='0';await wait(105);suffix.style.opacity='1';await wait(105);}
+      await fadeTo('?');
       await wait(1500);
-      const suffix=' HUH?!';
-      let base='MF ART?';
-      for(const ch of suffix){base+=ch;set(base);await wait(62);}
+      let text='?';
+      for(const ch of ' HUH?!'){text+=ch;set(text);await wait(62);}
       await wait(1350);
-      await fade(true);
-      set('MF ART');
-      await fade(false);
-      await wait(420);
-      for(let count=1;count<=3;count++){set('MF ART'+'.'.repeat(count));await wait(170);}
+      await fadeTo('');
+      for(let count=1;count<=3;count++){set('.'.repeat(count));await wait(170);}
       await wait(500);
-      for(let count=2;count>=0;count--){set('MF ART'+'.'.repeat(count));await wait(120);}
-      for(let count=1;count<=3;count++){set('MF ART'+'.'.repeat(count));await wait(170);}
+      for(let count=2;count>=0;count--){set('.'.repeat(count));await wait(120);}
+      for(let count=1;count<=3;count++){set('.'.repeat(count));await wait(170);}
       await wait(2000);
-      await fade(true);
-      set('MF ART!');
-      await fade(false);
+      await fadeTo('!');
     }
   }
   loop();

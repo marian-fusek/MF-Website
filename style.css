@@ -5201,3 +5201,75 @@ body.project-open .mf-nav-art {
     min-height: 48svh !important;
   }
 }
+
+/* ============================================================
+   V41 — GoBaller video, carousel timing, mobile type spacing
+   ============================================================ */
+
+/* Project videos use the exact same visual frame as still images. */
+.mf-project-image-viewport > video {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: var(--image-x, 50%) 50% !important;
+  background: #000;
+  filter: none !important;
+  pointer-events: none;
+}
+.mf-project-slide-video,
+.mf-project-slide-video video {
+  filter: none !important;
+}
+
+/* Both end-card arrows point right and follow the cursor in parallel. */
+.mf-project-end-arrow-left,
+.mf-project-end-arrow-right {
+  transform: translate3d(var(--arrow-shift-x,0),calc(-50% + var(--arrow-shift-y,0px)),0) !important;
+}
+
+/* All section labels share slightly more open tracking. */
+.mf-index-title,
+.mf-timeline-label,
+.mf-about-title,
+.mf-art-showcase-copy h2 {
+  letter-spacing: -.035em !important;
+}
+
+/* Keep the MF ART base title fixed while only its suffix changes. */
+.mf-art-title-base,
+.mf-art-title-suffix {
+  display: inline-block;
+}
+.mf-art-title-suffix {
+  min-width: .25em;
+  transition: opacity .18s ease, transform .26s var(--ease);
+  will-change: opacity, transform;
+}
+
+@media (max-width: 1024px) {
+  /* Mobile project videos inherit the same tap-to-fit and pan behavior. */
+  .mf-project-image-viewport > video {
+    transition: object-position .16s ease-out, transform .62s var(--ease) !important;
+  }
+  .mf-project-image-viewport.is-fit > video {
+    object-fit: contain !important;
+    object-position: 50% 50% !important;
+  }
+
+  /* A literal, consistent word gap for every giant mobile title. */
+  .mf-roll {
+    grid-template-columns: max-content max-content !important;
+    column-gap: .18em !important;
+    justify-content: center !important;
+    justify-items: start !important;
+  }
+  .mf-roll-left,
+  .mf-roll-right {
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    justify-self: start !important;
+    letter-spacing: -.08em !important;
+  }
+}
