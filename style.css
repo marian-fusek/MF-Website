@@ -5377,3 +5377,64 @@ body.project-open .mf-nav-art {
     grid-row: 2 !important;
   }
 }
+
+/* ============================================================
+   V43 — stable carousel buffers, native-feeling mobile swipe,
+   GoBaller INDEX assets and reliable mobile giant-type fitting
+   ============================================================ */
+
+/* The carousel never uses blur; only short directional drift, scale and fade. */
+.mf-goballer-carousel,
+.mf-carousel-stage,
+.mf-carousel-card,
+.mf-carousel-card-current,
+.mf-carousel-card-next {
+  filter: none !important;
+}
+.mf-carousel-card {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: center center;
+}
+
+@media (max-width: 1024px) {
+  /* Safe first-paint size; JS replaces it with one shared measured value once
+     Geist is ready. Keeping this conservative prevents a clipped flash. */
+  .mf-roll {
+    --mobile-roll-size: clamp(27px, 9.2vw, 58px);
+    overflow: visible !important;
+  }
+  .mf-roll-mobile-label {
+    width: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+    word-spacing: normal !important;
+  }
+
+  /* Horizontal gestures follow the finger while vertical page scrolling stays
+     native. The image/background remain fully colored. */
+  .mf-goballer-carousel {
+    touch-action: pan-y !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mf-goballer-carousel.is-dragging .mf-carousel-card {
+    will-change: transform, opacity;
+  }
+  .mf-carousel-background,
+  .mf-carousel-card {
+    filter: none !important;
+  }
+}
+
+.mf-carousel-cursor-ghost {
+  position: absolute !important;
+  top: 0 !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 3 !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+}

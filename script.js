@@ -212,8 +212,9 @@ if(indexExtra){
       "/images/projects/miunae/05-miunae-brandkit.jpg"
     ],
     "02":[
+      "/images/goballer/01-goballer-logo.jpg",
+      "/images/goballer/02-goballer-brand.jpg",
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
     ],
@@ -571,8 +572,8 @@ if(indexExtra){
       const media=project.images[Number(slide.dataset.slide)];
       if(!media||media.type!=="carousel")return;
       const root=slide.querySelector('.mf-goballer-carousel');
-      const current=root.querySelector('.mf-carousel-card-current');
-      const nextCard=root.querySelector('.mf-carousel-card-next');
+      let current=root.querySelector('.mf-carousel-card-current');
+      let nextCard=root.querySelector('.mf-carousel-card-next');
       const leftZone=root.querySelector('.mf-carousel-zone-left');
       const rightZone=root.querySelector('.mf-carousel-zone-right');
       const cursor=root.querySelector('.mf-carousel-cursor');
@@ -596,56 +597,100 @@ if(indexExtra){
 
       function emitCursorGhost(direction){
         if(mobileProjectLayout.matches||!cursor.classList.contains('is-visible'))return;
-        const ghost=cursorInner.cloneNode(true);
-        ghost.classList.add('mf-carousel-cursor-ghost');
-        cursor.appendChild(ghost);
+        const ghost=document.createElement('b');
+        ghost.className='mf-carousel-cursor-ghost';
+        ghost.textContent=arrowEl.textContent;
+        cursorInner.appendChild(ghost);
         const drift=direction>0?15:-15;
         ghost.animate([
-          {opacity:1,transform:'translate3d(0,0,0)'},
-          {opacity:0,transform:`translate3d(${drift}px,0,0)`}
-        ],{duration:360,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'}).finished
+          {opacity:1,transform:'translate3d(-50%,0,0)'},
+          {opacity:0,transform:`translate3d(calc(-50% + ${drift}px),0,0)`}
+        ],{duration:420,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'}).finished
           .catch(()=>{})
           .then(()=>ghost.remove());
       }
 
-      async function move(direction){
+      function prepareIncoming(target){
+        nextCard.src=cards[target];
+        nextCard.alt=`GoBaller visual ${target+1}`;
+        nextCard.style.opacity='0';
+        nextCard.style.transform='translate3d(0,0,0) scale(.96)';
+        nextCard.style.filter='none';
+        return nextCard.decode?.().catch(()=>{})||Promise.resolve();
+      }
+
+      async function move(direction,fromGesture=false){
         if(animating)return;
         animating=true;
-        root.classList.remove('is-expanded');
+        root.classList.remove('is-expanded','is-dragging');
         root.dataset.panX='0';
         root.style.setProperty('--carousel-pan-x','0px');
         const target=wrap(index+direction);
-        const travel=(root.clientWidth||window.innerWidth)*1.08*(direction>0?1:-1);
         emitCursorGhost(direction);
 
+        const oldCurrent=current;
+        const incoming=nextCard;
+        oldCurrent.getAnimations().forEach(animation=>animation.cancel());
+        incoming.getAnimations().forEach(animation=>animation.cancel());
+
+        const enterFrom=direction>0?30:-30;
+        const exitTo=direction>0?-30:30;
+        const ready=fromGesture
+          ? (incoming.decode?.().catch(()=>{})||Promise.resolve())
+          : prepareIncoming(target);
+        const outgoingFromTransform=fromGesture&&oldCurrent.style.transform
+          ? oldCurrent.style.transform
+          : 'translate3d(0,0,0) scale(1)';
+        const outgoingFromOpacity=fromGesture&&oldCurrent.style.opacity
+          ? Number(oldCurrent.style.opacity)
+          : 1;
+        const incomingFromTransform=fromGesture&&incoming.style.transform
+          ? incoming.style.transform
+          : `translate3d(${enterFrom}px,0,0) scale(.955)`;
+        const incomingFromOpacity=fromGesture&&incoming.style.opacity
+          ? Number(incoming.style.opacity)
+          : 0;
+
+        /* The current card reacts immediately and only drifts symbolically.
+           The replacement enters from the matching side after it is decoded.
+           Swapping the two DOM buffers prevents the old source from flashing
+           back while the browser decodes the next image. */
+        const outgoing=oldCurrent.animate([
+          {transform:outgoingFromTransform,opacity:outgoingFromOpacity},
+          {transform:`translate3d(${exitTo}px,0,0) scale(.955)`,opacity:0}
+        ],{
+          duration:620,
+          easing:'cubic-bezier(.32,.72,0,1)',
+          fill:'forwards'
+        });
+
+        await ready;
+        const incomingAnimation=incoming.animate([
+          {transform:incomingFromTransform,opacity:incomingFromOpacity},
+          {transform:'translate3d(0,0,0) scale(1)',opacity:1}
+        ],{
+          duration:820,
+          easing:'cubic-bezier(.16,1,.3,1)',
+          fill:'forwards'
+        });
+
+        await Promise.allSettled([outgoing.finished,incomingAnimation.finished]);
+        index=target;
+
+        oldCurrent.classList.remove('mf-carousel-card-current');
+        oldCurrent.classList.add('mf-carousel-card-next');
+        incoming.classList.remove('mf-carousel-card-next');
+        incoming.classList.add('mf-carousel-card-current');
+
+        current=incoming;
+        nextCard=oldCurrent;
         current.getAnimations().forEach(animation=>animation.cancel());
         nextCard.getAnimations().forEach(animation=>animation.cancel());
-        nextCard.src=cards[target];
-        nextCard.style.opacity='0';
-        nextCard.style.transform=`translate3d(${travel}px,0,0) scale(1.055)`;
-        nextCard.style.filter='none';
-        nextCard.style.zIndex='4';
-        current.style.zIndex='3';
-
-        /* Start both motions immediately after the click. The old image leaves
-           first and never hangs underneath the new one. */
-        const outgoing=current.animate([
-          {transform:'translate3d(0,0,0) scale(1)',opacity:1},
-          {transform:`translate3d(${-travel}px,0,0) scale(.92)`,opacity:0}
-        ],{duration:500,easing:'cubic-bezier(.55,.01,.72,.38)',fill:'forwards'});
-        const incoming=nextCard.animate([
-          {transform:`translate3d(${travel}px,0,0) scale(1.055)`,opacity:0},
-          {offset:.82,transform:'translate3d(-1.2%,0,0) scale(.995)',opacity:1},
-          {transform:'translate3d(0,0,0) scale(1)',opacity:1}
-        ],{duration:650,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
-
-        await Promise.allSettled([outgoing.finished,incoming.finished]);
-        index=target;
-        current.src=cards[index];
-        current.alt=`GoBaller visual ${index+1}`;
         current.removeAttribute('style');
         nextCard.removeAttribute('style');
-        nextCard.src=cards[wrap(index+1)];
+        nextCard.src=cards[wrap(index+direction)];
+        nextCard.alt='';
+
         updateCursorLabel();
         if(mobileProjectLayout.matches)preloadAround(index);
         animating=false;
@@ -667,6 +712,17 @@ if(indexExtra){
 
       if(mobileProjectLayout.matches){
         root.style.setProperty('--carousel-pan-x','0px');
+        let swipeDirection=0,swipeTarget=-1;
+        const clearSwipePreview=()=>{
+          root.classList.remove('is-dragging');
+          current.style.transform='';
+          current.style.opacity='';
+          nextCard.style.transform='';
+          nextCard.style.opacity='';
+          nextCard.style.pointerEvents='';
+          swipeDirection=0;
+          swipeTarget=-1;
+        };
         root.addEventListener('pointerdown',event=>{
           if(animating)return;
           isDown=true;moved=false;startX=event.clientX;startY=event.clientY;
@@ -674,16 +730,36 @@ if(indexExtra){
           root.setPointerCapture?.(event.pointerId);
         });
         root.addEventListener('pointermove',event=>{
-          if(!isDown)return;
+          if(!isDown||animating)return;
           const dx=event.clientX-startX,dy=event.clientY-startY;
-          if(Math.abs(dx)+Math.abs(dy)>12)moved=true;
+          if(Math.abs(dx)+Math.abs(dy)>10)moved=true;
           if(root.classList.contains('is-expanded')&&Math.abs(dx)>Math.abs(dy)){
             const limit=root.clientWidth*.38;
             const pan=Math.max(-limit,Math.min(limit,panStart+dx));
             root.dataset.panX=String(pan);
             root.style.setProperty('--carousel-pan-x',`${pan}px`);
+            return;
           }
-        });
+          if(Math.abs(dx)<=Math.abs(dy)+5)return;
+          event.preventDefault();
+          const direction=dx<0?1:-1;
+          const target=wrap(index+direction);
+          if(direction!==swipeDirection||target!==swipeTarget){
+            swipeDirection=direction;swipeTarget=target;
+            nextCard.src=cards[target];
+            nextCard.alt=`GoBaller visual ${target+1}`;
+          }
+          const width=Math.max(1,root.clientWidth);
+          const progress=Math.min(1,Math.abs(dx)/(width*.72));
+          const restrained=dx*.62;
+          const incomingStart=(direction>0?1:-1)*Math.min(width*.32,120);
+          root.classList.add('is-dragging');
+          current.style.transform=`translate3d(${restrained}px,0,0) scale(${1-progress*.035})`;
+          current.style.opacity=String(1-progress*.58);
+          nextCard.style.opacity=String(progress);
+          nextCard.style.transform=`translate3d(${incomingStart*(1-progress)}px,0,0) scale(${.965+progress*.035})`;
+          nextCard.style.pointerEvents='none';
+        },{passive:false});
         const endPointer=event=>{
           if(!isDown)return;
           isDown=false;
@@ -697,16 +773,22 @@ if(indexExtra){
             }
             return;
           }
-          if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)+8){
-            move(dx<0?1:-1);
-          }else if(!moved){
-            root.classList.add('is-expanded');
-            root.dataset.panX='0';
-            root.style.setProperty('--carousel-pan-x','0px');
+          const shouldMove=Math.abs(dx)>44&&Math.abs(dx)>Math.abs(dy)+8;
+          if(shouldMove){
+            root.classList.remove('is-dragging');
+            swipeDirection=0;swipeTarget=-1;
+            move(dx<0?1:-1,true);
+          }else{
+            clearSwipePreview();
+            if(!moved){
+              root.classList.add('is-expanded');
+              root.dataset.panX='0';
+              root.style.setProperty('--carousel-pan-x','0px');
+            }
           }
         };
         root.addEventListener('pointerup',endPointer);
-        root.addEventListener('pointercancel',()=>{isDown=false;});
+        root.addEventListener('pointercancel',()=>{isDown=false;clearSwipePreview();});
       }
     });
   }
@@ -1151,29 +1233,38 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   });
 })();
 
-/* Mobile big-type fitting: one shared size based on the longest literal title. */
+/* Mobile big-type fitting: one stable shared size measured from the literal
+   longest title. It only recalculates when viewport width changes, so Safari's
+   address-bar height animation cannot resize or clip the rows mid-scroll. */
 (function(){
   const mobile=window.matchMedia("(max-width: 1024px)");
   const rows=[...document.querySelectorAll(".mf-roll")];
   if(!rows.length)return;
-  let resizeTimer=0;
-  function fit(){
+  let resizeTimer=0,lastWidth=0;
+  const measurer=document.createElement('span');
+  measurer.setAttribute('aria-hidden','true');
+  measurer.style.cssText='position:fixed;left:-99999px;top:0;display:block;width:max-content;white-space:nowrap;visibility:hidden;pointer-events:none;font-family:Geist,Arial,sans-serif;font-weight:850;line-height:.74;letter-spacing:-.08em;text-transform:uppercase;';
+  document.body.appendChild(measurer);
+  function fit(force=false){
     if(!mobile.matches){rows.forEach(row=>row.style.removeProperty("--mobile-roll-size"));return;}
-    const available=Math.max(250,(document.documentElement.clientWidth||window.innerWidth)-24);
+    const width=Math.round(document.documentElement.clientWidth||window.innerWidth);
+    if(!force&&Math.abs(width-lastWidth)<3)return;
+    lastWidth=width;
+    const available=Math.max(240,width-28);
+    const labels=rows.map(row=>row.querySelector('.mf-roll-mobile-label')).filter(Boolean);
     let widest=1;
-    rows.forEach(row=>{
-      const label=row.querySelector('.mf-roll-mobile-label');
-      if(!label)return;
-      label.style.fontSize='100px';
-      widest=Math.max(widest,label.scrollWidth);
+    measurer.style.fontSize='100px';
+    labels.forEach(label=>{
+      measurer.textContent=label.textContent;
+      widest=Math.max(widest,measurer.getBoundingClientRect().width);
     });
-    const shared=Math.max(28,Math.min(104,100*available/widest));
+    const shared=Math.max(27,Math.min(96,100*available/widest));
     rows.forEach(row=>row.style.setProperty('--mobile-roll-size',`${shared.toFixed(2)}px`));
   }
-  const queue=()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(fit,80);};
-  if(document.fonts?.ready)document.fonts.ready.then(fit);else setTimeout(fit,220);
+  const queue=()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>fit(false),100);};
+  if(document.fonts?.ready)document.fonts.ready.then(()=>fit(true));else setTimeout(()=>fit(true),220);
   window.addEventListener('resize',queue,{passive:true});
-  mobile.addEventListener?.('change',fit);
+  mobile.addEventListener?.('change',()=>fit(true));
 })();
 
 /* XP SHAPE — fast particles, two-second hover morphs, lively breathing */
