@@ -449,7 +449,7 @@ if(indexExtra){
           <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous carousel image"></button>
           <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next carousel image"></button>
           <div class="mf-carousel-cursor" aria-hidden="true"><div class="mf-carousel-cursor-inner"><b>→</b><span># 02</span></div></div>
-          <div class="mf-carousel-swipe-hint" aria-hidden="true"><span>←</span><b>SWIPE</b><span>→</span></div>
+          <div class="mf-carousel-swipe-hint" aria-hidden="true"><span class="mf-carousel-swipe-arrow">←</span><span class="mf-carousel-swipe-copy"><b class="mf-carousel-swipe-count">01 / ${String(media.cards.length).padStart(2,'0')}</b><em>SWIPE</em></span><span class="mf-carousel-swipe-arrow">→</span></div>
         </div>
       </figure>`;
     }
@@ -580,6 +580,7 @@ if(indexExtra){
       const cursorInner=cursor.querySelector('.mf-carousel-cursor-inner');
       const arrowEl=cursorInner.querySelector('b');
       const numberEl=cursorInner.querySelector('span');
+      const swipeCountEl=root.querySelector('.mf-carousel-swipe-count');
       let index=0,animating=false,isDown=false,startX=0,startY=0,moved=false,panStart=0;
       const cards=media.cards;
       const wrap=n=>(n%cards.length+cards.length)%cards.length;
@@ -593,6 +594,7 @@ if(indexExtra){
         const zone=cursor.dataset.zone||'right';
         arrowEl.textContent=zone==='left'?'←':'→';
         numberEl.textContent=zone==='left'?label(index-1):label(index+1);
+        if(swipeCountEl)swipeCountEl.textContent=`${String(index+1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
       }
 
       function emitCursorGhost(direction){
@@ -696,6 +698,7 @@ if(indexExtra){
         animating=false;
       }
 
+      updateCursorLabel();
       const api={root,slide,move,get index(){return index;}};
       root._mfCarousel=api;
       leftZone.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();move(-1);});
@@ -723,6 +726,24 @@ if(indexExtra){
           swipeDirection=0;
           swipeTarget=-1;
         };
+        let touchLock=null,touchX=0,touchY=0;
+        root.addEventListener('touchstart',event=>{
+          const touch=event.touches[0];
+          if(!touch)return;
+          touchX=touch.clientX;touchY=touch.clientY;touchLock=null;
+        },{passive:true});
+        root.addEventListener('touchmove',event=>{
+          const touch=event.touches[0];
+          if(!touch)return;
+          const dx=touch.clientX-touchX,dy=touch.clientY-touchY;
+          if(!touchLock&&Math.max(Math.abs(dx),Math.abs(dy))>7){
+            touchLock=Math.abs(dx)>Math.abs(dy)*1.05?'x':'y';
+          }
+          if(touchLock==='x')event.preventDefault();
+        },{passive:false});
+        root.addEventListener('touchend',()=>{touchLock=null;},{passive:true});
+        root.addEventListener('touchcancel',()=>{touchLock=null;},{passive:true});
+
         root.addEventListener('pointerdown',event=>{
           if(animating)return;
           isDown=true;moved=false;startX=event.clientX;startY=event.clientY;
@@ -1126,37 +1147,109 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   loop();
 })();
 
-/* VARIABLE PROXIMITY — word-safe BIO copy */
+/* BIO TABS — animated content switch with one active panel */
 (function(){
-  const container=document.querySelector(".mf-about-text");
+  const menu=document.querySelector('.mf-bio-menu');
+  const wrapper=document.getElementById('mfBioPanels');
+  if(!menu||!wrapper)return;
+  const buttons=[...menu.querySelectorAll('[data-bio-tab]')];
+  const panels=[...wrapper.querySelectorAll('[data-bio-panel]')];
+  let active=wrapper.querySelector('.mf-bio-panel.is-active')||panels[0];
+  let switching=false;
+
+  function setMenu(key){
+    buttons.forEach(button=>{
+      const selected=button.dataset.bioTab===key;
+      button.classList.toggle('is-active',selected);
+      button.setAttribute('aria-selected',selected?'true':'false');
+    });
+  }
+
+  async function showPanel(key){
+    const next=wrapper.querySelector(`[data-bio-panel="${key}"]`);
+    if(!next||next===active||switching)return;
+    switching=true;
+    setMenu(key);
+
+    const fromHeight=active.getBoundingClientRect().height;
+    next.style.display='block';
+    next.style.position='absolute';
+    next.style.inset='0';
+    next.style.visibility='hidden';
+    const toHeight=next.scrollHeight;
+    next.style.visibility='visible';
+    wrapper.style.height=`${fromHeight}px`;
+
+    const heightAnimation=wrapper.animate(
+      [{height:`${fromHeight}px`},{height:`${toHeight}px`}],
+      {duration:650,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'}
+    );
+    const outgoing=active.animate([
+      {clipPath:'inset(0 0 0 0)',opacity:1,transform:'translate3d(0,0,0)'},
+      {clipPath:'inset(0 0 100% 0)',opacity:0,transform:'translate3d(0,-10px,0)'}
+    ],{duration:420,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+    const incoming=next.animate([
+      {clipPath:'inset(0 0 100% 0)',opacity:0,transform:'translate3d(0,-10px,0)'},
+      {clipPath:'inset(0 0 0 0)',opacity:1,transform:'translate3d(0,0,0)'}
+    ],{duration:620,delay:120,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+
+    await Promise.allSettled([heightAnimation.finished,outgoing.finished,incoming.finished]);
+    active.classList.remove('is-active');
+    active.setAttribute('aria-hidden','true');
+    active.style.cssText='';
+    next.classList.add('is-active');
+    next.setAttribute('aria-hidden','false');
+    next.style.cssText='';
+    wrapper.style.height='auto';
+    active=next;
+    switching=false;
+  }
+
+  buttons.forEach(button=>button.addEventListener('click',()=>showPanel(button.dataset.bioTab)));
+})();
+
+/* VARIABLE PROXIMITY — word-safe, link-safe BIO copy */
+(function(){
+  const container=document.querySelector('.mf-about-text');
   if(!container)return;
   const radius=120;
-  const texts=[...container.querySelectorAll("p, .mf-about-note")];
 
-  texts.forEach(el=>{
-    const label=el.textContent;
-    el.setAttribute("aria-label",label);
-    el.textContent="";
-    const words=label.split(" ");
-    words.forEach((word,wordIndex)=>{
-      const wordSpan=document.createElement("span");
-      wordSpan.className="vp-word";
-      [...word].forEach(ch=>{
-        const span=document.createElement("span");
-        span.className="vp-char";
-        span.setAttribute("aria-hidden","true");
+  function wrapTextNode(node){
+    const text=node.nodeValue;
+    if(!text||!text.trim())return;
+    const fragment=document.createDocumentFragment();
+    const tokens=text.split(/(\s+)/);
+    tokens.forEach(token=>{
+      if(!token)return;
+      if(/^\s+$/.test(token)){fragment.appendChild(document.createTextNode(token));return;}
+      const word=document.createElement('span');
+      word.className='vp-word';
+      [...token].forEach(ch=>{
+        const span=document.createElement('span');
+        span.className='vp-char';
+        span.setAttribute('aria-hidden','true');
         span.textContent=ch;
-        wordSpan.appendChild(span);
+        word.appendChild(span);
       });
-      el.appendChild(wordSpan);
-      if(wordIndex<words.length-1)el.appendChild(document.createTextNode(" "));
+      fragment.appendChild(word);
     });
+    node.replaceWith(fragment);
+  }
+
+  container.querySelectorAll('.mf-bio-panel p, .mf-bio-panel .mf-about-note').forEach(el=>{
+    el.setAttribute('aria-label',el.textContent.trim());
+    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{acceptNode(node){
+      return node.parentElement?.closest('.vp-word')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
+    }});
+    const nodes=[];
+    while(walker.nextNode())nodes.push(walker.currentNode);
+    nodes.forEach(wrapTextNode);
   });
 
-  let mouse={x:-9999,y:-9999},raf=0,inside=false;
+  let mouse={x:-9999,y:-9999},raf=0;
   function update(){
     raf=0;
-    container.querySelectorAll(".vp-char").forEach(char=>{
+    container.querySelectorAll('.mf-bio-panel.is-active .vp-char').forEach(char=>{
       const r=char.getBoundingClientRect();
       const dx=mouse.x-(r.left+r.width/2),dy=mouse.y-(r.top+r.height/2);
       const d=Math.sqrt(dx*dx+dy*dy);
@@ -1167,8 +1260,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       char.style.opacity=String(.5+(.5*n));
     });
   }
-  container.addEventListener("pointermove",e=>{inside=true;mouse={x:e.clientX,y:e.clientY};if(!raf)raf=requestAnimationFrame(update);});
-  container.addEventListener("pointerleave",()=>{inside=false;mouse={x:-9999,y:-9999};if(!raf)raf=requestAnimationFrame(update);});
+  container.addEventListener('pointermove',event=>{mouse={x:event.clientX,y:event.clientY};if(!raf)raf=requestAnimationFrame(update);});
+  container.addEventListener('pointerleave',()=>{mouse={x:-9999,y:-9999};if(!raf)raf=requestAnimationFrame(update);});
 })();
 
 /* Mobile practice titles are rendered as one literal line so normal word
