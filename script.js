@@ -214,7 +214,7 @@ if(indexExtra){
     "02":[
       "/images/projects/goballer/01-goballer-logo.jpg",
       "/images/projects/goballer/02-goballer-brand.jpg",
-      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=76",
+      "/images/projects/goballer/03-goballer-app.jpg",
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
     ],
@@ -286,6 +286,12 @@ if(indexExtra){
     "05-0.jpg"
   ].map(name=>`/images/projects/goballer/brand/${name}`);
 
+  const goballerAppCards=[
+    {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-1.jpg",title:"GoBaller iOS screen 1"},
+    {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-2.jpg",title:"GoBaller iOS screen 2"},
+    {type:"video",src:"/vids/goballer/gb-app/gb-app.mp4",title:"GoBaller iOS product video"}
+  ];
+
   const projectData={
     "01":{
       title:"MIUNĀE",
@@ -310,7 +316,7 @@ if(indexExtra){
       images:[
         {type:"video",src:"/vids/goballer/gb.mp4",title:"GoBaller product film"},
         {type:"carousel",background:"/images/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
-        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88",
+        {type:"mediaCarousel",cards:goballerAppCards,title:"GoBaller iOS application"},
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
       ]
@@ -409,6 +415,18 @@ if(indexExtra){
     </figure>`;
   }
 
+  function projectMediaCurtain(){
+    return `<div class="mf-project-media-curtain" aria-hidden="true">${"<span></span>".repeat(10)}</div>`;
+  }
+
+  function carouselItemMarkup(item,index){
+    const normalized=typeof item==="string"?{type:"image",src:item}:item;
+    if(normalized?.type==="video"){
+      return `<video src="${esc(normalized.src)}" title="${esc(normalized.title||`Carousel video ${index+1}`)}" muted loop playsinline preload="metadata"></video>`;
+    }
+    return `<img src="${esc(normalized?.src||"")}" alt="${esc(normalized?.title||`Carousel visual ${index+1}`)}" draggable="false">`;
+  }
+
   function renderMedia(project,media,i){
     if(media&&typeof media==="object"&&media.type==="iframe"){
       const key=media.liveKey||"website";
@@ -421,6 +439,7 @@ if(indexExtra){
           <div class="mf-live-shield" aria-hidden="true"></div>
           <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">${liveLabel(key,active)}</button>
         </div>
+        ${projectMediaCurtain()}
       </figure>`;
     }
     if(media&&typeof media==="object"&&media.type==="curator"){
@@ -433,27 +452,32 @@ if(indexExtra){
           <div class="mf-live-shield" aria-hidden="true"></div>
           <button class="mf-live-toggle" type="button" aria-pressed="${active?'true':'false'}">${liveLabel(key,active)}</button>
         </div>
+        ${projectMediaCurtain()}
       </figure>`;
     }
     if(media&&typeof media==="object"&&media.type==="video"){
-      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}" title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video></div></figure>`;
+      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}" title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video></div>${projectMediaCurtain()}</figure>`;
     }
-    if(media&&typeof media==="object"&&media.type==="carousel"){
-      return `<figure class="mf-project-slide mf-project-slide-carousel" data-slide="${i}" data-carousel="true">
-        <div class="mf-goballer-carousel" aria-label="${esc(media.title||'Project carousel')}">
-          <img class="mf-carousel-background" src="${esc(media.background)}" alt="" draggable="false">
+    if(media&&typeof media==="object"&&(media.type==="carousel"||media.type==="mediaCarousel")){
+      const mixed=media.type==="mediaCarousel";
+      const first=media.cards[0];
+      const second=media.cards[1]||first;
+      return `<figure class="mf-project-slide mf-project-slide-carousel${mixed?' mf-project-slide-media-carousel':''}" data-slide="${i}" data-carousel="true">
+        <div class="mf-goballer-carousel${mixed?' mf-goballer-app-carousel':''}" aria-label="${esc(media.title||'Project carousel')}">
+          ${media.background?`<img class="mf-carousel-background" src="${esc(media.background)}" alt="" draggable="false">`:''}
           <div class="mf-carousel-stage">
-            <img class="mf-carousel-card mf-carousel-card-current" src="${esc(media.cards[0])}" alt="GoBaller visual 1" draggable="false">
-            <img class="mf-carousel-card mf-carousel-card-next" src="${esc(media.cards[1]||media.cards[0])}" alt="" draggable="false" aria-hidden="true">
+            ${mixed?`<div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-current">${carouselItemMarkup(first,0)}</div><div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-next" aria-hidden="true">${carouselItemMarkup(second,1)}</div>`:`<img class="mf-carousel-card mf-carousel-card-current" src="${esc(first)}" alt="GoBaller visual 1" draggable="false"><img class="mf-carousel-card mf-carousel-card-next" src="${esc(second)}" alt="" draggable="false" aria-hidden="true">`}
           </div>
+          <div class="mf-carousel-runtime-loader" aria-hidden="true"><div class="mf-carousel-runtime-loader-copy">LOADING VIDEO<span>_</span></div><div class="mf-carousel-runtime-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
           <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous carousel image"></button>
           <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next carousel image"></button>
           <div class="mf-carousel-cursor" aria-hidden="true"><div class="mf-carousel-cursor-inner"><b>→</b><span># 02</span></div></div>
           <div class="mf-carousel-swipe-hint" aria-hidden="true"><span class="mf-carousel-swipe-arrow">←</span><span class="mf-carousel-swipe-copy"><b class="mf-carousel-swipe-count">01 / ${String(media.cards.length).padStart(2,'0')}</b><em>SWIPE</em></span><span class="mf-carousel-swipe-arrow">→</span></div>
         </div>
+        ${projectMediaCurtain()}
       </figure>`;
     }
-    return `<figure class="mf-project-slide mf-project-slide-image" data-slide="${i}"><div class="mf-project-image-viewport"><img src="${esc(media)}" alt="${esc(project.title)} project visual ${i+1}" loading="${i===0?'eager':'lazy'}" draggable="false"></div></figure>`;
+    return `<figure class="mf-project-slide mf-project-slide-image" data-slide="${i}"><div class="mf-project-image-viewport"><img src="${esc(media)}" alt="${esc(project.title)} project visual ${i+1}" loading="${i===0?'eager':'lazy'}" draggable="false"></div>${projectMediaCurtain()}</figure>`;
   }
 
   function renderProject(key){
@@ -467,6 +491,7 @@ if(indexExtra){
     fields.approach.textContent=project.approach;
     slides.innerHTML=project.images.map((media,i)=>renderMedia(project,media,i)).join("")+renderEndCard(key,project.images.length);
 
+    setupProjectMediaReveals();
     setupLiveSlides();
     setupCurator();
     setupStaticImageSlides();
@@ -479,6 +504,62 @@ if(indexExtra){
     overlay.scrollTop=0;
     updateCounter();
     updateActiveExtras();
+  }
+
+  function setupProjectMediaReveals(){
+    slides.querySelectorAll('.mf-project-slide:not(.mf-project-end-slide)').forEach(slide=>{
+      const markReady=()=>{
+        if(slide.classList.contains('is-media-ready'))return;
+        slide.classList.add('is-media-ready');
+        if(slide===slides.children[activeIndex])revealProjectSlide(slide);
+      };
+      slide._mfMediaReady=markReady;
+      setTimeout(markReady,6500);
+
+      if(slide.classList.contains('mf-project-slide-instagram'))return;
+      const iframe=slide.querySelector('iframe');
+      if(iframe){iframe.addEventListener('load',markReady,{once:true});return;}
+      const video=slide.querySelector(':scope > .mf-project-image-viewport > video');
+      if(video){
+        if(video.readyState>=2)markReady();
+        else{
+          video.addEventListener('loadeddata',markReady,{once:true});
+          video.addEventListener('error',markReady,{once:true});
+        }
+        return;
+      }
+      if(slide.classList.contains('mf-project-slide-carousel')){
+        const visible=[...slide.querySelectorAll('.mf-carousel-background, .mf-carousel-card-current img, img.mf-carousel-card-current')];
+        if(!visible.length){markReady();return;}
+        let remaining=visible.length;
+        const one=()=>{remaining-=1;if(remaining<=0)markReady();};
+        visible.forEach(img=>{
+          if(img.complete&&img.naturalWidth)one();
+          else{
+            img.addEventListener('load',one,{once:true});
+            img.addEventListener('error',one,{once:true});
+          }
+        });
+        return;
+      }
+      const image=slide.querySelector(':scope > .mf-project-image-viewport > img');
+      if(image){
+        if(image.complete&&image.naturalWidth)markReady();
+        else{
+          image.addEventListener('load',markReady,{once:true});
+          image.addEventListener('error',markReady,{once:true});
+        }
+        return;
+      }
+      markReady();
+    });
+  }
+
+  function revealProjectSlide(slide){
+    if(!slide||slide.dataset.mediaRevealed==='true'||!slide.classList.contains('is-media-ready'))return;
+    slide.dataset.mediaRevealed='true';
+    slide.classList.add('is-media-revealing');
+    setTimeout(()=>slide.classList.add('is-media-revealed'),1500);
   }
 
   function applyLiveState(slide,active){
@@ -511,7 +592,7 @@ if(indexExtra){
     const curatorHost=instagramSlide.querySelector('#curator-feed-default-feed-layout');
     const scriptSrc=instagramSlide.dataset.curatorSrc;
     let finished=false;
-    const finish=()=>{if(finished)return;finished=true;instagramSlide.classList.add('is-loaded');applyLiveState(instagramSlide,!!liveStates.instagram);};
+    const finish=()=>{if(finished)return;finished=true;instagramSlide.classList.add('is-loaded');instagramSlide._mfMediaReady?.();applyLiveState(instagramSlide,!!liveStates.instagram);};
     if(!curatorHost||!scriptSrc){finish();return;}
     const observer=new MutationObserver(()=>{const rendered=curatorHost.querySelector('.crt-feed, .crt-post, .crt-grid-post, iframe')||curatorHost.children.length>1;if(rendered){observer.disconnect();finish();}});
     observer.observe(curatorHost,{childList:true,subtree:true});
@@ -570,7 +651,7 @@ if(indexExtra){
   function setupCarousels(project){
     slides.querySelectorAll('.mf-project-slide-carousel').forEach(slide=>{
       const media=project.images[Number(slide.dataset.slide)];
-      if(!media||media.type!=="carousel")return;
+      if(!media||!(media.type==="carousel"||media.type==="mediaCarousel"))return;
       const root=slide.querySelector('.mf-goballer-carousel');
       let current=root.querySelector('.mf-carousel-card-current');
       let nextCard=root.querySelector('.mf-carousel-card-next');
@@ -583,12 +664,59 @@ if(indexExtra){
       const swipeCountEl=root.querySelector('.mf-carousel-swipe-count');
       let index=0,animating=false,isDown=false,startX=0,startY=0,moved=false,panStart=0;
       const cards=media.cards;
+      const mixed=media.type==="mediaCarousel";
       const wrap=n=>(n%cards.length+cards.length)%cards.length;
       const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
-      const preloadOne=src=>{const preload=new Image();preload.decoding='async';preload.src=src;};
+      const normalizeItem=item=>typeof item==="string"?{type:"image",src:item}:item;
+      const itemAt=n=>normalizeItem(cards[wrap(n)]);
+      const preloadOne=item=>{
+        const normalized=normalizeItem(item);
+        if(normalized.type==="video")return;
+        const preload=new Image();preload.decoding='async';preload.src=normalized.src;
+      };
       const preloadAround=at=>{[at-1,at,at+1].forEach(n=>preloadOne(cards[wrap(n)]));};
       if(mobileProjectLayout.matches)preloadAround(index);
       else cards.forEach(preloadOne);
+
+      function mountCard(card,item,itemIndex,showLoader=false){
+        const normalized=normalizeItem(item);
+        if(!mixed){
+          card.src=normalized.src;
+          card.alt=`GoBaller visual ${itemIndex+1}`;
+          card._mfReady=card.decode?.().catch(()=>{})||Promise.resolve();
+          return card._mfReady;
+        }
+        card.replaceChildren();
+        if(normalized.type==="video"){
+          const video=document.createElement('video');
+          video.src=normalized.src;
+          video.title=normalized.title||`Carousel video ${itemIndex+1}`;
+          video.muted=true;video.loop=true;video.playsInline=true;video.preload='auto';
+          card.appendChild(video);
+          if(showLoader)root.classList.add('is-loading-media');
+          card._mfReady=new Promise(resolve=>{
+            let finished=false;
+            const finish=()=>{
+              if(finished)return;finished=true;
+              if(showLoader)root.classList.remove('is-loading-media');
+              video.play().catch(()=>{});
+              resolve();
+            };
+            if(video.readyState>=2)finish();
+            else{
+              video.addEventListener('loadeddata',finish,{once:true});
+              video.addEventListener('error',finish,{once:true});
+              setTimeout(finish,5000);
+            }
+          });
+          return card._mfReady;
+        }
+        const img=document.createElement('img');
+        img.src=normalized.src;img.alt=normalized.title||`Carousel visual ${itemIndex+1}`;img.draggable=false;
+        card.appendChild(img);
+        card._mfReady=img.decode?.().catch(()=>{})||Promise.resolve();
+        return card._mfReady;
+      }
 
       function updateCursorLabel(){
         const zone=cursor.dataset.zone||'right';
@@ -613,12 +741,10 @@ if(indexExtra){
       }
 
       function prepareIncoming(target){
-        nextCard.src=cards[target];
-        nextCard.alt=`GoBaller visual ${target+1}`;
         nextCard.style.opacity='0';
         nextCard.style.transform='translate3d(0,0,0) scale(.96)';
         nextCard.style.filter='none';
-        return nextCard.decode?.().catch(()=>{})||Promise.resolve();
+        return mountCard(nextCard,cards[target],target,mixed&&itemAt(target).type==="video");
       }
 
       async function move(direction,fromGesture=false){
@@ -638,7 +764,7 @@ if(indexExtra){
         const enterFrom=direction>0?30:-30;
         const exitTo=direction>0?-30:30;
         const ready=fromGesture
-          ? (incoming.decode?.().catch(()=>{})||Promise.resolve())
+          ? (incoming._mfReady||incoming.decode?.().catch(()=>{})||Promise.resolve())
           : prepareIncoming(target);
         const outgoingFromTransform=fromGesture&&oldCurrent.style.transform
           ? oldCurrent.style.transform
@@ -690,8 +816,7 @@ if(indexExtra){
         nextCard.getAnimations().forEach(animation=>animation.cancel());
         current.removeAttribute('style');
         nextCard.removeAttribute('style');
-        nextCard.src=cards[wrap(index+direction)];
-        nextCard.alt='';
+        mountCard(nextCard,cards[wrap(index+direction)],wrap(index+direction),false);
 
         updateCursorLabel();
         if(mobileProjectLayout.matches)preloadAround(index);
@@ -767,8 +892,7 @@ if(indexExtra){
           const target=wrap(index+direction);
           if(direction!==swipeDirection||target!==swipeTarget){
             swipeDirection=direction;swipeTarget=target;
-            nextCard.src=cards[target];
-            nextCard.alt=`GoBaller visual ${target+1}`;
+            mountCard(nextCard,cards[target],target,mixed&&itemAt(target).type==="video");
           }
           const width=Math.max(1,root.clientWidth);
           const progress=Math.min(1,Math.abs(dx)/(width*.72));
@@ -900,6 +1024,7 @@ if(indexExtra){
 
   function updateActiveExtras(){
     const activeSlide=slides.children[activeIndex];
+    revealProjectSlide(activeSlide);
     currentCarousel=activeSlide?.querySelector('.mf-goballer-carousel')?._mfCarousel||null;
     if(controlsHint){
       controlsHint.innerHTML=currentCarousel?'↑ ↓ ← → [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And telekinesis':'↑ ↓ [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And your free will';
@@ -1147,7 +1272,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   loop();
 })();
 
-/* BIO TABS — stable crossfade with no layout or menu movement */
+/* BIO TABS — slower sequential fade, stable on desktop and mobile */
 (function(){
   const menu=document.querySelector('.mf-bio-menu');
   const wrapper=document.getElementById('mfBioPanels');
@@ -1172,32 +1297,39 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     });
   }
 
+  const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+
   async function showPanel(key){
     const next=wrapper.querySelector(`[data-bio-panel="${key}"]`);
     if(!next||next===active||switching)return;
     switching=true;
     setMenu(key);
 
-    const outgoing=active.animate(
+    const outgoing=active;
+    const outAnimation=outgoing.animate(
       [{opacity:1},{opacity:0}],
-      {duration:150,easing:'ease-out',fill:'forwards'}
+      {duration:330,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}
     );
-    await outgoing.finished.catch(()=>{});
+    await outAnimation.finished.catch(()=>{});
+    outAnimation.cancel();
 
-    active.classList.remove('is-active');
-    active.setAttribute('aria-hidden','true');
-    active.inert=true;
-    active.getAnimations().forEach(animation=>animation.cancel());
+    outgoing.classList.remove('is-active');
+    outgoing.setAttribute('aria-hidden','true');
+    outgoing.inert=true;
 
+    next.style.opacity='0';
     next.classList.add('is-active');
     next.setAttribute('aria-hidden','false');
     next.inert=false;
-    const incoming=next.animate(
+    await nextFrame();
+
+    const inAnimation=next.animate(
       [{opacity:0},{opacity:1}],
-      {duration:210,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'}
+      {duration:620,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'}
     );
-    await incoming.finished.catch(()=>{});
-    incoming.cancel();
+    await inAnimation.finished.catch(()=>{});
+    inAnimation.cancel();
+    next.style.opacity='';
 
     active=next;
     switching=false;

@@ -5641,3 +5641,163 @@ body.project-open .mf-nav-art {
     width: 22px !important;
   }
 }
+
+/* ============================================================
+   V47 — project media loader reveal, GoBaller app deck, BIO timing
+   ============================================================ */
+
+/* Every large project visual is covered until it is both ready and active.
+   The ten vertical panels use the same motion language as the homepage load. */
+.mf-project-slide:not(.mf-project-end-slide) {
+  position: relative;
+  isolation: isolate;
+}
+.mf-project-media-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  pointer-events: none;
+  overflow: hidden;
+  background: #000;
+}
+.mf-project-media-curtain span {
+  display: block;
+  min-width: 0;
+  background: #000;
+  transform: translate3d(0,0,0);
+  will-change: transform;
+}
+.mf-project-slide.is-media-revealing .mf-project-media-curtain {
+  background: transparent;
+}
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span {
+  animation: mfProjectMediaReveal .86s var(--ease) forwards;
+}
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(1) { animation-delay: 0s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(2) { animation-delay: .06s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(3) { animation-delay: .12s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(4) { animation-delay: .18s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(5) { animation-delay: .24s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(6) { animation-delay: .30s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(7) { animation-delay: .36s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(8) { animation-delay: .42s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(9) { animation-delay: .48s; }
+.mf-project-slide.is-media-revealing .mf-project-media-curtain span:nth-child(10) { animation-delay: .54s; }
+.mf-project-slide.is-media-revealed .mf-project-media-curtain {
+  visibility: hidden;
+}
+@keyframes mfProjectMediaReveal {
+  to { transform: translate3d(0,-102%,0); }
+}
+
+/* Mixed image/video GoBaller app carousel. The card itself is animated by the
+   existing carousel engine; its media always stays contained and in color. */
+.mf-goballer-app-carousel {
+  background: #000;
+}
+.mf-carousel-media-card {
+  width: min(86.4%, 1320px) !important;
+  height: 86.4% !important;
+  max-width: min(86.4%, 1320px) !important;
+  max-height: 86.4% !important;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+}
+.mf-carousel-media-card > img,
+.mf-carousel-media-card > video {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none;
+}
+.mf-carousel-runtime-loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 7;
+  width: min(260px, 58%);
+  transform: translate3d(-50%,-50%,0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .28s ease, visibility 0s linear .28s;
+}
+.mf-goballer-carousel.is-loading-media .mf-carousel-runtime-loader {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.mf-carousel-runtime-loader-copy {
+  margin-bottom: 10px;
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.74);
+  text-transform: uppercase;
+}
+.mf-carousel-runtime-loader-copy span {
+  animation: cursorBlink 1s steps(1) infinite;
+}
+.mf-carousel-runtime-loader-bars {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+  height: 2px;
+}
+.mf-carousel-runtime-loader-bars i {
+  display: block;
+  background: rgba(255,255,255,.58);
+  transform-origin: left center;
+  animation: mfCarouselLoaderBar .9s var(--ease) infinite alternate;
+}
+.mf-carousel-runtime-loader-bars i:nth-child(2) { animation-delay: .07s; }
+.mf-carousel-runtime-loader-bars i:nth-child(3) { animation-delay: .14s; }
+.mf-carousel-runtime-loader-bars i:nth-child(4) { animation-delay: .21s; }
+.mf-carousel-runtime-loader-bars i:nth-child(5) { animation-delay: .28s; }
+.mf-carousel-runtime-loader-bars i:nth-child(6) { animation-delay: .35s; }
+@keyframes mfCarouselLoaderBar {
+  from { transform: scaleX(.12); opacity: .3; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+/* On desktop, BIO navigation and active copy begin on the same row. */
+@media (min-width: 1025px) {
+  .mf-about {
+    grid-template-rows: auto auto;
+    row-gap: 30px;
+  }
+  .mf-about-title {
+    grid-row: 1;
+  }
+  .mf-bio-menu {
+    grid-row: 2;
+    margin-top: 0 !important;
+  }
+  .mf-about-layout {
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 1024px) {
+  .mf-carousel-media-card {
+    width: 90% !important;
+    height: 78% !important;
+    max-width: 90% !important;
+    max-height: 78% !important;
+  }
+  .mf-goballer-carousel.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
+    width: 96% !important;
+    height: 88% !important;
+    max-width: 96% !important;
+    max-height: 88% !important;
+  }
+}
