@@ -289,7 +289,7 @@ if(indexExtra){
   const goballerAppCards=[
     {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-1.jpg",title:"GoBaller iOS screen 1"},
     {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-2.jpg",title:"GoBaller iOS screen 2"},
-    {type:"video",src:"/vids/goballer/gb-app/gb-app.mp4",title:"GoBaller iOS product video"}
+    {type:"video",src:"/vids/goballer/gb-app/gb-app.mp4",fallbackSrc:"/vids/goballer/gb-app.mp4",title:"GoBaller iOS product video"}
   ];
 
   const projectData={
@@ -416,7 +416,11 @@ if(indexExtra){
   }
 
   function projectMediaCurtain(){
-    return `<div class="mf-project-media-curtain" aria-hidden="true">${"<span></span>".repeat(10)}</div>`;
+    return "";
+  }
+
+  function projectVideoLoader(copy="LOADING VIDEO"){
+    return `<div class="mf-project-video-loader" aria-hidden="true"><div class="mf-project-video-loader-copy">${esc(copy)}<span>_</span></div><div class="mf-project-video-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`;
   }
 
   function carouselItemMarkup(item,index){
@@ -456,14 +460,15 @@ if(indexExtra){
       </figure>`;
     }
     if(media&&typeof media==="object"&&media.type==="video"){
-      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}" title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video></div>${projectMediaCurtain()}</figure>`;
+      const fallback=media.fallbackSrc?` data-fallback-src="${esc(media.fallbackSrc)}"`:"";
+      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}"${fallback} title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video>${projectVideoLoader()}</div>${projectMediaCurtain()}</figure>`;
     }
     if(media&&typeof media==="object"&&(media.type==="carousel"||media.type==="mediaCarousel")){
       const mixed=media.type==="mediaCarousel";
       const first=media.cards[0];
       const second=media.cards[1]||first;
       return `<figure class="mf-project-slide mf-project-slide-carousel${mixed?' mf-project-slide-media-carousel':''}" data-slide="${i}" data-carousel="true">
-        <div class="mf-goballer-carousel${mixed?' mf-goballer-app-carousel':''}" aria-label="${esc(media.title||'Project carousel')}">
+        <div class="mf-goballer-carousel${mixed?' mf-goballer-app-carousel mf-carousel-fullframe':''}" aria-label="${esc(media.title||'Project carousel')}">
           ${media.background?`<img class="mf-carousel-background" src="${esc(media.background)}" alt="" draggable="false">`:''}
           <div class="mf-carousel-stage">
             ${mixed?`<div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-current">${carouselItemMarkup(first,0)}</div><div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-next" aria-hidden="true">${carouselItemMarkup(second,1)}</div>`:`<img class="mf-carousel-card mf-carousel-card-current" src="${esc(first)}" alt="GoBaller visual 1" draggable="false"><img class="mf-carousel-card mf-carousel-card-next" src="${esc(second)}" alt="" draggable="false" aria-hidden="true">`}
@@ -491,9 +496,9 @@ if(indexExtra){
     fields.approach.textContent=project.approach;
     slides.innerHTML=project.images.map((media,i)=>renderMedia(project,media,i)).join("")+renderEndCard(key,project.images.length);
 
-    setupProjectMediaReveals();
     setupLiveSlides();
     setupCurator();
+    setupProjectVideoLoaders();
     setupStaticImageSlides();
     setupCarousels(project);
     setupEndCard();
@@ -506,61 +511,46 @@ if(indexExtra){
     updateActiveExtras();
   }
 
-  function setupProjectMediaReveals(){
-    slides.querySelectorAll('.mf-project-slide:not(.mf-project-end-slide)').forEach(slide=>{
-      const markReady=()=>{
-        if(slide.classList.contains('is-media-ready'))return;
-        slide.classList.add('is-media-ready');
-        if(slide===slides.children[activeIndex])revealProjectSlide(slide);
+  function setupProjectVideoLoaders(){
+    slides.querySelectorAll('.mf-project-slide-video').forEach(slide=>{
+      const video=slide.querySelector(':scope .mf-project-video-viewport > video');
+      if(!video)return;
+      let fallbackUsed=false;
+      let done=false;
+      const timer=setTimeout(()=>{if(!done)slide.classList.add('is-video-loading');},1000);
+      const finish=()=>{
+        if(done)return;
+        done=true;
+        clearTimeout(timer);
+        slide.classList.remove('is-video-loading');
+        slide.classList.add('is-video-ready');
+        video.muted=true;
+        video.playsInline=true;
+        video.play().catch(()=>{});
       };
-      slide._mfMediaReady=markReady;
-      setTimeout(markReady,6500);
-
-      if(slide.classList.contains('mf-project-slide-instagram'))return;
-      const iframe=slide.querySelector('iframe');
-      if(iframe){iframe.addEventListener('load',markReady,{once:true});return;}
-      const video=slide.querySelector(':scope > .mf-project-image-viewport > video');
-      if(video){
-        if(video.readyState>=2)markReady();
-        else{
-          video.addEventListener('loadeddata',markReady,{once:true});
-          video.addEventListener('error',markReady,{once:true});
+      const tryFallback=()=>{
+        const fallback=video.dataset.fallbackSrc;
+        if(fallback&&!fallbackUsed){
+          fallbackUsed=true;
+          done=false;
+          video.src=fallback;
+          video.load();
+          return;
         }
-        return;
+        finish();
+      };
+      if(video.readyState>=2)finish();
+      else{
+        video.addEventListener('loadeddata',finish,{once:true});
+        video.addEventListener('canplay',finish,{once:true});
+        video.addEventListener('error',tryFallback,{once:true});
+        setTimeout(finish,8000);
       }
-      if(slide.classList.contains('mf-project-slide-carousel')){
-        const visible=[...slide.querySelectorAll('.mf-carousel-background, .mf-carousel-card-current img, img.mf-carousel-card-current')];
-        if(!visible.length){markReady();return;}
-        let remaining=visible.length;
-        const one=()=>{remaining-=1;if(remaining<=0)markReady();};
-        visible.forEach(img=>{
-          if(img.complete&&img.naturalWidth)one();
-          else{
-            img.addEventListener('load',one,{once:true});
-            img.addEventListener('error',one,{once:true});
-          }
-        });
-        return;
-      }
-      const image=slide.querySelector(':scope > .mf-project-image-viewport > img');
-      if(image){
-        if(image.complete&&image.naturalWidth)markReady();
-        else{
-          image.addEventListener('load',markReady,{once:true});
-          image.addEventListener('error',markReady,{once:true});
-        }
-        return;
-      }
-      markReady();
     });
   }
 
-  function revealProjectSlide(slide){
-    if(!slide||slide.dataset.mediaRevealed==='true'||!slide.classList.contains('is-media-ready'))return;
-    slide.dataset.mediaRevealed='true';
-    slide.classList.add('is-media-revealing');
-    setTimeout(()=>slide.classList.add('is-media-revealed'),1500);
-  }
+  function setupProjectMediaReveals(){}
+  function revealProjectSlide(){}
 
   function applyLiveState(slide,active){
     const key=slide.dataset.liveKey||"website";
@@ -592,7 +582,7 @@ if(indexExtra){
     const curatorHost=instagramSlide.querySelector('#curator-feed-default-feed-layout');
     const scriptSrc=instagramSlide.dataset.curatorSrc;
     let finished=false;
-    const finish=()=>{if(finished)return;finished=true;instagramSlide.classList.add('is-loaded');instagramSlide._mfMediaReady?.();applyLiveState(instagramSlide,!!liveStates.instagram);};
+    const finish=()=>{if(finished)return;finished=true;instagramSlide.classList.add('is-loaded');applyLiveState(instagramSlide,!!liveStates.instagram);};
     if(!curatorHost||!scriptSrc){finish();return;}
     const observer=new MutationObserver(()=>{const rendered=curatorHost.querySelector('.crt-feed, .crt-post, .crt-grid-post, iframe')||curatorHost.children.length>1;if(rendered){observer.disconnect();finish();}});
     observer.observe(curatorHost,{childList:true,subtree:true});
@@ -690,23 +680,38 @@ if(indexExtra){
         if(normalized.type==="video"){
           const video=document.createElement('video');
           video.src=normalized.src;
+          if(normalized.fallbackSrc)video.dataset.fallbackSrc=normalized.fallbackSrc;
           video.title=normalized.title||`Carousel video ${itemIndex+1}`;
           video.muted=true;video.loop=true;video.playsInline=true;video.preload='auto';
+          video.autoplay=true;
           card.appendChild(video);
-          if(showLoader)root.classList.add('is-loading-media');
           card._mfReady=new Promise(resolve=>{
             let finished=false;
+            let fallbackUsed=false;
+            const loaderTimer=showLoader?setTimeout(()=>{if(!finished)root.classList.add('is-loading-media');},1000):0;
             const finish=()=>{
               if(finished)return;finished=true;
-              if(showLoader)root.classList.remove('is-loading-media');
+              if(loaderTimer)clearTimeout(loaderTimer);
+              root.classList.remove('is-loading-media');
               video.play().catch(()=>{});
               resolve();
+            };
+            const fail=()=>{
+              const fallback=video.dataset.fallbackSrc;
+              if(fallback&&!fallbackUsed){
+                fallbackUsed=true;
+                video.src=fallback;
+                video.load();
+                return;
+              }
+              finish();
             };
             if(video.readyState>=2)finish();
             else{
               video.addEventListener('loadeddata',finish,{once:true});
-              video.addEventListener('error',finish,{once:true});
-              setTimeout(finish,5000);
+              video.addEventListener('canplay',finish,{once:true});
+              video.addEventListener('error',fail,{once:true});
+              setTimeout(finish,8000);
             }
           });
           return card._mfReady;
@@ -1024,7 +1029,6 @@ if(indexExtra){
 
   function updateActiveExtras(){
     const activeSlide=slides.children[activeIndex];
-    revealProjectSlide(activeSlide);
     currentCarousel=activeSlide?.querySelector('.mf-goballer-carousel')?._mfCarousel||null;
     if(controlsHint){
       controlsHint.innerHTML=currentCarousel?'↑ ↓ ← → [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And telekinesis':'↑ ↓ [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And your free will';

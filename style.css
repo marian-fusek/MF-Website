@@ -5801,3 +5801,147 @@ body.project-open .mf-nav-art {
     max-height: 88% !important;
   }
 }
+
+/* ============================================================
+   V48 — clean project media, full-frame app deck, delayed video loaders
+   ============================================================ */
+
+/* The homepage keeps its own loader. Project media never uses that curtain. */
+.mf-project-media-curtain {
+  display: none !important;
+}
+
+/* Standalone project videos show a restrained loader only when loading lasts
+   longer than one second. */
+.mf-project-video-viewport {
+  position: relative;
+  isolation: isolate;
+}
+.mf-project-video-loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 8;
+  width: min(260px, 58%);
+  transform: translate3d(-50%,-50%,0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .3s ease, visibility 0s linear .3s;
+}
+.mf-project-slide-video.is-video-loading .mf-project-video-loader {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.mf-project-video-loader-copy {
+  margin-bottom: 10px;
+  font-family: "Geist Mono", monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.74);
+  text-transform: uppercase;
+}
+.mf-project-video-loader-copy span {
+  animation: cursorBlink 1s steps(1) infinite;
+}
+.mf-project-video-loader-bars {
+  display: grid;
+  grid-template-columns: repeat(6,1fr);
+  gap: 3px;
+  height: 2px;
+}
+.mf-project-video-loader-bars i {
+  display: block;
+  background: rgba(255,255,255,.58);
+  transform-origin: left center;
+  animation: mfCarouselLoaderBar .9s var(--ease) infinite alternate;
+}
+.mf-project-video-loader-bars i:nth-child(2){animation-delay:.07s}
+.mf-project-video-loader-bars i:nth-child(3){animation-delay:.14s}
+.mf-project-video-loader-bars i:nth-child(4){animation-delay:.21s}
+.mf-project-video-loader-bars i:nth-child(5){animation-delay:.28s}
+.mf-project-video-loader-bars i:nth-child(6){animation-delay:.35s}
+
+/* GoBaller frame three is a true full-frame media carousel. Frame two keeps
+   its smaller screens on the permanent field background. */
+.mf-project-slide-media-carousel .mf-carousel-fullframe,
+.mf-project-slide-media-carousel .mf-carousel-stage {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000 !important;
+}
+.mf-project-slide-media-carousel .mf-carousel-media-card {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  box-shadow: none !important;
+  background: #000 !important;
+}
+.mf-project-slide-media-carousel .mf-carousel-media-card > img,
+.mf-project-slide-media-carousel .mf-carousel-media-card > video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  filter: none !important;
+}
+
+/* Desktop BIO navigation begins exactly at the first line of active copy. */
+@media (min-width: 1025px) {
+  .mf-bio-menu {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    align-self: start !important;
+    transform: none !important;
+  }
+  .mf-about-layout,
+  .mf-about-text,
+  .mf-bio-panels,
+  .mf-bio-panel > :first-child {
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* With the overlay at rest, remove its transformed containing block so the
+     fixed close control remains attached to the viewport through every slide. */
+  .mf-overlay.is-visible {
+    transform: none !important;
+  }
+  .mf-overlay.active .mf-close,
+  body.project-open .mf-overlay .mf-close {
+    position: fixed !important;
+    top: max(8px, env(safe-area-inset-top)) !important;
+    right: 8px !important;
+    z-index: 10020 !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* The app deck fills the same mobile viewport as ordinary project media.
+     It remains swipeable, but it is never presented as a smaller card. */
+  .mf-project-slide-media-carousel .mf-carousel-media-card,
+  .mf-project-slide-media-carousel .mf-goballer-carousel.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform-origin: center !important;
+  }
+  .mf-project-slide-media-carousel .mf-carousel-media-card > img,
+  .mf-project-slide-media-carousel .mf-carousel-media-card > video {
+    object-fit: cover !important;
+  }
+  .mf-project-slide-media-carousel .mf-goballer-carousel.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
+    transform: translate3d(0,0,0) scale(1) !important;
+  }
+}
