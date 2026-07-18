@@ -8,11 +8,6 @@
 </head>
 <body class="mf-preload-locked">
 
-<div class="mf-wip-gate" id="mfWipGate" role="button" tabindex="0" aria-label="Enter website">
-  <div class="mf-wip-message"><div class="mf-wip-copy">Work in progress, chill!</div><div class="mf-wip-subcopy">But feel free to close this and intrude...</div></div>
-  <div class="mf-wip-cursor" id="mfWipCursor" aria-hidden="true">×</div>
-</div>
-
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
   <defs>
     <filter id="motionBlur" x="-20%" width="140%" y="0%" height="100%">
@@ -24,11 +19,21 @@
 <div id="mf">
 
   <div class="mf-loader" id="mfLoader" aria-hidden="true">
-    <div class="mf-loader-inner">
+    <div class="mf-loader-ink" id="mfLoaderInk">
+      <span class="mf-loader-blob b1"></span>
+      <span class="mf-loader-blob b2"></span>
+      <span class="mf-loader-blob b3"></span>
+      <span class="mf-loader-blob b4"></span>
+      <span class="mf-loader-blob b5"></span>
+      <span class="mf-loader-blob b6"></span>
+      <div class="mf-loader-edge" id="mfLoaderEdge" aria-hidden="true"></div>
+    </div>
+    <div class="mf-loader-hud">
       <div class="mf-loader-progress" id="mfLoaderProgress">00%</div>
-      <div class="mf-loader-bar-track"><div class="mf-loader-bar-fill" id="mfLoaderBar"></div></div>
-      <div class="mf-loader-ascii" id="mfLoaderAscii">// booting tasteful chaos</div>
-      <div class="mf-loader-particles" id="mfLoaderParticles" aria-hidden="true"></div>
+    </div>
+    <div class="mf-loader-reveal" id="mfLoaderReveal" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
     </div>
   </div>
 
