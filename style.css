@@ -5147,7 +5147,7 @@ body.project-open .mf-nav-art {
     transform: translate3d(var(--carousel-pan-x, 0px),0,0) scale(1.36) !important;
     transition: transform .18s ease-out !important;
   }
-  .mf-goballer-carousel.is-expanded .mf-carousel-swipe-hint {
+  .mf-goballer-carousel.is-expanded:not(.is-current-video) .mf-carousel-swipe-hint {
     opacity: 0 !important;
   }
   .mf-carousel-swipe-hint {
@@ -5943,5 +5943,103 @@ body.project-open .mf-nav-art {
   }
   .mf-project-slide-media-carousel .mf-goballer-carousel.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
     transform: translate3d(0,0,0) scale(1) !important;
+  }
+}
+
+/* ============================================================
+   V49 — mobile project media: contain first, tap to immerse
+   ============================================================ */
+@media (max-width: 1024px) {
+  /* Ordinary project still images are fully visible on arrival. Tapping
+     returns them to the immersive cover view where horizontal dragging
+     exposes the cropped sides. Videos keep their established behavior.
+     MIUNĀE slide 01 is deliberately initialized expanded. */
+  .mf-project-image-viewport.is-fit > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: 50% 50% !important;
+    transform: none !important;
+    background: #000 !important;
+  }
+
+  .mf-project-image-viewport:not(.is-fit) > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: var(--image-x, 50%) 50% !important;
+  }
+
+  /* Frame 02: keep the full small screen visible for swiping. Once tapped,
+     the selected screen becomes a viewport-filling cover and the existing
+     drag controller pans that expanded canvas. */
+  .mf-project-slide-carousel:not(.mf-project-slide-media-carousel)
+  .mf-goballer-carousel:not(.is-expanded) .mf-carousel-card-current {
+    width: auto !important;
+    height: auto !important;
+    max-width: 90% !important;
+    max-height: 82% !important;
+    object-fit: contain !important;
+    transform: translate3d(0,0,0) scale(1) !important;
+  }
+
+  .mf-project-slide-carousel:not(.mf-project-slide-media-carousel)
+  .mf-goballer-carousel.is-expanded .mf-carousel-card-current {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    transform: translate3d(var(--carousel-pan-x, 0px),0,0) scale(1.08) !important;
+    box-shadow: none !important;
+  }
+
+  /* In mixed full-frame decks, only still-image cards use the two-state
+     contain/expand model. Video cards retain their previous full-frame view. */
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image:not(.is-expanded) .mf-carousel-media-card {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform: translate3d(0,0,0) scale(1) !important;
+  }
+
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image:not(.is-expanded) .mf-carousel-media-card > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    transform: none !important;
+    background: #000 !important;
+  }
+
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform: translate3d(var(--carousel-pan-x, 0px),0,0) scale(1.28) !important;
+    transform-origin: center center !important;
+  }
+
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image.is-expanded .mf-carousel-media-card.mf-carousel-card-current > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    background: #000 !important;
+  }
+
+  /* Swipe guidance belongs only to the fully-visible/collapsed state. */
+  .mf-goballer-carousel.is-expanded .mf-carousel-swipe-hint {
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 }

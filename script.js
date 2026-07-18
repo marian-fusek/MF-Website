@@ -205,16 +205,16 @@ if(indexExtra){
 (function(){
   const previewImages={
     "01":[
-      "/images/projects/miunae/01-miunae-logo.jpg",
-      "/images/projects/miunae/02-miunae-web.jpg",
-      "/images/projects/miunae/03-miunae-insta.jpg",
-      "/images/projects/miunae/04-miunae-all.jpg",
-      "/images/projects/miunae/05-miunae-brandkit.jpg"
+      "/media/projects/miunae/01-miunae-logo.jpg",
+      "/media/projects/miunae/02-miunae-web.jpg",
+      "/media/projects/miunae/03-miunae-insta.jpg",
+      "/media/projects/miunae/04-miunae-all.jpg",
+      "/media/projects/miunae/05-miunae-brandkit.jpg"
     ],
     "02":[
-      "/images/projects/goballer/01-goballer-logo.jpg",
-      "/images/projects/goballer/02-goballer-brand.jpg",
-      "/images/projects/goballer/03-goballer-app.jpg",
+      "/media/projects/goballer/01-goballer-logo.jpg",
+      "/media/projects/goballer/02-goballer-brand.jpg",
+      "/media/projects/goballer/03-goballer-app.jpg",
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=76",
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
     ],
@@ -284,12 +284,13 @@ if(indexExtra){
     "03-0.jpg","03-1.jpg","03-2.jpg",
     "04-0.jpg","04-1.jpg","04-2.jpg","04-3.jpg","04-4.jpg","04-5.jpg",
     "05-0.jpg"
-  ].map(name=>`/images/projects/goballer/brand/${name}`);
+  ].map(name=>`/media/projects/goballer/brand/${name}`);
 
   const goballerAppCards=[
-    {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-1.jpg",title:"GoBaller iOS screen 1"},
-    {type:"image",src:"/images/projects/goballer/app/03-goballer-ios-2.jpg",title:"GoBaller iOS screen 2"},
-    {type:"video",src:"/vids/goballer/gb-app/gb-app.mp4",fallbackSrc:"/vids/goballer/gb-app.mp4",title:"GoBaller iOS product video"}
+    {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-1.jpg",title:"GoBaller iOS screen 1"},
+    {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-2.jpg",title:"GoBaller iOS screen 2"},
+    {type:"video",src:"/media/projects/goballer/app/03-goballer-ios-3.mp4",title:"GoBaller iOS product video"},
+    {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-4.jpg",title:"GoBaller iOS screen 4"}
   ];
 
   const projectData={
@@ -300,10 +301,10 @@ if(indexExtra){
       context:"MIUNĀE needed to enter a saturated skincare category without resembling another polished wellness brand. Its formulas carried real history, but the story had to feel immediate rather than nostalgic. The work needed enough discipline to feel premium and enough tension to remain alive.",
       approach:"I built the identity around time as both ingredient and attitude. Typography, material choices and imagery were reduced until every element felt deliberate. The resulting system moves between quiet control and botanical overgrowth while staying recognizably MIUNĀE.",
       images:[
-        "/images/projects/miunae/01-miunae-logo.jpg",
+        "/media/projects/miunae/01-miunae-logo.jpg",
         {type:"iframe",src:"https://www.miunae.com/",title:"MIUNĀE live website",liveKey:"website"},
         {type:"curator",src:"https://cdn.curator.io/published/8bcd46ff-7c2b-4fd0-baa3-8d3df4db1ee3.js",title:"@miunae.beauty live feed",liveKey:"instagram"},
-        "/images/projects/miunae/04-miunae-all.jpg",
+        "/media/projects/miunae/04-miunae-all.jpg",
         {type:"iframe",src:"https://www.miunae.com/brand-kit",title:"MIUNĀE live brand kit",liveKey:"brandKit"}
       ]
     },
@@ -314,8 +315,8 @@ if(indexExtra){
       context:"GoBaller had to work for ambitious young players, parents and experienced coaches at the same time. The product contained a deep training system, but the interface could not feel technical or intimidating. It needed credibility on the pitch and clarity in the hand.",
       approach:"I organized the product around progression, repetition and visible momentum. The identity borrows energy from sport without relying on predictable visual clichés. Every screen was shaped to keep the next useful action obvious while preserving a strong, ownable character.",
       images:[
-        {type:"video",src:"/vids/goballer/gb.mp4",title:"GoBaller product film"},
-        {type:"carousel",background:"/images/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
+        {type:"video",src:"/media/projects/goballer/logo/01-goballer-logo.mp4",title:"GoBaller product film"},
+        {type:"carousel",background:"/media/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
         {type:"mediaCarousel",cards:goballerAppCards,title:"GoBaller iOS application"},
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=88",
         "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
@@ -599,6 +600,19 @@ if(indexExtra){
     slides.querySelectorAll('.mf-project-slide-image .mf-project-image-viewport').forEach(viewport=>{
       const media=viewport.querySelector('img, video');
       if(!media)return;
+
+      /* V49's contain-first state applies only to still images. Videos keep
+         their established V48 presentation and interaction unchanged. */
+      const isStillImage=media.tagName==='IMG';
+      if(isStillImage){
+        const slide=viewport.closest('.mf-project-slide');
+        const isMiunaeOpeningImage=currentProjectKey==='01'&&Number(slide?.dataset.slide)===0;
+        viewport.classList.toggle('is-fit',!isMiunaeOpeningImage);
+        viewport.dataset.position='50';
+      }else{
+        viewport.classList.remove('is-fit');
+      }
+
       let downX=0,downY=0,startPosition=50,moved=false,dragging=false,isDown=false;
       viewport.style.setProperty('--image-x','50%');
       viewport.addEventListener('pointerdown',event=>{
@@ -659,6 +673,18 @@ if(indexExtra){
       const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
       const normalizeItem=item=>typeof item==="string"?{type:"image",src:item}:item;
       const itemAt=n=>normalizeItem(cards[wrap(n)]);
+      const syncCurrentMediaType=()=>{
+        if(!mixed)return;
+        const type=itemAt(index).type==='video'?'video':'image';
+        root.classList.toggle('is-current-image',type==='image');
+        root.classList.toggle('is-current-video',type==='video');
+        if(type==='video'){
+          root.classList.remove('is-expanded');
+          root.dataset.panX='0';
+          root.style.setProperty('--carousel-pan-x','0px');
+        }
+      };
+      syncCurrentMediaType();
       const preloadOne=item=>{
         const normalized=normalizeItem(item);
         if(normalized.type==="video")return;
@@ -809,6 +835,7 @@ if(indexExtra){
 
         await Promise.allSettled([outgoing.finished,incomingAnimation.finished]);
         index=target;
+        syncCurrentMediaType();
 
         oldCurrent.classList.remove('mf-carousel-card-current');
         oldCurrent.classList.add('mf-carousel-card-next');
@@ -931,9 +958,14 @@ if(indexExtra){
           }else{
             clearSwipePreview();
             if(!moved){
-              root.classList.add('is-expanded');
-              root.dataset.panX='0';
-              root.style.setProperty('--carousel-pan-x','0px');
+              /* Only still-image cards use the new contain/expand model.
+                 Video cards retain their established full-frame behavior. */
+              const canExpand=!mixed||itemAt(index).type!=='video';
+              if(canExpand){
+                root.classList.add('is-expanded');
+                root.dataset.panX='0';
+                root.style.setProperty('--carousel-pan-x','0px');
+              }
             }
           }
         };
