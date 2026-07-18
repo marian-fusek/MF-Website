@@ -23,9 +23,13 @@
 
 <div id="mf">
 
-  <div class="mf-loader" id="mfLoader">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
+  <div class="mf-loader" id="mfLoader" aria-hidden="true">
+    <div class="mf-loader-inner">
+      <div class="mf-loader-progress" id="mfLoaderProgress">00%</div>
+      <div class="mf-loader-bar-track"><div class="mf-loader-bar-fill" id="mfLoaderBar"></div></div>
+      <div class="mf-loader-ascii" id="mfLoaderAscii">// booting tasteful chaos</div>
+      <div class="mf-loader-particles" id="mfLoaderParticles" aria-hidden="true"></div>
+    </div>
   </div>
 
   <div class="mf-grid" id="mfGrid"></div>
@@ -266,6 +270,7 @@
 
 
   <div class="mf-art-overlay" id="mfArtOverlay" aria-hidden="true">
+    <div class="mf-art-runtime-loader" id="mfArtRuntimeLoader" aria-hidden="true"><div class="mf-loader-progress">00%</div><div class="mf-loader-bar-track"><div class="mf-loader-bar-fill"></div></div><div class="mf-loader-ascii">// loading MF art</div></div>
     <div class="mf-art-particles" id="mfArtParticles" aria-hidden="true"></div>
     <div class="mf-art-world" id="mfArtWorld" aria-label="Draggable infinite art gallery"></div>
     <div class="mf-art-intro" id="mfArtIntro">
@@ -294,9 +299,9 @@
     <button class="mf-donation-close" id="mfDonationClose" type="button" aria-label="Close donation"><span></span><span></span></button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/p5.min.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/p5.min.js" defer></script>
+  <script src="script.js" defer></script>
 </div>
 </body>
 </html>
