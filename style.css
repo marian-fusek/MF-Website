@@ -5578,3 +5578,66 @@ body.project-open .mf-nav-art {
     touch-action: pan-y pinch-zoom !important;
   }
 }
+
+/* ============================================================
+   V46 — stable BIO tabs, smooth portrait tracking, mobile project close
+   ============================================================ */
+
+/* Active BIO state is communicated by color only — never an underline. */
+.mf-bio-menu-item::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Stack all panels in one grid cell. Their shared grid track adopts the
+   tallest panel, so changing copy cannot move the menu or jump the page. */
+.mf-bio-panels {
+  display: grid !important;
+  width: 100%;
+  overflow: visible !important;
+  transition: none !important;
+}
+.mf-bio-panel {
+  display: block !important;
+  grid-area: 1 / 1;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.mf-bio-panel.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Continuous JS tracking and a CSS transform transition fight each other.
+   Let the frame loop own transform; retain only reveal and glitch easing. */
+.mf-photo-card {
+  transition: opacity 1s var(--ease), filter .16s linear !important;
+  will-change: transform, filter;
+}
+
+@media (max-width: 1024px) {
+  /* Keep project dismissal available over every image, video and embedded
+     frame, aligned to the same top edge as the fixed MF navigation mark. */
+  .mf-overlay .mf-close {
+    position: fixed !important;
+    top: max(9px, env(safe-area-inset-top)) !important;
+    right: 8px !important;
+    z-index: 9999 !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
+  }
+  .mf-overlay.is-visible .mf-close {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .mf-overlay .mf-close span {
+    top: 11px !important;
+    width: 22px !important;
+  }
+}
