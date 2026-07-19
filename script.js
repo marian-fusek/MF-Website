@@ -370,8 +370,8 @@ if(indexExtra){
       context:"AIMS had technology with unusual depth, but its value was difficult to communicate outside technical conversations. Buyers needed to understand the advantage quickly while still believing the system could handle professional-scale catalogs. The brand had to bridge engineering precision and creative intuition.",
       approach:"I reframed the platform around the moments where search changes the work itself. Product language became more direct, the identity gained focus and the sales story moved from feature inventory to practical leverage. The system gives the technology room to feel sophisticated without becoming abstract.",
       images:[
-        {type:"video",src:"/media/projects/aims/logo/01-aims-logo.mp4",title:"AIMS logo animation",note:"[Not part of the redesign]"},
-        {type:"iframe",src:"https://aimsapi.com",title:"AIMS live website",liveKey:"aimsWebsite",loaderCopy:"LOADING AIMSAPI.COM"}
+        {type:"video",src:"/media/projects/aims/logo/01-aims-logo.mp4",title:"AIMS logo animation",note:"[NOT PART OF THE REDESIGN]"},
+        {type:"verticalGallery",background:"/media/projects/aims/web/02-aims-bgr.jpg",cards:["/media/projects/aims/web/01-hp.jpg"],title:"AIMS website"}
       ]
     },
     "04":{
@@ -420,7 +420,7 @@ if(indexExtra){
   let wheelReset=0;
   let projectSwitching=false;
   let currentCarousel=null;
-  const liveStates={website:false,instagram:false,brandKit:false,aimsWebsite:false};
+  const liveStates={website:false,instagram:false,brandKit:false};
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
   const esc=s=>String(s).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
@@ -435,11 +435,6 @@ if(indexExtra){
       return active
         ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
         : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM / BRAND-KIT</span>';
-    }
-    if(key==="aimsWebsite"){
-      return active
-        ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
-        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> AIMSAPI.COM</span>';
     }
     return active
       ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
@@ -504,6 +499,22 @@ if(indexExtra){
         ${projectMediaCurtain()}
       </figure>`;
     }
+    if(media&&typeof media==="object"&&media.type==="verticalGallery"){
+      const cards=Array.isArray(media.cards)?media.cards:[];
+      const first=cards[0]||"";
+      return `<figure class="mf-project-slide mf-project-slide-vertical-gallery" data-slide="${i}">
+        <div class="mf-vertical-gallery${cards.length<2?' is-single':''}" aria-label="${esc(media.title||'Vertical project gallery')}">
+          <img class="mf-vertical-gallery-background" src="${esc(media.background||'')}" alt="" draggable="false">
+          <div class="mf-vertical-scroll">
+            <div class="mf-vertical-scroll-inner"><img class="mf-vertical-gallery-image" src="${esc(first)}" alt="${esc(media.title||project.title+' website')}" draggable="false"></div>
+          </div>
+          <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous gallery image"></button>
+          <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next gallery image"></button>
+          <div class="mf-carousel-cursor" aria-hidden="true"><div class="mf-carousel-cursor-inner"><b>→</b><span># 01</span></div></div>
+          <button class="mf-live-toggle mf-vertical-toggle" type="button" aria-pressed="false"><span class="mf-live-toggle-label"><em>[ENABLE]</em> SCROLL FOR THE WHOLE THING!</span></button>
+        </div>
+      </figure>`;
+    }
     if(media&&typeof media==="object"&&media.type==="video"){
       const fallback=media.fallbackSrc?` data-fallback-src="${esc(media.fallbackSrc)}"`:"";
       const note=media.note?`<div class="mf-project-media-note">${esc(media.note)}</div>`:"";
@@ -547,6 +558,7 @@ if(indexExtra){
     setupProjectVideoLoaders();
     setupStaticImageSlides();
     setupCarousels(project);
+    setupVerticalGalleries(project);
     setupEndCard();
 
     activeIndex=0;
@@ -996,6 +1008,95 @@ if(indexExtra){
     });
   }
 
+  function setupVerticalGalleries(project){
+    slides.querySelectorAll('.mf-project-slide-vertical-gallery').forEach(slide=>{
+      const media=project.images[Number(slide.dataset.slide)];
+      if(!media||media.type!=="verticalGallery")return;
+      const root=slide.querySelector('.mf-vertical-gallery');
+      const scroller=root?.querySelector('.mf-vertical-scroll');
+      const image=root?.querySelector('.mf-vertical-gallery-image');
+      const toggle=root?.querySelector('.mf-vertical-toggle');
+      const leftZone=root?.querySelector('.mf-carousel-zone-left');
+      const rightZone=root?.querySelector('.mf-carousel-zone-right');
+      const cursor=root?.querySelector('.mf-carousel-cursor');
+      const arrow=cursor?.querySelector('b');
+      const number=cursor?.querySelector('span');
+      const cards=Array.isArray(media.cards)?media.cards:[];
+      if(!root||!scroller||!image||!toggle||!cards.length)return;
+      let index=0,enabled=false,moving=false,startX=0,startY=0;
+      const wrap=n=>(n%cards.length+cards.length)%cards.length;
+      const label=n=>`# ${String(wrap(n)+1).padStart(2,'0')}`;
+      const setEnabled=value=>{
+        enabled=value;
+        root.classList.toggle('is-scroll-enabled',enabled);
+        toggle.setAttribute('aria-pressed',enabled?'true':'false');
+        toggle.innerHTML=enabled
+          ? '<span class="mf-live-toggle-label">EXIT THE SCROLL</span>'
+          : '<span class="mf-live-toggle-label"><em>[ENABLE]</em> SCROLL FOR THE WHOLE THING!</span>';
+      };
+      const updateCursor=zone=>{
+        if(!arrow||!number)return;
+        arrow.textContent=zone==='left'?'←':'→';
+        number.textContent=zone==='left'?label(index-1):label(index+1);
+      };
+      const move=async direction=>{
+        if(moving||cards.length<2)return;
+        moving=true;
+        const target=wrap(index+direction);
+        const exit=direction>0?-24:24;
+        const enter=direction>0?24:-24;
+        await image.animate([
+          {opacity:1,transform:'translate3d(0,0,0) scale(1)'},
+          {opacity:0,transform:`translate3d(${exit}px,0,0) scale(.985)`}
+        ],{duration:380,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}).finished.catch(()=>{});
+        image.src=cards[target];
+        await (image.decode?.().catch(()=>{})||Promise.resolve());
+        scroller.scrollTop=0;
+        const incoming=image.animate([
+          {opacity:0,transform:`translate3d(${enter}px,0,0) scale(.985)`},
+          {opacity:1,transform:'translate3d(0,0,0) scale(1)'}
+        ],{duration:620,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+        await incoming.finished.catch(()=>{});
+        incoming.cancel();
+        index=target;
+        updateCursor(cursor?.dataset.zone||'right');
+        moving=false;
+      };
+      toggle.addEventListener('click',event=>{
+        event.preventDefault();event.stopPropagation();setEnabled(!enabled);
+      });
+      leftZone?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(!enabled)move(-1);});
+      rightZone?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(!enabled)move(1);});
+      root.addEventListener('pointermove',event=>{
+        if(mobileProjectLayout.matches||enabled||cards.length<2||!cursor)return;
+        const rect=root.getBoundingClientRect();
+        const zone=event.clientX-rect.left<rect.width/2?'left':'right';
+        cursor.dataset.zone=zone;updateCursor(zone);
+        cursor.style.transform=`translate3d(${event.clientX-rect.left}px,${event.clientY-rect.top}px,0)`;
+        cursor.classList.add('is-visible');
+      });
+      root.addEventListener('pointerleave',()=>cursor?.classList.remove('is-visible'));
+      root.addEventListener('touchstart',event=>{
+        if(enabled||cards.length<2)return;
+        const touch=event.touches[0];if(!touch)return;startX=touch.clientX;startY=touch.clientY;
+      },{passive:true});
+      root.addEventListener('touchend',event=>{
+        if(enabled||cards.length<2)return;
+        const touch=event.changedTouches[0];if(!touch)return;
+        const dx=touch.clientX-startX,dy=touch.clientY-startY;
+        if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)+8)move(dx<0?1:-1);
+      },{passive:true});
+      scroller.addEventListener('wheel',event=>{
+        if(!enabled)return;
+        event.stopPropagation();
+      },{passive:true});
+      setEnabled(false);
+      updateCursor('right');
+      const api={root,slide,move,get index(){return index;}};
+      root._mfCarousel=cards.length>1?api:null;
+    });
+  }
+
   function setupEndCard(){
     const endCard=slides.querySelector('.mf-project-end-card');
     if(!endCard)return;
@@ -1082,7 +1183,7 @@ if(indexExtra){
 
   function updateActiveExtras(){
     const activeSlide=slides.children[activeIndex];
-    currentCarousel=activeSlide?.querySelector('.mf-goballer-carousel')?._mfCarousel||null;
+    currentCarousel=(activeSlide?.querySelector('.mf-goballer-carousel, .mf-vertical-gallery'))?._mfCarousel||null;
     if(controlsHint){
       controlsHint.innerHTML=currentCarousel?'↑ ↓ ← → [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And telekinesis':'↑ ↓ [ESC]&nbsp;&nbsp;–&nbsp;&nbsp;And your free will';
       controlsHint.classList.toggle('is-carousel',!!currentCarousel);
@@ -1170,6 +1271,7 @@ if(indexExtra){
     if(mobileProjectLayout.matches)return;
     if(event.target.closest?.(".mf-project-slide-instagram.is-browsing .mf-instagram-embed-host"))return;
     if(event.target.closest?.(".mf-project-slide-live.is-browsing iframe"))return;
+    if(event.target.closest?.(".mf-vertical-gallery.is-scroll-enabled .mf-vertical-scroll"))return;
     event.preventDefault();
     if(wheelLocked)return;
     wheelTotal+=event.deltaY;

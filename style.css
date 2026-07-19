@@ -6940,3 +6940,85 @@ body.mf-name-revealed .mf-hero-name {
     margin:0 !important;
   }
 }
+
+/* ============================================================
+   V64 — reusable vertical gallery
+   ============================================================ */
+.mf-project-slide-vertical-gallery { position:relative; }
+.mf-vertical-gallery {
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  isolation:isolate;
+  background:#000;
+}
+.mf-vertical-gallery-background {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0;
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  filter:none !important;
+  transform:none !important;
+}
+.mf-vertical-scroll {
+  position:absolute;
+  inset:0;
+  z-index:2;
+  overflow:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+  touch-action:pan-y;
+}
+.mf-vertical-scroll::-webkit-scrollbar { display:none; }
+.mf-vertical-gallery.is-scroll-enabled .mf-vertical-scroll {
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  cursor:ns-resize;
+}
+.mf-vertical-scroll-inner {
+  box-sizing:border-box;
+  width:100%;
+  min-height:100%;
+  padding:80px 80px 80px;
+}
+.mf-vertical-gallery-image {
+  display:block;
+  width:100% !important;
+  height:auto !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  object-position:top center !important;
+  filter:none !important;
+  transform:none;
+  will-change:opacity,transform;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.mf-vertical-toggle { z-index:20; }
+.mf-vertical-gallery.is-scroll-enabled .mf-carousel-zone,
+.mf-vertical-gallery.is-scroll-enabled .mf-carousel-cursor,
+.mf-vertical-gallery.is-single .mf-carousel-zone,
+.mf-vertical-gallery.is-single .mf-carousel-cursor {
+  display:none !important;
+}
+@media (max-width:1024px) {
+  .mf-vertical-scroll-inner {
+    padding:12px 12px 72px;
+  }
+  .mf-vertical-gallery-image {
+    width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+  .mf-vertical-gallery.is-scroll-enabled .mf-vertical-scroll {
+    touch-action:pan-y !important;
+  }
+}
