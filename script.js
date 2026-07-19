@@ -51,8 +51,8 @@ function runMfSiteLoader(){
   let target=1,display=1,raf=0,finished=false,completionRequested=false;
   let settled=0;
   const total=Math.max(1,resources.length);
-  const minDelay=2600;
-  const simulatedDuration=3600;
+  const minDelay=450;
+  const simulatedDuration=850;
   const startTime=performance.now();
   function paintFrontier(value){
     const ratio=Math.max(0,Math.min(1,value/100));
@@ -60,8 +60,8 @@ function runMfSiteLoader(){
       const txt=`${String(Math.round(value)).padStart(2,'0')}%`;
       progressEl.textContent=txt;
       progressEl.dataset.glitch=txt;
-      progressEl.style.fontVariationSettings=`'wght' ${Math.round(100+ratio*900)}, 'opsz' ${Math.round(8+ratio*136)}`;
-      progressEl.style.fontWeight=String(Math.round(100+ratio*800));
+      progressEl.style.setProperty('font-variation-settings',`'wght' ${Math.round(100+ratio*900)}, 'opsz' ${Math.round(8+ratio*136)}`,'important');
+      progressEl.style.setProperty('font-weight',String(Math.round(100+ratio*800)),'important');
     }
     if(barEl)barEl.style.width=`${ratio*100}%`;
     if(asciiEl&&Math.random()>.92)asciiEl.textContent=['// assembling experience','<> signal acquired','[] loading intent','++ almost human'][Math.floor(Math.random()*4)];
@@ -71,7 +71,7 @@ function runMfSiteLoader(){
     const elapsed=performance.now()-startTime;
     const simulatedCap=Math.min(100,1+(elapsed/simulatedDuration)*99);
     const effectiveTarget=Math.min(target,simulatedCap);
-    display += (effectiveTarget-display) * (effectiveTarget>=99 ? 0.045 : 0.065);
+    display += (effectiveTarget-display) * (effectiveTarget>=99 ? 0.14 : 0.12);
     if(target===100 && display>99.55) display=100;
     paintFrontier(display);
     if(target===100&&display===100){beginCompletion();return;}
@@ -93,6 +93,7 @@ function runMfSiteLoader(){
       setTimeout(()=>{
         document.body.classList.add('mf-loader-revealing','mf-page-revealed');
         loader.classList.add('is-revealing');
+        setTimeout(()=>document.body.classList.add('mf-name-revealed'),950);
         setTimeout(()=>loader.classList.add('done'),1500);
       },720);
     },1000);
