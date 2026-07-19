@@ -1436,8 +1436,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const overlayTitle=document.getElementById('mfGuidanceOverlayTitle');
   const overlayIntro=document.getElementById('mfGuidanceOverlayIntro');
   const kicker=document.getElementById('mfGuidanceKicker');
+  const overlayAside=overlay?.querySelector('.mf-guidance-overlay-aside');
+  const guidanceSection=document.getElementById('guidance');
   const closeButton=overlay?.querySelector('.mf-guidance-close');
-  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!closeButton)return;
+  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
 
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
@@ -1449,7 +1451,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       title.classList.add('is-clearing');
       await wait(430);
       title.classList.remove('is-id','is-clearing');
-      await wait(2000);
+      await wait(4000);
     }
   }
   runTitle();
@@ -1471,29 +1473,66 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   ];
 
   const entries=[
-    {id:'anna',length:'short',name:'Anna Nováková',role:'Senior Product Designer',company:'STUDIO N',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=82',tags:['1:1','Mindset coaching','Perspective'],copy:shortReview},
-    {id:'marek',length:'medium',name:'Marek Kováč',role:'Co-founder & CEO',company:'BRIGHT / OPS',country:'Slovakia',flag:'SK',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=82',tags:['Team audit','Org design','Leadership'],copy:mediumReview},
-    {id:'michal',length:'long',name:'Michal',role:'Creative & Founder',company:'INDEPENDENT',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=82',tags:['1:1','Self-discovery','Mindset'],copy:longReview},
-    {id:'alina',length:'short',name:'Alina Petrova',role:'Product Director',company:'ORBITAL',country:'Russia',flag:'RU',photo:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=82',tags:['Mentoring','Clarity','Leadership'],copy:`When you sit opposite Marián, you are the only person who matters in that moment. No one is more important than you. As if no one else had ever existed.`},
-    {id:'jordan',length:'short',name:'Jordan Lee',role:'Design Engineering Lead',company:'NORTH / STAR',country:'United States',flag:'US',photo:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=82',tags:['Team systems','Leadership','Scale'],copy:`If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`},
-    {id:'elina',length:'short',name:'Elina Koskinen',role:'Design Lead',company:'POLAR LABS',country:'Finland',flag:'FI',photo:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=82',tags:['Coaching','Direction','Growth'],copy:`The only right path is your own, and no one has ever published a map of it. It is up to you to discover that path and find out what lies along it.`}
+    {id:'anna',length:'short',name:'Anna Nováková',role:'Senior Product Designer',company:'Studio N',mark:'✦',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=82',tags:['Design Coaching','Life Coaching'],copy:shortReview},
+    {id:'marek',length:'medium',name:'Marek Kováč',role:'Co-founder & CEO',company:'Bright Ops',mark:'●',country:'Slovakia',flag:'SK',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=82',tags:['Executive Coaching','Career Coaching'],copy:mediumReview},
+    {id:'michal',length:'long',name:'Michal',role:'Creative & Founder',company:'Independent',mark:'▲',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=82',tags:['Transformational Coaching','Life Coaching'],copy:longReview},
+    {id:'alina',length:'short',name:'Alina Petrova',role:'Product Director',company:'Orbital',mark:'◆',country:'Russia',flag:'RU',photo:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=82',tags:['Executive Coaching','Transformational Coaching'],copy:`When you sit opposite Marián, you are the only person who matters in that moment. No one is more important than you. As if no one else had ever existed.`},
+    {id:'jordan',length:'short',name:'Jordan Lee',role:'Design Engineering Lead',company:'North Star',mark:'✚',country:'United States',flag:'US',photo:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=82',tags:['Design Coaching','Executive Coaching'],copy:`If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`},
+    {id:'elina',length:'short',name:'Elina Koskinen',role:'Design Lead',company:'Polar Labs',mark:'○',country:'Finland',flag:'FI',photo:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=82',tags:['Life Coaching','Career Coaching'],copy:`The only right path is your own, and no one has ever published a map of it. It is up to you to discover that path and find out what lies along it.`}
   ];
 
   const modes={
-    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:'Direct, attentive conversations that help creatives and founders find their own answer rather than borrow somebody else’s.',order:['anna','michal','alina','elina','marek','jordan']},
+    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['anna','michal','alina','elina','marek','jordan']},
     leadership:{title:'Team<br>Leadership',kicker:'GUIDANCE / 02 / ORGANISATIONAL',intro:'Team audits, leadership development and practical interventions for growing creative and technology organizations.',order:['marek','jordan','alina','anna','michal','elina']}
   };
 
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[char]));
-  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt=""><span><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small></span><span class="mf-guidance-company-logo">${escapeHtml(entry.company)}</span></div><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div></div>`;
+  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt=""><span><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-role">${escapeHtml(entry.role)} · ${escapeHtml(entry.company)}</small><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small></span><span class="mf-guidance-company-logo" aria-label="Placeholder company logo">${escapeHtml(entry.mark)}</span></div><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div></div>`;
   const copyMarkup=entry=>Array.isArray(entry.copy)?entry.copy.map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''):escapeHtml(entry.copy);
   const reviewMarkup=(entry,index)=>{
-    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}"><div><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / LONG FORM</div>${personMarkup(entry)}</div><div class="mf-guidance-long-copy">${copyMarkup(entry)}</div></article>`;
-    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}"><div><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / MEDIUM FORM</div>${personMarkup(entry)}</div><blockquote>${copyMarkup(entry)}</blockquote></article>`;
-    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}"><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / SHORT SIGNAL</div><blockquote>${copyMarkup(entry)}</blockquote>${personMarkup(entry)}</article>`;
+    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div>${personMarkup(entry)}</div><div class="mf-guidance-long-copy">${copyMarkup(entry)}</div></article>`;
+    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div>${personMarkup(entry)}</div><blockquote>${copyMarkup(entry)}</blockquote></article>`;
+    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><blockquote>${copyMarkup(entry)}</blockquote>${personMarkup(entry)}</article>`;
   };
 
   let currentMode='mindset';
+  let guidanceReturnY=0;
+  let activeReviewId='';
+  let reviewScrollFrame=0;
+  const mobileGuidance=window.matchMedia('(max-width:1024px)');
+  const markActiveReview=id=>{
+    if(!id||id===activeReviewId)return;
+    activeReviewId=id;
+    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
+      const active=button.dataset.reviewTarget===id;
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-current',active?'true':'false');
+    });
+  };
+  const updateActiveReview=()=>{
+    reviewScrollFrame=0;
+    const targetY=mobileGuidance.matches?64:76;
+    const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
+    if(!articles.length)return;
+    let nearest=articles[0],distance=Infinity;
+    articles.forEach(article=>{
+      const rect=article.getBoundingClientRect();
+      const candidate=rect.top<=targetY&&rect.bottom>targetY?0:Math.min(Math.abs(rect.top-targetY),Math.abs(rect.bottom-targetY));
+      if(candidate<distance){distance=candidate;nearest=article;}
+    });
+    markActiveReview(nearest.dataset.reviewId);
+  };
+  const scheduleReviewTracking=()=>{
+    if(!reviewScrollFrame)reviewScrollFrame=requestAnimationFrame(updateActiveReview);
+  };
+  reviewsHost.addEventListener('scroll',scheduleReviewTracking,{passive:true});
+  overlay.addEventListener('scroll',scheduleReviewTracking,{passive:true});
+  overlayAside.addEventListener('wheel',event=>{
+    if(mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
+    event.preventDefault();
+    reviewsHost.scrollTop+=event.deltaY;
+  },{passive:false});
+
   function render(mode){
     currentMode=mode in modes?mode:'mindset';
     const config=modes[currentMode];
@@ -1502,12 +1541,18 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     overlayIntro.textContent=config.intro;
     kicker.textContent=config.kicker;
     reviewsHost.innerHTML=ordered.map(reviewMarkup).join('');
-    reviewNav.innerHTML=ordered.slice(0,5).map((entry,index)=>`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${entry.length.toUpperCase()}</span></button>`).join('');
-    overlay.querySelectorAll('[data-guidance-switch]').forEach(button=>button.classList.toggle('is-active',button.dataset.guidanceSwitch===currentMode));
-    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>document.getElementById(`guidance-review-${button.dataset.reviewTarget}`)?.scrollIntoView({behavior:'smooth',block:'start'})));
+    reviewNav.innerHTML=ordered.map((entry,index)=>`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${escapeHtml(entry.country)}</span></button>`).join('');
+    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>{
+      markActiveReview(button.dataset.reviewTarget);
+      document.getElementById(`guidance-review-${button.dataset.reviewTarget}`)?.scrollIntoView({behavior:'smooth',block:'start'});
+    }));
     reviewsHost.scrollTop=0;
+    overlay.scrollTop=0;
+    activeReviewId='';
+    markActiveReview(ordered[0]?.id);
   }
   function open(mode){
+    guidanceReturnY=window.scrollY+guidanceSection.getBoundingClientRect().top;
     render(mode);
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
@@ -1518,9 +1563,11 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden','true');
     document.body.classList.remove('mf-guidance-open');
+    const restore=()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'});
+    requestAnimationFrame(restore);
+    setTimeout(restore,760);
   }
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
-  overlay.querySelectorAll('[data-guidance-switch]').forEach(button=>button.addEventListener('click',()=>render(button.dataset.guidanceSwitch)));
   closeButton.addEventListener('click',close);
   window.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.classList.contains('is-open'))close();});
 })();
