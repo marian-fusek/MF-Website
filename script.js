@@ -87,29 +87,15 @@ function runMfSiteLoader(){
     if(finished)return;
     finished=true;
     setTimeout(()=>{
-      progressEl?.classList.add('is-100-blink');
+      loader.classList.add('is-completing');
+      progressEl?.classList.add('is-final-glitch');
+      if(asciiEl)asciiEl.textContent='// signal released';
       setTimeout(()=>{
-        if(progressEl){
-          progressEl.classList.remove('is-100-blink');
-          progressEl.classList.add('is-check');
-          progressEl.textContent='✓';
-          progressEl.dataset.glitch='✓';
-          progressEl.style.setProperty('font-variation-settings',`'wght' 500, 'opsz' 40`,'important');
-          progressEl.style.setProperty('font-weight','500','important');
-        }
-        if(asciiEl)asciiEl.textContent='// verified';
-        setTimeout(()=>{
-          loader.classList.add('is-completing');
-          progressEl?.classList.add('is-final-glitch');
-          if(asciiEl)asciiEl.textContent='// signal released';
-          setTimeout(()=>{
-            document.body.classList.add('mf-loader-revealing','mf-page-revealed');
-            loader.classList.add('is-revealing');
-            setTimeout(()=>document.body.classList.add('mf-name-revealed'),950);
-            setTimeout(()=>loader.classList.add('done'),1500);
-          },720);
-        },420);
-      },420);
+        document.body.classList.add('mf-loader-revealing','mf-page-revealed');
+        loader.classList.add('is-revealing');
+        setTimeout(()=>document.body.classList.add('mf-name-revealed'),950);
+        setTimeout(()=>loader.classList.add('done'),1500);
+      },720);
     },1000);
   };
   const requestCompletion=()=>{
@@ -375,7 +361,7 @@ if(indexExtra){
       images:[
         {type:"video",src:"/media/projects/goballer/logo/01-goballer-logo.mp4",title:"GoBaller product film"},
         {type:"carousel",background:"/media/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
-        {type:"video",src:"/media/projects/goballer/app-vi/03-goballer-ios-1.mp4",title:"GoBaller iOS application film"},
+        {type:"video",src:"/media/projects/goballer/app-vid/03-goballer-ios-1.mp4",title:"GoBaller iOS application film"},
         {type:"mediaCarousel",cards:goballerAppCards,title:"GoBaller iOS application gallery"},
         "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
       ]
