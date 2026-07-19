@@ -267,18 +267,6 @@ if(indexExtra){
       "/media/projects/aims/02-aims-web.jpg",
       "/media/projects/aims/socials/03-aims-socials-1.jpg",
       "/media/projects/aims/merch/04-aims-merch-1.jpg"
-    ],
-    "04":[
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1464820453369-31d2c0b651af?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=900&q=76"
-    ],
-    "05":[
-      "https://images.unsplash.com/photo-1464278533981-50106e6176b1?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=900&q=76"
     ]
   };
   const strips=[...document.querySelectorAll('.mf-strip')];
@@ -388,32 +376,6 @@ if(indexExtra){
           {type:"image",src:"/media/projects/aims/socials/03-aims-socials-3.jpg",title:"AIMS social visual 3"}
         ],title:"AIMS social gallery"},
         "/media/projects/aims/merch/04-aims-merch-1.jpg"
-      ]
-    },
-    "04":{
-      title:"Mindset Coaching",
-      intro:"One-to-one sessions, group work, mentoring and team audits for founders, leaders and creatives. The practice creates room for direct conversations that move past performance and into useful change.",
-      scope:"Positioning, coaching framework, service design, session formats, communication and experience direction.",
-      context:"Creative and technical leaders often arrive with a visible work problem and a less visible pattern underneath it. Standard coaching language can make those conversations feel distant or overly polished. The practice needed to feel rigorous, human and safe without becoming soft or formulaic.",
-      approach:"I designed the experience around attention rather than templates. The language stays direct, the structure remains flexible and every format is built to surface what is actually blocking movement. The result is a practice that can hold both strategic decisions and the personal reality beneath them.",
-      images:[
-        "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1497436072909-f5e4be1713c0?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=2200&q=88"
-      ]
-    },
-    "05":{
-      title:"Team Leadership",
-      intro:"Design and engineering leadership focused on empowering leaders of leaders. The work joins product quality, organizational clarity and the conditions people need to do their strongest work.",
-      scope:"Executive leadership, design organization, engineering partnership, team systems, hiring and leadership development.",
-      context:"Growing product organizations create pressure faster than they create shared judgment. Teams can add process while losing clarity, ownership and the standard that made the work valuable. Leadership needed to scale without turning the organization into a machine for meetings.",
-      approach:"I treated structure as a tool for better decisions rather than control. Responsibilities, critique and communication were redesigned around trust, explicit standards and stronger leaders at every level. The organization could move faster because authority and quality no longer depended on one person.",
-      images:[
-        "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1464278533981-50106e6176b1?auto=format&fit=crop&w=2200&q=88"
       ]
     }
   };
@@ -1460,6 +1422,107 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     }
   }
   loop();
+})();
+
+/* ============================================================
+   THE CHANGE — GUIDANCE title + editorial review archive.
+   V67 is the exact pre-Guidance checkpoint.
+   ============================================================ */
+(function(){
+  const title=document.getElementById('guidanceTitle');
+  const overlay=document.getElementById('mfGuidanceOverlay');
+  const reviewsHost=document.getElementById('mfGuidanceReviews');
+  const reviewNav=document.getElementById('mfGuidanceReviewNav');
+  const overlayTitle=document.getElementById('mfGuidanceOverlayTitle');
+  const overlayIntro=document.getElementById('mfGuidanceOverlayIntro');
+  const kicker=document.getElementById('mfGuidanceKicker');
+  const closeButton=overlay?.querySelector('.mf-guidance-close');
+  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!closeButton)return;
+
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  async function runTitle(){
+    while(title.isConnected){
+      title.classList.remove('is-id','is-clearing');
+      await wait(2000);
+      title.classList.add('is-id');
+      await wait(2000);
+      title.classList.add('is-clearing');
+      await wait(430);
+      title.classList.remove('is-id','is-clearing');
+      await wait(2000);
+    }
+  }
+  runTitle();
+
+  const shortReview=`Thanks to talking with Marián, I realized certain things much sooner than I would have on my own. He helped me understand another part of my personality and see the world from a different angle. If I lose myself again in the future, I will definitely reach out to him. Thanks for everything.`;
+
+  const mediumReview=[
+    `I have to say, we have had many mentors and consultants. Many of them helped us move forward, gave us feedback, and created a space where we could talk about our challenges despite the daily routine.`,
+    `Marián was on another level for us. To be honest, I was extremely surprised by how quickly and precisely he was able to understand who we are, what our challenges are, and identify the problems without any unnecessary fluff. His presentation was so valuable that I went through it several times. :) Based on his suggestions and his ability to identify potential issues in the future, we made important changes to our organizational structure and prioritized our focus on the areas where we had pain points.`,
+    `Marián continues to be our long-term mentor and coach. We regularly return to discuss specific topics and validate whether he confirms that our approach is good or offers a different perspective. If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`
+  ];
+
+  const longReview=[
+    `Hi, my name is Michal, and I was born twice in my life. The first time was 29 years ago, and I am grateful to my Mom for that (and my Dad, of course). The second time was six months ago, and I owe that to Marián. You see, I was not always who I am now, and I became this person thanks to him. Actually, thanks to myself—but I would not have been capable of it without him. Complicated, right?`,
+    `The fact is, Marián’s presence affected every aspect of my being. For the better. What was the magic? That is the best thing about all of it: there is no magic, and there never was. There is only an incredible ability to listen, and a boundless interest in and attention toward you. When you sit opposite Marián, you are the only person who matters in that moment. No one is more important than you. As if no one else had ever existed.`,
+    `When I first met Marián, I was fairly convinced I knew who I was and who I needed to become. I had an idea of myself and my desires—everything I had to fit into my life, everything I had to achieve. Those were all the things that would make me happy. What I will be grateful to Marián for until the day I die is that he did not help me achieve any of them. Instead, he helped me realize that none of them were my dreams or goals, let alone the foundation of my happiness. They were the dreams and goals of other people. Strangers. People I know nothing about and probably never will. (What do those people even know about themselves?) Dreams someone sold me and I bought willingly and thoughtlessly. Very little of it came from me, from my personality, or from knowing myself. It was only with Marián that we discovered me: what I truly want, what gives me energy, and what takes it away. And that brings us to a major affliction of today’s world. Many people will tell you what is best for you. They will sell it to you or offer it for free. Based on their own experience or someone else’s, they will advise you on how to achieve success, fame, and happiness as a finished product. Yet not one of them makes even the slightest effort to know and understand you sincerely—to understand what it is like to be YOU. To discover you. They think that what worked for them must work for others. So they give advice. But that is nothing more than vanity disguised as goodwill, and advice aimed blindly. Instead of showing you a direction, they entangle you even further and lead you farther away from yourself. If happiness has ever existed in this world, you already have it within you; you simply have not discovered it. YET. And that is what Marián helped me understand—and that understanding is the key to everything!`,
+    `Marián sincerely believes there is no universal advice, no universal path to happiness. The only right path is your own, and no one has ever published a map of it. How could they? It is up to you to discover that path and find out what lies along it. No one can tell you when and where to turn, let alone where you are supposed to arrive. You probably do not know that yourself. YET. No one has ever walked that path before, so no one can tell you what will be waiting there. But someone can help you prepare for it and pack your backpack. YOUR own backpack, equipped with everything you might need along the way so that nothing catches you unprepared. They will not fill it with what other people needed, but with what you need. I am immensely grateful that I was able to pack mine with Marián. I now know there is no one else I would rather have packed it with. I cannot imagine anyone doing it with such genuine interest in my journey as he did. When you allow the right person to know you better than you may know yourself, it is as if your older self were preparing you for the road. Thank you, Marián, for being my older self, just as you are the older self of all your “bodies,” as you call them.`,
+    `I leave my work with Marián a free, self-aware person, able to interpret my life in my own favor, whatever happens in it. You cannot always control which cards land on the table or whether you run into snakes in the sand along the way (Marián will never promise otherwise). But you can always play as well as you possibly can, despite everything and everyone. You can always enjoy your game, your journey, so that one day you can calmly say, from a good place: I followed my own path, and it was a ride no one else experienced. And perhaps, through that, inspire others never to stop searching for their own path for a very good reason, and never to settle for anything less. That is what this is all about. Thank you, my friend, for teaching me to play as if my life depended on it!`
+  ];
+
+  const entries=[
+    {id:'anna',length:'short',name:'Anna Nováková',role:'Senior Product Designer',company:'STUDIO N',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=82',tags:['1:1','Mindset coaching','Perspective'],copy:shortReview},
+    {id:'marek',length:'medium',name:'Marek Kováč',role:'Co-founder & CEO',company:'BRIGHT / OPS',country:'Slovakia',flag:'SK',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=82',tags:['Team audit','Org design','Leadership'],copy:mediumReview},
+    {id:'michal',length:'long',name:'Michal',role:'Creative & Founder',company:'INDEPENDENT',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=82',tags:['1:1','Self-discovery','Mindset'],copy:longReview},
+    {id:'alina',length:'short',name:'Alina Petrova',role:'Product Director',company:'ORBITAL',country:'Russia',flag:'RU',photo:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=82',tags:['Mentoring','Clarity','Leadership'],copy:`When you sit opposite Marián, you are the only person who matters in that moment. No one is more important than you. As if no one else had ever existed.`},
+    {id:'jordan',length:'short',name:'Jordan Lee',role:'Design Engineering Lead',company:'NORTH / STAR',country:'United States',flag:'US',photo:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=82',tags:['Team systems','Leadership','Scale'],copy:`If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`},
+    {id:'elina',length:'short',name:'Elina Koskinen',role:'Design Lead',company:'POLAR LABS',country:'Finland',flag:'FI',photo:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=82',tags:['Coaching','Direction','Growth'],copy:`The only right path is your own, and no one has ever published a map of it. It is up to you to discover that path and find out what lies along it.`}
+  ];
+
+  const modes={
+    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:'Direct, attentive conversations that help creatives and founders find their own answer rather than borrow somebody else’s.',order:['anna','michal','alina','elina','marek','jordan']},
+    leadership:{title:'Team<br>Leadership',kicker:'GUIDANCE / 02 / ORGANISATIONAL',intro:'Team audits, leadership development and practical interventions for growing creative and technology organizations.',order:['marek','jordan','alina','anna','michal','elina']}
+  };
+
+  const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[char]));
+  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt=""><span><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small></span><span class="mf-guidance-company-logo">${escapeHtml(entry.company)}</span></div><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div></div>`;
+  const copyMarkup=entry=>Array.isArray(entry.copy)?entry.copy.map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''):escapeHtml(entry.copy);
+  const reviewMarkup=(entry,index)=>{
+    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}"><div><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / LONG FORM</div>${personMarkup(entry)}</div><div class="mf-guidance-long-copy">${copyMarkup(entry)}</div></article>`;
+    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}"><div><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / MEDIUM FORM</div>${personMarkup(entry)}</div><blockquote>${copyMarkup(entry)}</blockquote></article>`;
+    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}"><div class="mf-guidance-review-type">${String(index+1).padStart(2,'0')} / SHORT SIGNAL</div><blockquote>${copyMarkup(entry)}</blockquote>${personMarkup(entry)}</article>`;
+  };
+
+  let currentMode='mindset';
+  function render(mode){
+    currentMode=mode in modes?mode:'mindset';
+    const config=modes[currentMode];
+    const ordered=config.order.map(id=>entries.find(entry=>entry.id===id)).filter(Boolean);
+    overlayTitle.innerHTML=config.title;
+    overlayIntro.textContent=config.intro;
+    kicker.textContent=config.kicker;
+    reviewsHost.innerHTML=ordered.map(reviewMarkup).join('');
+    reviewNav.innerHTML=ordered.slice(0,5).map((entry,index)=>`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${entry.length.toUpperCase()}</span></button>`).join('');
+    overlay.querySelectorAll('[data-guidance-switch]').forEach(button=>button.classList.toggle('is-active',button.dataset.guidanceSwitch===currentMode));
+    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>document.getElementById(`guidance-review-${button.dataset.reviewTarget}`)?.scrollIntoView({behavior:'smooth',block:'start'})));
+    reviewsHost.scrollTop=0;
+  }
+  function open(mode){
+    render(mode);
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('mf-guidance-open');
+    requestAnimationFrame(()=>overlay.classList.add('is-open'));
+    setTimeout(()=>reviewsHost.focus({preventScroll:true}),500);
+  }
+  function close(){
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('mf-guidance-open');
+  }
+  document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
+  overlay.querySelectorAll('[data-guidance-switch]').forEach(button=>button.addEventListener('click',()=>render(button.dataset.guidanceSwitch)));
+  closeButton.addEventListener('click',close);
+  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.classList.contains('is-open'))close();});
 })();
 
 /* BIO TABS — slower sequential fade, stable on desktop and mobile */
