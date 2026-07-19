@@ -260,8 +260,7 @@ if(indexExtra){
       "/media/projects/goballer/01-goballer-logo.jpg",
       "/media/projects/goballer/02-goballer-brand.jpg",
       "/media/projects/goballer/03-goballer-app.jpg",
-      "/media/projects/goballer/app/04-goballer-ios-1.jpg",
-      "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=76"
+      "/media/projects/goballer/app/04-goballer-ios-1.jpg"
     ],
     "03":[
       "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=900&q=76",
@@ -363,8 +362,7 @@ if(indexExtra){
         {type:"video",src:"/media/projects/goballer/logo/01-goballer-logo.mp4",title:"GoBaller product film"},
         {type:"carousel",background:"/media/projects/goballer/brand/01-goballer-field.jpg",cards:goballerCards,title:"GoBaller brand system"},
         {type:"video",src:"/media/projects/goballer/app-vid/03-goballer-ios-1.mp4",title:"GoBaller iOS application film"},
-        {type:"mediaCarousel",cards:goballerAppCards,title:"GoBaller iOS application gallery"},
-        "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=2200&q=88"
+        {type:"mediaCarousel",cards:goballerAppCards,title:"GoBaller iOS application gallery"}
       ]
     },
     "03":{
