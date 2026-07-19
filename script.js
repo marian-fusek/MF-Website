@@ -15,7 +15,6 @@ const mfLoaderBits=loader?{
   progress:loader.querySelector('#mfLoaderProgress'),
   bar:loader.querySelector('#mfLoaderBar'),
   ascii:loader.querySelector('#mfLoaderAscii'),
-  particles:loader.querySelector('#mfLoaderParticles'),
   reveal:loader.querySelector('#mfLoaderReveal')
 }:null;
 let mfSiteLoaderStarted=false;
@@ -25,21 +24,14 @@ function runMfSiteLoader(){
   const progressEl=mfLoaderBits?.progress;
   const barEl=mfLoaderBits?.bar;
   const asciiEl=mfLoaderBits?.ascii;
-  const particleEl=mfLoaderBits?.particles;
-  if(particleEl&&!particleEl.childElementCount){
-    for(let i=0;i<28;i++){
-      const dot=document.createElement('span');
-      dot.style.setProperty('--x',`${Math.random()*100}%`);
-      dot.style.setProperty('--y',`${Math.random()*100}%`);
-      dot.style.setProperty('--s',`${1+Math.random()*3}px`);
-      dot.style.setProperty('--d',`${4+Math.random()*7}s`);
-      dot.style.setProperty('--delay',`${-Math.random()*7}s`);
-      dot.style.setProperty('--dx',`${-26+Math.random()*52}px`);
-      dot.style.setProperty('--dy',`${-32+Math.random()*64}px`);
-      dot.style.setProperty('--a',`${.16+Math.random()*.5}`);
-      particleEl.appendChild(dot);
-    }
-  }
+  const syncLoaderNameHeight=()=>{
+    const name=document.getElementById('heroName');
+    const height=name?.getBoundingClientRect().height||0;
+    if(height>40)loader.style.setProperty('--mf-loader-name-height',`${height.toFixed(1)}px`);
+  };
+  requestAnimationFrame(syncLoaderNameHeight);
+  document.fonts?.ready?.then(syncLoaderNameHeight);
+  window.addEventListener('resize',syncLoaderNameHeight,{passive:true});
   const withTimeout=(promise,ms=4200)=>Promise.race([Promise.resolve(promise),new Promise(resolve=>setTimeout(resolve,ms))]);
   const resources=[];
   const imgs=[...document.images].filter(img=>{
@@ -58,10 +50,10 @@ function runMfSiteLoader(){
     if(document.readyState==='complete')return resolve();
     window.addEventListener('load',()=>resolve(),{once:true});
   })));
-  let target=0,display=0,raf=0,finished=false;
+  let target=1,display=1,raf=0,finished=false,completionRequested=false;
   let settled=0;
   const total=Math.max(1,resources.length);
-  const minDelay=1650;
+  const minDelay=2600;
   const startTime=performance.now();
   function paintFrontier(value){
     const ratio=Math.max(0,Math.min(1,value/100));
@@ -71,44 +63,49 @@ function runMfSiteLoader(){
       progressEl.dataset.glitch=txt;
       progressEl.style.fontVariationSettings=`'wght' ${Math.round(100+ratio*900)}, 'opsz' ${Math.round(8+ratio*136)}`;
       progressEl.style.fontWeight=String(Math.round(100+ratio*800));
-      progressEl.classList.toggle('is-glitch', Math.random()>.78 && value<100);
     }
     if(barEl)barEl.style.width=`${ratio*100}%`;
     if(asciiEl&&Math.random()>.92)asciiEl.textContent=['// assembling experience','<> signal acquired','[] loading intent','++ almost human'][Math.floor(Math.random()*4)];
   }
   const render=()=>{
     raf=0;
-    display += (target-display) * (target>=99 ? 0.06 : 0.07);
+    display += (target-display) * (target>=99 ? 0.045 : 0.065);
     if(target===100 && display>99.55) display=100;
     paintFrontier(display);
-    if(Math.abs(target-display)>.08) raf=requestAnimationFrame(render);
+    if(target===100&&display===100){beginCompletion();return;}
+    if(Math.abs(target-display)>.04) raf=requestAnimationFrame(render);
   };
   const setTarget=v=>{
     target=Math.max(target,Math.min(100,v));
     if(!raf) raf=requestAnimationFrame(render);
   };
-  resources.forEach(p=>Promise.resolve(p).then(()=>{ settled++; setTarget(7+(settled/total)*85); }));
-  setTarget(4);
-  const finish=()=>{
+  resources.forEach(p=>Promise.resolve(p).then(()=>{ settled++; setTarget(3+(settled/total)*89); }));
+  paintFrontier(1);
+  const beginCompletion=()=>{
     if(finished)return;
     finished=true;
-    target=100;
-    display=100;
-    paintFrontier(100);
     setTimeout(()=>{
+      loader.classList.add('is-completing');
       progressEl?.classList.add('is-final-glitch');
       if(asciiEl)asciiEl.textContent='// 100% — dismorphing';
       setTimeout(()=>{
+        document.body.classList.add('mf-loader-revealing','mf-page-revealed');
         loader.classList.add('is-revealing');
-        setTimeout(()=>loader.classList.add('done'),1080);
-      },1000);
-    },260);
+        setTimeout(()=>loader.classList.add('done'),1500);
+      },720);
+    },1000);
+  };
+  const requestCompletion=()=>{
+    if(completionRequested)return;
+    completionRequested=true;
+    target=100;
+    if(!raf)raf=requestAnimationFrame(render);
   };
   Promise.allSettled(resources).then(()=>{
     const elapsed=performance.now()-startTime;
-    setTimeout(finish,Math.max(0,minDelay-elapsed));
+    setTimeout(requestCompletion,Math.max(0,minDelay-elapsed));
   });
-  setTimeout(finish,6500);
+  setTimeout(requestCompletion,6500);
 }
 
 startMfSite();
@@ -466,7 +463,7 @@ if(indexExtra){
   }
 
   function projectVideoLoader(copy="LOADING VIDEO"){
-    return `<div class="mf-project-video-loader" aria-hidden="true"><div class="mf-project-video-loader-copy">${esc(copy)}<span>_</span></div><div class="mf-project-video-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`;
+    return `<div class="mf-project-video-loader" aria-hidden="true"><div class="mf-project-video-loader-copy"><span>${esc(copy)}<i>_</i></span><b class="mf-project-video-loader-percent">01%</b></div><div class="mf-project-video-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`;
   }
 
   function carouselItemMarkup(item,index){
@@ -519,7 +516,7 @@ if(indexExtra){
           <div class="mf-carousel-stage">
             ${mixed?`<div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-current">${carouselItemMarkup(first,0)}</div><div class="mf-carousel-card mf-carousel-media-card mf-carousel-card-next" aria-hidden="true">${carouselItemMarkup(second,1)}</div>`:`<img class="mf-carousel-card mf-carousel-card-current" src="${esc(first)}" alt="GoBaller visual 1" draggable="false"><img class="mf-carousel-card mf-carousel-card-next" src="${esc(second)}" alt="" draggable="false" aria-hidden="true">`}
           </div>
-          <div class="mf-carousel-runtime-loader" aria-hidden="true"><div class="mf-carousel-runtime-loader-copy">LOADING VIDEO<span>_</span></div><div class="mf-carousel-runtime-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="mf-carousel-runtime-loader" aria-hidden="true"><div class="mf-carousel-runtime-loader-copy"><span>LOADING VIDEO<i>_</i></span><b class="mf-carousel-runtime-loader-percent">01%</b></div><div class="mf-carousel-runtime-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
           <button class="mf-carousel-zone mf-carousel-zone-left" type="button" aria-label="Previous carousel image"></button>
           <button class="mf-carousel-zone mf-carousel-zone-right" type="button" aria-label="Next carousel image"></button>
           <div class="mf-carousel-cursor" aria-hidden="true"><div class="mf-carousel-cursor-inner"><b>→</b><span># 02</span></div></div>
@@ -563,12 +560,23 @@ if(indexExtra){
       if(!video)return;
       let fallbackUsed=false;
       let done=false;
-      const timer=setTimeout(()=>{if(!done)slide.classList.add('is-video-loading');},1000);
+      let loaderShown=false,progress=1,progressTimer=0;
+      const percent=slide.querySelector('.mf-project-video-loader-percent');
+      const setProgress=value=>{progress=Math.max(progress,Math.min(100,value));if(percent)percent.textContent=`${String(Math.round(progress)).padStart(2,'0')}%`;};
+      const timer=setTimeout(()=>{
+        if(done)return;
+        loaderShown=true;
+        slide.classList.add('is-video-loading');
+        setProgress(1);
+        progressTimer=setInterval(()=>setProgress(Math.min(92,progress+1+Math.random()*3)),120);
+      },1000);
       const finish=()=>{
         if(done)return;
         done=true;
         clearTimeout(timer);
-        slide.classList.remove('is-video-loading');
+        clearInterval(progressTimer);
+        if(loaderShown){setProgress(100);setTimeout(()=>slide.classList.remove('is-video-loading'),180);}
+        else slide.classList.remove('is-video-loading');
         slide.classList.add('is-video-ready');
         video.muted=true;
         video.playsInline=true;
@@ -730,11 +738,22 @@ if(indexExtra){
           card._mfReady=new Promise(resolve=>{
             let finished=false;
             let fallbackUsed=false;
-            const loaderTimer=showLoader?setTimeout(()=>{if(!finished)root.classList.add('is-loading-media');},1000):0;
+            let loaderShown=false,progress=1,progressTimer=0;
+            const percent=root.querySelector('.mf-carousel-runtime-loader-percent');
+            const setProgress=value=>{progress=Math.max(progress,Math.min(100,value));if(percent)percent.textContent=`${String(Math.round(progress)).padStart(2,'0')}%`;};
+            const loaderTimer=showLoader?setTimeout(()=>{
+              if(finished)return;
+              loaderShown=true;
+              root.classList.add('is-loading-media');
+              setProgress(1);
+              progressTimer=setInterval(()=>setProgress(Math.min(92,progress+1+Math.random()*3)),120);
+            },1000):0;
             const finish=()=>{
               if(finished)return;finished=true;
               if(loaderTimer)clearTimeout(loaderTimer);
-              root.classList.remove('is-loading-media');
+              clearInterval(progressTimer);
+              if(loaderShown){setProgress(100);setTimeout(()=>root.classList.remove('is-loading-media'),180);}
+              else root.classList.remove('is-loading-media');
               video.play().catch(()=>{});
               resolve();
             };
@@ -809,12 +828,6 @@ if(indexExtra){
         root.style.setProperty('--carousel-pan-x','0px');
         const target=wrap(index+direction);
         emitCursorGhost(direction);
-        if(mixed){
-          const nextType=itemAt(target).type==='video'?'video':'image';
-          root.classList.toggle('is-current-image',nextType==='image');
-          root.classList.toggle('is-current-video',nextType==='video');
-        }
-
         const oldCurrent=current;
         const incoming=nextCard;
         oldCurrent.getAnimations().forEach(animation=>animation.cancel());

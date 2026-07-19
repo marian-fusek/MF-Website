@@ -4482,6 +4482,256 @@ body.mf-preload-locked .mf-loader span {
   }
 }
 
+/* ============================================================
+   V56 — loader aligned to the hero grid and reliable media loading
+   ============================================================ */
+.mf-loader {
+  --mf-loader-name-height: clamp(150px, 25vw, 330px);
+  display:block !important;
+  background:#000;
+  opacity:1;
+  visibility:visible;
+  transition:none;
+  overflow:hidden;
+}
+.mf-loader.done {
+  display:none !important;
+}
+.mf-loader > .mf-loader-progress {
+  position:absolute;
+  top:20px;
+  right:20px;
+  left:auto;
+  width:30vw;
+  min-width:220px;
+  color:#fff;
+  text-align:right;
+  font-family:"Geist",Arial,sans-serif;
+  font-size:clamp(60px,9vw,150px);
+  line-height:.82;
+  letter-spacing:-.075em;
+  font-variant-numeric:tabular-nums;
+  mix-blend-mode:normal;
+  transform:none;
+  transition:font-variation-settings .14s linear,font-weight .14s linear;
+  will-change:font-variation-settings;
+  z-index:3;
+}
+.mf-loader > .mf-loader-progress::before,
+.mf-loader > .mf-loader-progress::after {
+  content:attr(data-glitch);
+  position:absolute;
+  inset:0;
+  text-align:right;
+  opacity:.13;
+  pointer-events:none;
+}
+.mf-loader > .mf-loader-progress::before {
+  color:#ff6060;
+  transform:translate3d(-1px,0,0);
+}
+.mf-loader > .mf-loader-progress::after {
+  color:#78caff;
+  transform:translate3d(1px,0,0);
+}
+.mf-loader > .mf-loader-ascii {
+  position:absolute;
+  left:20px;
+  right:20px;
+  bottom:calc(32px + var(--mf-loader-name-height));
+  min-height:0;
+  color:rgba(255,255,255,.56);
+  font:10px/1.2 "Geist Mono",monospace;
+  letter-spacing:.1em;
+  text-align:left;
+  z-index:3;
+}
+.mf-loader > .mf-loader-bar-track {
+  position:absolute;
+  left:20px;
+  right:20px;
+  bottom:20px;
+  width:auto;
+  height:var(--mf-loader-name-height);
+  overflow:hidden;
+  border:0;
+  background:#090909;
+  z-index:2;
+  transform-origin:center bottom;
+}
+.mf-loader > .mf-loader-bar-track .mf-loader-bar-fill {
+  position:absolute;
+  inset:0 auto 0 0;
+  width:1%;
+  height:100%;
+  background:#fff;
+  transition:width .1s linear;
+}
+.mf-loader-bar-grid {
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  pointer-events:none;
+}
+.mf-loader .mf-loader-bar-grid span {
+  display:block;
+  background:transparent !important;
+  transform:none !important;
+  animation:none !important;
+  border-left:1px solid #000;
+}
+.mf-loader .mf-loader-bar-grid span:first-child { border-left:0; }
+
+/* One-second hold is controlled in JS; this phase performs the cut, double
+   blink and bottom squeeze before the page itself starts revealing. */
+.mf-loader.is-completing > .mf-loader-progress {
+  animation:mfLoaderNumberCut .72s steps(1,end) both !important;
+}
+.mf-loader.is-completing > .mf-loader-progress::before {
+  opacity:1;
+  color:#fff;
+  clip-path:inset(0 0 50% 0);
+  animation:mfLoaderNumberTopCut .72s cubic-bezier(.22,1,.36,1) both;
+}
+.mf-loader.is-completing > .mf-loader-progress::after {
+  opacity:1;
+  color:#fff;
+  clip-path:inset(50% 0 0 0);
+  animation:mfLoaderNumberBottomCut .72s cubic-bezier(.22,1,.36,1) both;
+}
+.mf-loader.is-completing > .mf-loader-bar-track {
+  animation:mfLoaderBarSqueeze .72s cubic-bezier(.7,0,.2,1) both;
+}
+.mf-loader.is-completing > .mf-loader-ascii {
+  animation:mfLoaderHudOut .46s ease .16s both;
+}
+@keyframes mfLoaderNumberCut {
+  0%,18%,36% { opacity:1; }
+  12%,30%,72%,100% { opacity:0; }
+}
+@keyframes mfLoaderNumberTopCut {
+  0% { transform:translate3d(0,0,0); }
+  100% { transform:translate3d(12px,-2px,0);opacity:0; }
+}
+@keyframes mfLoaderNumberBottomCut {
+  0% { transform:translate3d(0,0,0); }
+  100% { transform:translate3d(-9px,2px,0);opacity:0; }
+}
+@keyframes mfLoaderBarSqueeze {
+  0% { transform:scaleY(1); }
+  100% { transform:scaleY(0); }
+}
+@keyframes mfLoaderHudOut { to { opacity:0;transform:translateY(5px); } }
+
+/* Three horizontal covers reveal left-to-right: bottom/name first, then
+   middle, then top. These overrides neutralize the legacy ten-column loader. */
+.mf-loader-reveal {
+  position:absolute;
+  inset:0;
+  z-index:5;
+  display:block !important;
+  opacity:0;
+  pointer-events:none;
+}
+.mf-loader .mf-loader-reveal > span {
+  position:absolute;
+  left:0;
+  width:100%;
+  height:33.4%;
+  display:block;
+  background:#000;
+  transform:none;
+  animation:none !important;
+  clip-path:inset(0 0 0 0);
+}
+.mf-loader-reveal-bottom { bottom:0; }
+.mf-loader-reveal-middle { top:33.3%; }
+.mf-loader-reveal-top { top:0; }
+.mf-loader.is-revealing {
+  background:transparent;
+}
+.mf-loader.is-revealing .mf-loader-reveal { opacity:1; }
+.mf-loader.is-revealing .mf-loader-reveal-bottom {
+  animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .02s forwards !important;
+}
+.mf-loader.is-revealing .mf-loader-reveal-middle {
+  animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .22s forwards !important;
+}
+.mf-loader.is-revealing .mf-loader-reveal-top {
+  animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .42s forwards !important;
+}
+@keyframes mfLoaderRowReveal { to { clip-path:inset(0 0 0 100%); } }
+
+body:not(.mf-page-revealed) .mf-hero-name { clip-path:inset(100% 0 0 0); }
+body.mf-page-revealed .mf-hero-name {
+  animation:mfHeroNameLoaderReveal .9s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes mfHeroNameLoaderReveal {
+  from { clip-path:inset(100% 0 0 0); }
+  to { clip-path:inset(0 0 0 0); }
+}
+
+/* Frame-two background always owns the entire frame from its first paint. */
+.mf-project-slide-carousel:not(.mf-project-slide-media-carousel) .mf-carousel-background {
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  transform:none !important;
+}
+
+.mf-project-video-loader,
+.mf-carousel-runtime-loader {
+  padding:18px;
+  background:#000;
+}
+.mf-project-video-loader-copy,
+.mf-carousel-runtime-loader-copy {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+.mf-project-video-loader-copy > span,
+.mf-carousel-runtime-loader-copy > span { white-space:nowrap; }
+.mf-project-video-loader-copy i,
+.mf-carousel-runtime-loader-copy i {
+  font-style:normal;
+  animation:cursorBlink 1s steps(1) infinite;
+}
+.mf-project-video-loader-percent,
+.mf-carousel-runtime-loader-percent {
+  color:rgba(255,255,255,.82);
+  font:inherit;
+  font-weight:400;
+  letter-spacing:.08em;
+  font-variant-numeric:tabular-nums;
+}
+
+@media (max-width:1024px) {
+  .mf-loader { --mf-loader-name-height:clamp(118px,28vw,190px); }
+  .mf-loader > .mf-loader-progress {
+    top:20px;
+    right:20px;
+    width:30vw;
+    min-width:132px;
+    font-size:clamp(48px,16vw,88px);
+  }
+  .mf-loader > .mf-loader-ascii {
+    left:20px;
+    right:20px;
+  }
+}
+
 @media (max-width: 620px) {
   .mf-nav-contact {
     display: none !important;
@@ -6447,5 +6697,162 @@ body.project-open .mf-nav-art {
     object-position:center !important;
     transform:none !important;
     background:#000 !important;
+  }
+}
+
+/* V56 final cascade — keep these rules last. */
+.mf-loader {
+  --mf-loader-name-height:clamp(150px,25vw,330px);
+  display:block !important;
+  background:#000 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  transition:none !important;
+}
+.mf-loader.done { display:none !important; }
+.mf-loader > .mf-loader-progress {
+  position:absolute !important;
+  inset:20px 20px auto auto !important;
+  width:30vw !important;
+  min-width:220px;
+  color:#fff !important;
+  text-align:right;
+  font:100 clamp(60px,9vw,150px)/.82 "Geist",Arial,sans-serif !important;
+  letter-spacing:-.075em !important;
+  font-variant-numeric:tabular-nums;
+  mix-blend-mode:normal !important;
+  transform:none;
+  transition:font-variation-settings .14s linear,font-weight .14s linear !important;
+  z-index:3;
+}
+.mf-loader > .mf-loader-progress::before,
+.mf-loader > .mf-loader-progress::after {
+  content:attr(data-glitch);
+  position:absolute;
+  inset:0;
+  text-align:right;
+  opacity:.13;
+}
+.mf-loader > .mf-loader-progress::before { color:#ff6060;transform:translateX(-1px); }
+.mf-loader > .mf-loader-progress::after { color:#78caff;transform:translateX(1px); }
+.mf-loader > .mf-loader-ascii {
+  position:absolute !important;
+  left:20px !important;
+  right:20px !important;
+  bottom:calc(32px + var(--mf-loader-name-height)) !important;
+  color:rgba(255,255,255,.56) !important;
+  font:10px/1.2 "Geist Mono",monospace !important;
+  letter-spacing:.1em;
+  text-align:left;
+  z-index:3;
+}
+.mf-loader > .mf-loader-bar-track {
+  position:absolute !important;
+  inset:auto 20px 20px 20px !important;
+  width:auto !important;
+  height:var(--mf-loader-name-height) !important;
+  overflow:hidden;
+  border:0 !important;
+  background:#090909 !important;
+  z-index:2;
+  transform-origin:center bottom;
+}
+.mf-loader > .mf-loader-bar-track .mf-loader-bar-fill {
+  position:absolute;
+  inset:0 auto 0 0;
+  width:1%;
+  height:100%;
+  background:#fff !important;
+  transition:width .1s linear !important;
+}
+.mf-loader-bar-grid {
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+}
+.mf-loader .mf-loader-bar-grid span {
+  display:block;
+  background:transparent !important;
+  transform:none !important;
+  animation:none !important;
+  border-left:1px solid #000;
+}
+.mf-loader .mf-loader-bar-grid span:first-child { border-left:0; }
+.mf-loader.is-completing > .mf-loader-progress {
+  animation:mfLoaderNumberCut .72s steps(1,end) both !important;
+}
+.mf-loader.is-completing > .mf-loader-progress::before {
+  opacity:1; color:#fff; clip-path:inset(0 0 50% 0);
+  animation:mfLoaderNumberTopCut .72s cubic-bezier(.22,1,.36,1) both !important;
+}
+.mf-loader.is-completing > .mf-loader-progress::after {
+  opacity:1; color:#fff; clip-path:inset(50% 0 0 0);
+  animation:mfLoaderNumberBottomCut .72s cubic-bezier(.22,1,.36,1) both !important;
+}
+.mf-loader.is-completing > .mf-loader-bar-track {
+  animation:mfLoaderBarSqueeze .72s cubic-bezier(.7,0,.2,1) both !important;
+}
+.mf-loader.is-completing > .mf-loader-ascii { animation:mfLoaderHudOut .46s ease .16s both !important; }
+.mf-loader-reveal {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:5 !important;
+  display:block !important;
+  opacity:0 !important;
+}
+.mf-loader .mf-loader-reveal > span {
+  position:absolute !important;
+  left:0 !important;
+  width:100% !important;
+  height:33.4% !important;
+  display:block !important;
+  background:#000 !important;
+  transform:none !important;
+  animation:none !important;
+  clip-path:inset(0 0 0 0);
+}
+.mf-loader-reveal-bottom { bottom:0 !important;top:auto !important; }
+.mf-loader-reveal-middle { top:33.3% !important; }
+.mf-loader-reveal-top { top:0 !important; }
+.mf-loader.is-revealing { background:transparent !important; }
+.mf-loader.is-revealing .mf-loader-reveal { opacity:1 !important; }
+.mf-loader.is-revealing .mf-loader-reveal-bottom { animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .02s forwards !important; }
+.mf-loader.is-revealing .mf-loader-reveal-middle { animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .22s forwards !important; }
+.mf-loader.is-revealing .mf-loader-reveal-top { animation:mfLoaderRowReveal .82s cubic-bezier(.77,0,.175,1) .42s forwards !important; }
+body:not(.mf-page-revealed) .mf-hero-name { clip-path:inset(100% 0 0 0); }
+body.mf-page-revealed .mf-hero-name { animation:mfHeroNameLoaderReveal .9s cubic-bezier(.16,1,.3,1) both !important; }
+
+.mf-project-slide-carousel:not(.mf-project-slide-media-carousel) .mf-carousel-background {
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  transform:none !important;
+}
+.mf-project-video-loader,.mf-carousel-runtime-loader { padding:18px;background:#000; }
+.mf-project-video-loader-copy,.mf-carousel-runtime-loader-copy {
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.mf-project-video-loader-copy > span,.mf-carousel-runtime-loader-copy > span { white-space:nowrap; }
+.mf-project-video-loader-copy i,.mf-carousel-runtime-loader-copy i { font-style:normal;animation:cursorBlink 1s steps(1) infinite; }
+.mf-project-video-loader-percent,.mf-carousel-runtime-loader-percent {
+  color:rgba(255,255,255,.82);font:inherit;font-weight:400;letter-spacing:.08em;font-variant-numeric:tabular-nums;
+}
+@media (max-width:1024px) {
+  .mf-loader { --mf-loader-name-height:clamp(118px,28vw,190px); }
+  .mf-loader > .mf-loader-progress {
+    inset:20px 20px auto auto !important;
+    width:30vw !important;
+    min-width:132px;
+    font-size:clamp(48px,16vw,88px) !important;
   }
 }
