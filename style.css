@@ -6743,7 +6743,7 @@ body.project-open .mf-nav-art {
   right:20px !important;
   bottom:calc(32px + var(--mf-loader-name-height)) !important;
   color:rgba(255,255,255,.56) !important;
-  font:10px/1.2 "Geist Mono",monospace !important;
+  font:400 10px/1.2 "Geist",Arial,sans-serif !important;
   letter-spacing:.1em;
   text-align:left;
   z-index:3;
@@ -6784,6 +6784,17 @@ body.project-open .mf-nav-art {
 .mf-loader .mf-loader-bar-grid span:first-child { border-left:0; }
 .mf-loader.is-completing > .mf-loader-progress {
   animation:mfLoaderNumberCut .72s steps(1,end) both !important;
+}
+.mf-loader > .mf-loader-progress.is-100-blink {
+  animation:mfLoaderHundredBlink .42s steps(1,end) both !important;
+}
+.mf-loader > .mf-loader-progress.is-check {
+  font-family:"Geist",Arial,sans-serif !important;
+  letter-spacing:0 !important;
+}
+@keyframes mfLoaderHundredBlink {
+  0%,18%,45%,68%,100% { opacity:1; }
+  19%,44%,69%,84% { opacity:0; }
 }
 .mf-loader.is-completing > .mf-loader-progress::before {
   opacity:1; color:#fff; clip-path:inset(0 0 50% 0);
