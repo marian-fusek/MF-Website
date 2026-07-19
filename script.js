@@ -371,7 +371,15 @@ if(indexExtra){
       approach:"I reframed the platform around the moments where search changes the work itself. Product language became more direct, the identity gained focus and the sales story moved from feature inventory to practical leverage. The system gives the technology room to feel sophisticated without becoming abstract.",
       images:[
         {type:"video",src:"/media/projects/aims/logo/01-aims-logo.mp4",title:"AIMS logo animation",note:"[NOT PART OF THE REDESIGN]"},
-        {type:"verticalGallery",background:"/media/projects/aims/web/02-aims-bgr.jpg",cards:["/media/projects/aims/web/01-hp.jpg"],title:"AIMS website"}
+        {type:"verticalGallery",background:"/media/projects/aims/web/00-aims-bgr.jpg",cards:[
+          "/media/projects/aims/web/01-hp.jpg",
+          "/media/projects/aims/web/02-products.jpg",
+          "/media/projects/aims/web/03-usecases.jpg",
+          "/media/projects/aims/web/04-about.jpg",
+          "/media/projects/aims/web/05-testimonials.jpg",
+          "/media/projects/aims/web/06-blog.jpg",
+          "/media/projects/aims/web/07-contact.jpg"
+        ],title:"AIMS website"}
       ]
     },
     "04":{
