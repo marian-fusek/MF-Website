@@ -25,9 +25,7 @@ function runMfSiteLoader(){
   const barEl=mfLoaderBits?.bar;
   const asciiEl=mfLoaderBits?.ascii;
   const syncLoaderNameHeight=()=>{
-    const name=document.getElementById('heroName');
-    const height=name?.getBoundingClientRect().height||0;
-    if(height>40)loader.style.setProperty('--mf-loader-name-height',`${height.toFixed(1)}px`);
+    loader.style.setProperty('--mf-loader-name-height',`${Math.max(90,window.innerHeight/3-20).toFixed(1)}px`);
   };
   requestAnimationFrame(syncLoaderNameHeight);
   document.fonts?.ready?.then(syncLoaderNameHeight);
@@ -54,6 +52,7 @@ function runMfSiteLoader(){
   let settled=0;
   const total=Math.max(1,resources.length);
   const minDelay=2600;
+  const simulatedDuration=3600;
   const startTime=performance.now();
   function paintFrontier(value){
     const ratio=Math.max(0,Math.min(1,value/100));
@@ -69,11 +68,14 @@ function runMfSiteLoader(){
   }
   const render=()=>{
     raf=0;
-    display += (target-display) * (target>=99 ? 0.045 : 0.065);
+    const elapsed=performance.now()-startTime;
+    const simulatedCap=Math.min(100,1+(elapsed/simulatedDuration)*99);
+    const effectiveTarget=Math.min(target,simulatedCap);
+    display += (effectiveTarget-display) * (effectiveTarget>=99 ? 0.045 : 0.065);
     if(target===100 && display>99.55) display=100;
     paintFrontier(display);
     if(target===100&&display===100){beginCompletion();return;}
-    if(Math.abs(target-display)>.04) raf=requestAnimationFrame(render);
+    if(Math.abs(target-display)>.04||effectiveTarget<target)raf=requestAnimationFrame(render);
   };
   const setTarget=v=>{
     target=Math.max(target,Math.min(100,v));
@@ -329,9 +331,9 @@ if(indexExtra){
   ].map(name=>`/media/projects/goballer/brand/${name}`);
 
   const goballerAppCards=[
-    {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-1.jpg",title:"GoBaller iOS screen 1"},
+    {type:"video",src:"/media/projects/goballer/app/03-goballer-ios-1.mp4",title:"GoBaller iOS product video"},
     {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-2.jpg",title:"GoBaller iOS screen 2"},
-    {type:"video",src:"/media/projects/goballer/app/03-goballer-ios-3.mp4",title:"GoBaller iOS product video"},
+    {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-3.jpg",title:"GoBaller iOS screen 3"},
     {type:"image",src:"/media/projects/goballer/app/03-goballer-ios-4.jpg",title:"GoBaller iOS screen 4"}
   ];
 
@@ -469,7 +471,7 @@ if(indexExtra){
   function carouselItemMarkup(item,index){
     const normalized=typeof item==="string"?{type:"image",src:item}:item;
     if(normalized?.type==="video"){
-      return `<video src="${esc(normalized.src)}" title="${esc(normalized.title||`Carousel video ${index+1}`)}" muted loop playsinline preload="metadata"></video>`;
+      return `<video src="${esc(normalized.src)}" title="${esc(normalized.title||`Carousel video ${index+1}`)}" autoplay muted loop playsinline preload="metadata"></video>`;
     }
     return `<img src="${esc(normalized?.src||"")}" alt="${esc(normalized?.title||`Carousel visual ${index+1}`)}" draggable="false">`;
   }
@@ -790,6 +792,10 @@ if(indexExtra){
         card._mfReady=img.decode?.().catch(()=>{})||Promise.resolve();
         return card._mfReady;
       }
+
+      /* Frame three now begins with video, so initialize it through the same
+         delayed-loader path used when a video is reached later in the deck. */
+      if(mixed&&itemAt(index).type==='video')mountCard(current,cards[index],index,true);
 
       function updateCursorLabel(){
         const zone=cursor.dataset.zone||'right';
@@ -1203,7 +1209,7 @@ if(indexExtra){
 function scaleHeroName(){const hero=document.getElementById("heroName"),wrap=document.getElementById("nameWrap"),info=document.querySelector(".mf-hero-info");if(!hero||!wrap)return;hero.style.fontSize="300px";wrap.style.transform="none";const width=wrap.scrollWidth,viewport=window.innerWidth,isMobile=viewport<=1024,leftPad=isMobile?8:-22,rightPad=isMobile?8:30,scale=(viewport-leftPad-rightPad)/width,offset=leftPad;wrap.style.transform=`translateX(${offset}px) scale(${scale})`;wrap.style.transformOrigin="left bottom";if(info&&window.innerWidth>1000){const fChar=hero.querySelector(".n-f");if(fChar){const fRect=fChar.getBoundingClientRect();info.style.left=(fRect.left+20)+"px";info.style.right="auto";info.style.width=Math.min(560,(window.innerWidth-fRect.left)*.55)+"px";info.style.top="22%";info.style.bottom="auto"}}else if(info){info.style.left="";info.style.right="";info.style.width="";info.style.bottom="";info.style.top=""}}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scaleHeroName);else setTimeout(scaleHeroName,200);scaleHeroName();window.addEventListener("resize",scaleHeroName);
 
-(function(){const hero=document.getElementById("heroName");if(!hero)return;const wait=ms=>new Promise(r=>setTimeout(r,ms));const chars=()=>Array.from(hero.querySelectorAll(".nc")).filter(c=>!c.classList.contains("n-sp"));async function accentA(){const a=hero.querySelector(".n-a2");if(!a)return;a.textContent="Á";await wait(600);a.textContent="A"}async function accentU(){const u=hero.querySelector(".n-u");if(!u)return;u.textContent="Ů";await wait(600);u.textContent="U"}async function disappear(){const list=["n-a1","n-r","n-i","n-a2","n-n","n-u","n-s","n-e","n-k"].map(c=>hero.querySelector("."+c)).filter(Boolean);list.forEach(el=>el.style.opacity="0");await wait(2100);list.forEach(el=>el.style.opacity="");await wait(400)}async function rgb(){const all=chars(),picks=[...all].sort(()=>Math.random()-.5).slice(0,3);let frame=0,total=120;const timer=setInterval(()=>{frame++;const t=frame/total,amp=Math.sin(t*Math.PI)*4,j=(Math.random()-.5)*.8,x=(amp+j).toFixed(2),nx=(-(amp+j*.7)).toFixed(2);picks.forEach(el=>{el.style.textShadow=`${x}px 0 3px rgba(226,27,22,.8),${nx}px 0 3px rgba(0,167,255,.8)`});if(frame>=total)clearInterval(timer)},16);await wait(2050);picks.forEach(el=>el.style.textShadow="")}async function blurFx(){const all=chars();all.forEach(el=>{el.style.transition=`filter .5s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(3px)"});await wait(1300);all.forEach(el=>{el.style.transition=`filter .8s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(0)"});await wait(900);all.forEach(el=>{el.style.transition="";el.style.filter=""})}const effects=[accentA,accentU,disappear,rgb,blurFx];function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}let queue=[];async function run(){await wait(2500);while(true){if(!queue.length)queue=shuffle(effects);await queue.shift()();await wait(2500)}}run();})();
+(function(){const hero=document.getElementById("heroName");if(!hero)return;const wait=ms=>new Promise(r=>setTimeout(r,ms));const chars=()=>Array.from(hero.querySelectorAll(".nc")).filter(c=>!c.classList.contains("n-sp"));async function accentA(){const a=hero.querySelector(".n-a2");if(!a)return;a.textContent="Á";await wait(600);a.textContent="A"}async function accentU(){const u=hero.querySelector(".n-u");if(!u)return;u.textContent="Ů";await wait(600);u.textContent="U"}async function disappear(){const list=["n-a1","n-r","n-i","n-a2","n-n","n-u","n-s","n-e","n-k"].map(c=>hero.querySelector("."+c)).filter(Boolean);list.forEach(el=>el.style.opacity="0");await wait(2100);list.forEach(el=>el.style.opacity="");await wait(400)}async function rgb(){const all=chars(),picks=[...all].sort(()=>Math.random()-.5).slice(0,3);let frame=0,total=120;const timer=setInterval(()=>{frame++;const t=frame/total,amp=Math.sin(t*Math.PI)*4,j=(Math.random()-.5)*.8,x=(amp+j).toFixed(2),nx=(-(amp+j*.7)).toFixed(2);picks.forEach(el=>{el.style.textShadow=`${x}px 0 3px rgba(226,27,22,.8),${nx}px 0 3px rgba(0,167,255,.8)`});if(frame>=total)clearInterval(timer)},16);await wait(2050);picks.forEach(el=>el.style.textShadow="")}async function blurFx(){const all=chars();all.forEach(el=>{el.style.transition=`filter .5s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(3px)"});await wait(1300);all.forEach(el=>{el.style.transition=`filter .8s cubic-bezier(.16,1,.3,1)`;el.style.filter="blur(0)"});await wait(900);all.forEach(el=>{el.style.transition="";el.style.filter=""})}const effects=[accentA,accentU,disappear,rgb,blurFx];function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}let queue=[];async function run(){while(!document.body.classList.contains("mf-page-revealed"))await wait(100);await wait(2500);while(true){if(!queue.length)queue=shuffle(effects);await queue.shift()();await wait(2500)}}run();})();
 
 /* XP structural reveal + title effects */
 (function(){const section=document.getElementById("xp"),track=document.getElementById("timelineItems");if(!section||!track)return;const cards=[...track.querySelectorAll(".mf-xp-card")];let started=false;const style=document.createElement("style");style.textContent=`.xp-char{display:inline-block;will-change:transform,opacity,filter,color,text-shadow;}.xp-cursor{display:inline-block;margin-left:0;animation:xpCursorBlink .72s steps(1) infinite;}@keyframes xpCursorBlink{50%{opacity:0;}}.xp-heart{display:inline-block;margin-left:.35em;color:#fff;filter:blur(.15px);transform-origin:center;animation:xpHeartBeat 1.05s cubic-bezier(.16,1,.3,1) infinite;}@keyframes xpHeartBeat{0%,100%{transform:scale(1);filter:blur(.15px);}12%{transform:scale(1.22);filter:blur(1.1px);}22%{transform:scale(.98);filter:blur(.25px);}34%{transform:scale(1.16);filter:blur(.9px);}48%{transform:scale(1);filter:blur(.15px);}}.xp-strv-red{color:var(--red,#e21b16)!important;text-shadow:0 0 14px rgba(226,27,22,.36);}.xp-symbio-word,.xp-symbio-digital{display:inline-block;white-space:pre;will-change:transform,opacity,letter-spacing;}`;document.head.appendChild(style);
@@ -1544,7 +1550,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=window.matchMedia("(max-width: 1024px)").matches?520:760;
+  const COUNT=window.matchMedia("(max-width: 1024px)").matches?360:760;
   const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"fourStar",symbio:"sinusoid",fg:"spiral"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
@@ -1913,7 +1919,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   function ensureArtPreview(){
     return ensureArtBuilt().then(async()=>{
       if(artPreviewReady)return;
-      await Promise.allSettled(pieces.map(piece=>loadImg(piece.miniImg)));
+      const mobilePreview=window.matchMedia('(max-width: 1024px), (pointer: coarse)').matches;
+      const previewPieces=mobilePreview?pieces.slice(0,12):pieces;
+      if(mobilePreview)pieces.slice(12).forEach(piece=>piece.miniEl?.remove());
+      await Promise.allSettled(previewPieces.map(piece=>loadImg(piece.miniImg)));
       artPreviewReady=true;
       render(performance.now());
     });
