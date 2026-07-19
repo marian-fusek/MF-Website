@@ -264,7 +264,9 @@ if(indexExtra){
     ],
     "03":[
       "/media/projects/aims/01-aims-logo.jpg",
-      "/media/projects/aims/02-aims-web.jpg"
+      "/media/projects/aims/02-aims-web.jpg",
+      "/media/projects/aims/socials/03-aims-socials-1.jpg",
+      "/media/projects/aims/merch/04-aims-merch-1.jpg"
     ],
     "04":[
       "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=76",
@@ -379,7 +381,13 @@ if(indexExtra){
           "/media/projects/aims/web/05-testimonials.jpg",
           "/media/projects/aims/web/06-blog.jpg",
           "/media/projects/aims/web/07-contact.jpg"
-        ],title:"AIMS website"}
+        ],title:"AIMS website"},
+        {type:"mediaCarousel",cards:[
+          {type:"image",src:"/media/projects/aims/socials/03-aims-socials-1.jpg",title:"AIMS social visual 1"},
+          {type:"image",src:"/media/projects/aims/socials/03-aims-socials-2.jpg",title:"AIMS social visual 2"},
+          {type:"image",src:"/media/projects/aims/socials/03-aims-socials-3.jpg",title:"AIMS social visual 3"}
+        ],title:"AIMS social gallery"},
+        "/media/projects/aims/merch/04-aims-merch-1.jpg"
       ]
     },
     "04":{
