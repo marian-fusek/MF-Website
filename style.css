@@ -6998,6 +6998,9 @@ body.mf-name-revealed .mf-hero-name {
   object-position:top center !important;
   filter:none !important;
   transform:none;
+  transform-origin:top center !important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
   will-change:opacity,transform;
   user-select:none;
   -webkit-user-drag:none;

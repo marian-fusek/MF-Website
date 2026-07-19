@@ -1053,22 +1053,37 @@ if(indexExtra){
         const target=wrap(index+direction);
         const exit=direction>0?-24:24;
         const enter=direction>0?24:-24;
-        await image.animate([
-          {opacity:1,transform:'translate3d(0,0,0) scale(1)'},
-          {opacity:0,transform:`translate3d(${exit}px,0,0) scale(.985)`}
-        ],{duration:380,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'}).finished.catch(()=>{});
-        image.src=cards[target];
-        await (image.decode?.().catch(()=>{})||Promise.resolve());
-        scroller.scrollTop=0;
-        const incoming=image.animate([
-          {opacity:0,transform:`translate3d(${enter}px,0,0) scale(.985)`},
-          {opacity:1,transform:'translate3d(0,0,0) scale(1)'}
-        ],{duration:620,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
-        await incoming.finished.catch(()=>{});
-        incoming.cancel();
-        index=target;
-        updateCursor(cursor?.dataset.zone||'right');
-        moving=false;
+        image.getAnimations().forEach(animation=>animation.cancel());
+        try{
+          const outgoing=image.animate([
+            {opacity:1,transform:'translate3d(0,0,0)'},
+            {opacity:0,transform:`translate3d(${exit}px,0,0)`}
+          ],{duration:320,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+          await outgoing.finished.catch(()=>{});
+          outgoing.cancel();
+
+          image.style.opacity='0';
+          image.style.transform=`translate3d(${enter}px,0,0)`;
+          image.src=cards[target];
+          await (image.decode?.().catch(()=>{})||Promise.resolve());
+          scroller.scrollTop=0;
+
+          const incoming=image.animate([
+            {opacity:0,transform:`translate3d(${enter}px,0,0)`},
+            {opacity:1,transform:'translate3d(0,0,0)'}
+          ],{duration:560,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+          await incoming.finished.catch(()=>{});
+          incoming.cancel();
+          image.style.opacity='1';
+          image.style.transform='translate3d(0,0,0)';
+          index=target;
+          updateCursor(cursor?.dataset.zone||'right');
+        }finally{
+          image.getAnimations().forEach(animation=>animation.cancel());
+          image.style.opacity='1';
+          image.style.transform='translate3d(0,0,0)';
+          moving=false;
+        }
       };
       toggle.addEventListener('click',event=>{
         event.preventDefault();event.stopPropagation();setEnabled(!enabled);
