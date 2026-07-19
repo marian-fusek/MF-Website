@@ -1883,7 +1883,7 @@ body.project-open .mf-nav-contact {
   justify-self:center;
   height:27vh;
   min-height:220px;
-  background-image:url('/images/marian-fusek.png');
+  background-image:url('/media/marian-fusek.png');
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
@@ -2154,7 +2154,7 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   min-height:220px;
   aspect-ratio:auto;
   border:0;
-  background-image:url('./images/marian-fusek.png') !important;
+  background-image:url('./media/marian-fusek.png') !important;
   background-repeat:no-repeat;
   background-position:left top;
   background-size:auto 100% !important;
@@ -6311,4 +6311,141 @@ body.project-open .mf-nav-art {
   .mf-loader-progress { top: 16px; left: 16px; font-size: clamp(36px, 14vw, 74px); }
   .mf-loader-token { font-size: 9px; }
   .mf-loader-blob { width: 38vw; height: 38vw; }
+}
+
+/* ============================================================
+   V55 — restored minimal loader, corrected media paths and
+   contain-only mobile project imagery
+   ============================================================ */
+.mf-loader {
+  background: #000;
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.mf-loader-inner {
+  position: relative;
+  z-index: 2;
+  width: min(760px, calc(100vw - 64px));
+  display: grid;
+  gap: 20px;
+}
+.mf-loader > .mf-loader-inner .mf-loader-progress {
+  position: relative;
+  inset: auto;
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(92px, 22vw, 360px);
+  line-height: .72;
+  letter-spacing: -.085em;
+  color: #fff;
+  mix-blend-mode: normal;
+  transform-origin: left center;
+  will-change: font-variation-settings, transform, filter;
+}
+.mf-loader > .mf-loader-inner .mf-loader-bar-track {
+  width: 100%;
+  height: 12px;
+  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.035);
+  overflow: hidden;
+}
+.mf-loader > .mf-loader-inner .mf-loader-bar-fill {
+  height: 100%;
+  width: 0;
+  background: #fff;
+  transition: width .12s linear;
+}
+.mf-loader > .mf-loader-inner .mf-loader-ascii {
+  color: rgba(255,255,255,.62);
+  min-height: 1.5em;
+}
+.mf-loader-progress.is-final-glitch {
+  animation: mfLoaderFinalDismorph 1s steps(8,end) both;
+}
+@keyframes mfLoaderFinalDismorph {
+  0% { transform: translate3d(0,0,0) skewX(0); filter:none; }
+  12% { transform: translate3d(-8px,2px,0) skewX(12deg) scaleX(1.05); filter:contrast(1.7); }
+  23% { transform: translate3d(11px,-3px,0) skewX(-8deg) scaleY(.92); }
+  36% { transform: translate3d(-4px,1px,0) scaleX(.96); filter:contrast(2); }
+  48% { transform: translate3d(8px,0,0) skewX(5deg); }
+  62% { transform: translate3d(-10px,-2px,0) scaleY(1.08); filter:contrast(1.4); }
+  76% { transform: translate3d(3px,1px,0) skewX(-3deg); }
+  100% { transform: translate3d(0,0,0); filter:none; }
+}
+.mf-loader-reveal { z-index: 4; }
+.mf-loader-reveal span { background:#000; }
+
+/* The ART runtime loader has its own compact centered percentage. */
+.mf-art-runtime-loader .mf-loader-progress {
+  position: relative;
+  inset: auto;
+  mix-blend-mode: normal;
+  color: #fff;
+}
+
+.mf-meta-text { white-space: pre-line; }
+.mf-art-mini-intro h3 { margin:0; }
+
+/* Project imagery always preserves the colors supplied by the author. */
+.mf-project-slide img,
+.mf-strip-preview-frame img,
+.mf-carousel-background,
+.mf-carousel-card img { filter:none !important; }
+
+@media (max-width: 1024px) {
+  .mf-loader-inner {
+    width: calc(100vw - 32px);
+    gap: 15px;
+  }
+  .mf-loader > .mf-loader-inner .mf-loader-progress {
+    font-size: clamp(78px, 30vw, 190px);
+  }
+  .mf-loader > .mf-loader-inner .mf-loader-bar-track { height:10px; }
+
+  /* Type 1: every still image is contained. There is no tap-to-expand or pan. */
+  .mf-project-image-viewport > img,
+  .mf-project-image-viewport.is-fit > img,
+  .mf-project-image-viewport:not(.is-fit) > img {
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    transform:none !important;
+    background:#000 !important;
+  }
+
+  /* Type 3: background remains full-frame; the card remains scaled down. */
+  .mf-project-slide-carousel:not(.mf-project-slide-media-carousel)
+  .mf-goballer-carousel .mf-carousel-card-current {
+    width:auto !important;
+    height:auto !important;
+    max-width:90% !important;
+    max-height:82% !important;
+    object-fit:contain !important;
+    transform:translate3d(0,0,0) scale(1) !important;
+  }
+
+  /* Type 4: stills are contained; video keeps the established full-frame rules. */
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image .mf-carousel-media-card,
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image.is-expanded .mf-carousel-media-card.mf-carousel-card-current {
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    transform:none !important;
+  }
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image .mf-carousel-media-card > img,
+  .mf-project-slide-media-carousel
+  .mf-goballer-carousel.is-current-image.is-expanded .mf-carousel-media-card.mf-carousel-card-current > img {
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    transform:none !important;
+    background:#000 !important;
+  }
 }

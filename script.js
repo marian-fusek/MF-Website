@@ -1,50 +1,21 @@
 const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
-/* Mobile Safari may reload a graphics-heavy tab under memory pressure.
-   Restore the same-tab position after any recovery, not only when the browser
-   reports the navigation as a formal reload. */
-(function(){
-  const mobile=window.matchMedia("(max-width: 1024px), (pointer: coarse)");
-  if(!mobile.matches)return;
-  try{history.scrollRestoration="manual";}catch(error){}
-  const key="mfMobileScrollY",enteredKey="mfMobileEntered";
-  let saveTimer=0,restoreTimers=[];
-  let hadEntered=false;
-  try{hadEntered=sessionStorage.getItem(enteredKey)==="1";}catch(error){}
-  const save=()=>{
-    clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){}},80);
-  };
-  const cancelRestore=()=>{restoreTimers.forEach(clearTimeout);restoreTimers=[];};
-  window.addEventListener("scroll",save,{passive:true});
-  window.addEventListener("pagehide",()=>{clearTimeout(saveTimer);try{sessionStorage.setItem(key,String(Math.max(0,window.scrollY)));}catch(error){};},{passive:true});
-  ["touchstart","pointerdown","wheel"].forEach(type=>window.addEventListener(type,cancelRestore,{passive:true}));
-  window._mfRestoreSavedMobileScroll=()=>{
-    if(!hadEntered)return;
-    let saved=0;
-    try{saved=Number(sessionStorage.getItem(key)||0);}catch(error){}
-    if(saved<=8)return;
-    cancelRestore();
-    const restore=()=>window.scrollTo({top:saved,left:0,behavior:"auto"});
-    [60,260,760,1600,2800].forEach(delay=>restoreTimers.push(setTimeout(restore,delay)));
-  };
-  window._mfMarkMobileEntered=()=>{hadEntered=true;try{sessionStorage.setItem(enteredKey,"1");}catch(error){}};
-  window.addEventListener("pageshow",event=>{if(event.persisted)setTimeout(()=>window._mfRestoreSavedMobileScroll?.(),40);});
-})();
+/* Let the browser own mobile scroll restoration. The previous delayed series
+   of scrollTo calls could fire during normal use and looked like a reload. */
 
 const loader=document.getElementById("mfLoader");
 function startMfSite(){
   document.body.classList.remove("mf-preload-locked");
   document.body.classList.add("mf-site-entered");
   runMfSiteLoader();
-  window._mfRestoreSavedMobileScroll?.();
-  window._mfMarkMobileEntered?.();
 }
 
 const mfLoaderBits=loader?{
   progress:loader.querySelector('#mfLoaderProgress'),
-  edge:loader.querySelector('#mfLoaderEdge'),
+  bar:loader.querySelector('#mfLoaderBar'),
+  ascii:loader.querySelector('#mfLoaderAscii'),
+  particles:loader.querySelector('#mfLoaderParticles'),
   reveal:loader.querySelector('#mfLoaderReveal')
 }:null;
 let mfSiteLoaderStarted=false;
@@ -52,19 +23,21 @@ function runMfSiteLoader(){
   if(!loader||mfSiteLoaderStarted){ if(loader) setTimeout(()=>loader.classList.add('done'),50); return; }
   mfSiteLoaderStarted=true;
   const progressEl=mfLoaderBits?.progress;
-  const edgeEl=mfLoaderBits?.edge;
-  const phrases=['++','[]','<>','signal_lost()','quiet','ask'];
-  if(edgeEl&&!edgeEl.childElementCount){
-    for(let i=0;i<18;i++){
-      const token=document.createElement('span');
-      token.className='mf-loader-token';
-      token.textContent=Math.random()>.45?phrases[Math.floor(Math.random()*phrases.length)]:'•';
-      token.dataset.angle=String(0.08+Math.random()*1.14);
-      token.dataset.offset=String(-28+Math.random()*56);
-      token.dataset.radius=String(.84+Math.random()*.22);
-      token.dataset.drift=String(6+Math.random()*18);
-      token.style.opacity=(.14+Math.random()*.45).toFixed(2);
-      edgeEl.appendChild(token);
+  const barEl=mfLoaderBits?.bar;
+  const asciiEl=mfLoaderBits?.ascii;
+  const particleEl=mfLoaderBits?.particles;
+  if(particleEl&&!particleEl.childElementCount){
+    for(let i=0;i<28;i++){
+      const dot=document.createElement('span');
+      dot.style.setProperty('--x',`${Math.random()*100}%`);
+      dot.style.setProperty('--y',`${Math.random()*100}%`);
+      dot.style.setProperty('--s',`${1+Math.random()*3}px`);
+      dot.style.setProperty('--d',`${4+Math.random()*7}s`);
+      dot.style.setProperty('--delay',`${-Math.random()*7}s`);
+      dot.style.setProperty('--dx',`${-26+Math.random()*52}px`);
+      dot.style.setProperty('--dy',`${-32+Math.random()*64}px`);
+      dot.style.setProperty('--a',`${.16+Math.random()*.5}`);
+      particleEl.appendChild(dot);
     }
   }
   const withTimeout=(promise,ms=4200)=>Promise.race([Promise.resolve(promise),new Promise(resolve=>setTimeout(resolve,ms))]);
@@ -92,27 +65,16 @@ function runMfSiteLoader(){
   const startTime=performance.now();
   function paintFrontier(value){
     const ratio=Math.max(0,Math.min(1,value/100));
-    loader.style.setProperty('--mf-progress',ratio.toFixed(4));
-    const vw=window.innerWidth, vh=window.innerHeight;
-    const diag=Math.hypot(vw,vh);
-    const frontier=diag*(0.03+ratio*1.06);
     if(progressEl){
       const txt=`${String(Math.round(value)).padStart(2,'0')}%`;
       progressEl.textContent=txt;
       progressEl.dataset.glitch=txt;
+      progressEl.style.fontVariationSettings=`'wght' ${Math.round(100+ratio*900)}, 'opsz' ${Math.round(8+ratio*136)}`;
+      progressEl.style.fontWeight=String(Math.round(100+ratio*800));
       progressEl.classList.toggle('is-glitch', Math.random()>.78 && value<100);
     }
-    if(edgeEl){
-      [...edgeEl.children].forEach((token,idx)=>{
-        const angle=Number(token.dataset.angle||0.5);
-        const radius=frontier*Number(token.dataset.radius||1);
-        const jitter=Math.sin(performance.now()*0.0015+idx*1.77)*Number(token.dataset.drift||12);
-        const x=Math.cos(angle)*radius + Number(token.dataset.offset||0) + jitter;
-        const y=Math.sin(angle)*radius + Number(token.dataset.offset||0) - jitter*.35;
-        token.style.transform=`translate3d(${x}px,${y}px,0)`;
-        token.style.opacity=(0.08 + (1-ratio)*0.08 + Math.max(0, Math.sin(performance.now()*0.002+idx))*0.35).toFixed(2);
-      });
-    }
+    if(barEl)barEl.style.width=`${ratio*100}%`;
+    if(asciiEl&&Math.random()>.92)asciiEl.textContent=['// assembling experience','<> signal acquired','[] loading intent','++ almost human'][Math.floor(Math.random()*4)];
   }
   const render=()=>{
     raf=0;
@@ -130,9 +92,17 @@ function runMfSiteLoader(){
   const finish=()=>{
     if(finished)return;
     finished=true;
-    setTarget(100);
-    loader.classList.add('is-revealing');
-    setTimeout(()=>loader.classList.add('done'),1080);
+    target=100;
+    display=100;
+    paintFrontier(100);
+    setTimeout(()=>{
+      progressEl?.classList.add('is-final-glitch');
+      if(asciiEl)asciiEl.textContent='// 100% — dismorphing';
+      setTimeout(()=>{
+        loader.classList.add('is-revealing');
+        setTimeout(()=>loader.classList.add('done'),1080);
+      },1000);
+    },260);
   };
   Promise.allSettled(resources).then(()=>{
     const elapsed=performance.now()-startTime;
@@ -680,44 +650,15 @@ if(indexExtra){
          their established V48 presentation and interaction unchanged. */
       const isStillImage=media.tagName==='IMG';
       if(isStillImage){
-        const slide=viewport.closest('.mf-project-slide');
-        const isMiunaeOpeningImage=currentProjectKey==='01'&&Number(slide?.dataset.slide)===0;
-        viewport.classList.toggle('is-fit',!isMiunaeOpeningImage);
+        viewport.classList.add('is-fit');
         viewport.dataset.position='50';
+        viewport.style.setProperty('--image-x','50%');
+        media.addEventListener('dragstart',event=>event.preventDefault());
+        return;
       }else{
         viewport.classList.remove('is-fit');
       }
 
-      let downX=0,downY=0,startPosition=50,moved=false,dragging=false,isDown=false;
-      viewport.style.setProperty('--image-x','50%');
-      viewport.addEventListener('pointerdown',event=>{
-        isDown=true;downX=event.clientX;downY=event.clientY;startPosition=Number(viewport.dataset.position||50);moved=false;dragging=false;
-        viewport.setPointerCapture?.(event.pointerId);
-      });
-      viewport.addEventListener('pointermove',event=>{
-        if(!isDown)return;
-        const dx=event.clientX-downX,dy=event.clientY-downY;
-        if(Math.abs(dx)+Math.abs(dy)>8)moved=true;
-        if(viewport.classList.contains('is-fit'))return;
-        if(Math.abs(dx)>Math.abs(dy)+4){
-          dragging=true;
-          const next=Math.max(0,Math.min(100,startPosition-dx/Math.max(1,viewport.clientWidth)*100));
-          viewport.dataset.position=String(next);
-          viewport.style.setProperty('--image-x',`${next}%`);
-        }
-      });
-      const end=event=>{
-        if(!isDown)return;
-        isDown=false;
-        try{viewport.releasePointerCapture?.(event.pointerId);}catch(_){ }
-        if(!moved&&!dragging){
-          viewport.classList.toggle('is-fit');
-          viewport.dataset.position='50';
-          viewport.style.setProperty('--image-x','50%');
-        }
-      };
-      viewport.addEventListener('pointerup',end);
-      viewport.addEventListener('pointercancel',()=>{isDown=false;});
       media.addEventListener('dragstart',event=>event.preventDefault());
       if(media.tagName==='VIDEO'){
         media.muted=true;
@@ -998,13 +939,6 @@ if(indexExtra){
           if(!isDown||animating)return;
           const dx=event.clientX-startX,dy=event.clientY-startY;
           if(Math.abs(dx)+Math.abs(dy)>10)moved=true;
-          if(root.classList.contains('is-expanded')&&Math.abs(dx)>Math.abs(dy)){
-            const limit=root.clientWidth*.38;
-            const pan=Math.max(-limit,Math.min(limit,panStart+dx));
-            root.dataset.panX=String(pan);
-            root.style.setProperty('--carousel-pan-x',`${pan}px`);
-            return;
-          }
           if(Math.abs(dx)<=Math.abs(dy)+5)return;
           event.preventDefault();
           const direction=dx<0?1:-1;
@@ -1029,32 +963,12 @@ if(indexExtra){
           isDown=false;
           const dx=event.clientX-startX,dy=event.clientY-startY;
           try{root.releasePointerCapture?.(event.pointerId);}catch(_){ }
-          if(root.classList.contains('is-expanded')){
-            if(!moved){
-              root.classList.remove('is-expanded');
-              root.dataset.panX='0';
-              root.style.setProperty('--carousel-pan-x','0px');
-            }
-            return;
-          }
           const shouldMove=Math.abs(dx)>44&&Math.abs(dx)>Math.abs(dy)+8;
           if(shouldMove){
             root.classList.remove('is-dragging');
             swipeDirection=0;swipeTarget=-1;
             move(dx<0?1:-1,true);
-          }else{
-            clearSwipePreview();
-            if(!moved){
-              /* Only still-image cards use the new contain/expand model.
-                 Video cards retain their established full-frame behavior. */
-              const canExpand=!mixed||itemAt(index).type!=='video';
-              if(canExpand){
-                root.classList.add('is-expanded');
-                root.dataset.panX='0';
-                root.style.setProperty('--carousel-pan-x','0px');
-              }
-            }
-          }
+          }else clearSwipePreview();
         };
         root.addEventListener('pointerup',endPointer);
         root.addEventListener('pointercancel',()=>{isDown=false;clearSwipePreview();});
@@ -1870,12 +1784,12 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       const depthNorm=Math.max(0,Math.min(1,(depth-.55)/.95));
       figure.style.setProperty("--depth-brightness",(0.8+depthNorm*.2).toFixed(3));
       figure.style.setProperty("--depth-blur",((1-depthNorm)*1.45).toFixed(2)+"px");
-      const artSrc=`/images/art/${name}`;
+      const artSrc=`/media/art/${name}`;
       const img=document.createElement("img");
       img.alt="";
       img.draggable=false;
       img.dataset.src=artSrc;
-      img.dataset.fallback=`./images/art/${name}`;
+      img.dataset.fallback=`./media/art/${name}`;
       img.onerror=()=>{ if(img.dataset.fallback&&img.src!==img.dataset.fallback){ img.src=img.dataset.fallback; return; } img.onerror=null; };
       figure.appendChild(img);
       world.appendChild(figure);
@@ -1891,7 +1805,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         miniImg.alt="";
         miniImg.draggable=false;
         miniImg.dataset.src=artSrc;
-        miniImg.dataset.fallback=`./images/art/${name}`;
+        miniImg.dataset.fallback=`./media/art/${name}`;
         miniImg.onerror=()=>{ if(miniImg.dataset.fallback&&miniImg.src!==miniImg.dataset.fallback){miniImg.src=miniImg.dataset.fallback;return;} miniImg.onerror=null; };
         miniEl.appendChild(miniImg);
         miniWorld.appendChild(miniEl);
