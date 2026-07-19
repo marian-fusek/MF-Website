@@ -142,7 +142,7 @@ startMfSite();
     requestAnimationFrame(tick);
   }
   window.addEventListener("wheel",e=>{
-    if(document.body.classList.contains("project-open"))return;
+    if(document.body.classList.contains("project-open")||document.body.classList.contains("mf-guidance-open"))return;
     e.preventDefault();
     targetY+=e.deltaY*1.4;
     targetY=Math.max(0,Math.min(targetY,document.body.scrollHeight-window.innerHeight));
@@ -1456,12 +1456,26 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   }
   runTitle();
 
-  const shortReview=`Thanks to talking with Marián, I realized certain things much sooner than I would have on my own. He helped me understand another part of my personality and see the world from a different angle. If I lose myself again in the future, I will definitely reach out to him. Thanks for everything.`;
+  const romanReview=[
+    `I started seeing Marián because I wanted to do something about my work ethic and discipline. I had left the company to work independently. Work began piling up, and very quickly I no longer knew what to tackle first.`,
+    `Marián’s help was invaluable in several ways. As someone new to coaching, he first explained thoroughly how the whole thing worked and how it would unfold. Then, as we worked on the problem itself, his intelligent, perceptive questions led me to answers and solutions that were actually my own. Many things from our sessions are now firmly embedded in my life, and I often think back to the many small pieces of advice and tips I picked up along the way with Marián. A bonus was Marián’s advice and experience from his own remarkably rich professional life, and the completely relaxed Scandinavian-Japanese-style atmosphere.`
+  ];
 
-  const mediumReview=[
-    `I have to say, we have had many mentors and consultants. Many of them helped us move forward, gave us feedback, and created a space where we could talk about our challenges despite the daily routine.`,
-    `Marián was on another level for us. To be honest, I was extremely surprised by how quickly and precisely he was able to understand who we are, what our challenges are, and identify the problems without any unnecessary fluff. His presentation was so valuable that I went through it several times. :) Based on his suggestions and his ability to identify potential issues in the future, we made important changes to our organizational structure and prioritized our focus on the areas where we had pain points.`,
-    `Marián continues to be our long-term mentor and coach. We regularly return to discuss specific topics and validate whether he confirms that our approach is good or offers a different perspective. If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`
+  const darjaReview=[
+    `Just like many other product designers out there, I pivoted careers and got into design through courses, books, webinars… basically learning by trial and error. At some point, I found myself completely overwhelmed with information and unsure how to navigate my career further, how to evolve, and what to focus on. That was when I reached out to Marián—not with a clear question, just a bunch of self-doubt. Although I used to be skeptical about the concept of mentoring, I could not miss the opportunity to talk to Marián because I followed and admired his design work. Yet I received so much more than a thorough design review, and I have been the most loyal design-coaching promoter ever since.`,
+    `To begin with, Marián created a safe and encouraging space for me to open up and put my thoughts in order. I always came with a problem that seemed unsolvable and always left feeling empowered and uplifted. He is the leader I desperately needed. We talked about pixels and icons, but also long-term goals, personal priorities, and emotional well-being. I received the most on-point design advice, which noticeably took my skills to a completely new level. I gained confidence and, most importantly, understood what my strengths are and how to develop them. As a result, I feel more connected to myself. Marián is a very talented designer and an incredible coach, and I am so grateful for the mentoring sessions that helped me grow on both career and personal levels.`
+  ];
+
+  const anastasiiaReview=`Working with Marián when I felt burned out, overwhelmed, and immobilized helped me acknowledge my feelings and rework my self-afflicting beliefs and interactions with the world. Marián can be the venting system you may have needed for a long time, but he can also be an essential part of setting a new course for that stage of your life.`;
+
+  const makoReview=[
+    `The coaching sessions helped me shift my paradigms in life. I thought I knew what steps to take to be a “good person,” which included living up to a particular set of standards influenced far more by my surroundings than by myself. Over the sessions, I learned to listen to myself and let myself be me—and everything else would fall into place. One day, I started thinking about the kind of life I could live on my own terms, without always trying to fit into the “successful career woman” mold. Such a simple thought freed my imagination and allowed me to reconsider what I truly valued: fulfilling relationships, authenticity, and a healthy, balanced life—not work. Last week, I had an interview for a job I wanted. I got nervous during the interview and did not feel that I performed the activities well. That night, I was overwhelmed with anxiety and racing thoughts, but I was quickly able to return to my foundations—the loving relationships I have around me. Now I feel okay. If I do not get hired, it will be okay, and I will keep trying elsewhere.`,
+    `My diary entry from October 1, 2022:`,
+    `Whenever I leave my coaching session, I feel an overwhelming sense of love for myself. That self-love inspires me to naturally do things that are “good” for me, like paint, journal, or even clean the house. I do these things because I want to take care of myself—not out of guilt to be productive. Over the week, that self-love dissipates. I eventually go back to trying to escape my reality by binge-watching TV. But the more I practice being kinder to myself and listening to my intuition, the more I can return to this space of forgiveness and self-love. I want to live on my own terms and figure out what that means for me.`
+  ];
+
+  const iljaReview=[
+    `Before meeting Marián, my history with coaching was a mixed bag. Until then, I had thought of coaches as self-assured gurus who applied a predefined set of techniques to help you clarify your goals and boost your productivity and performance. My perspective completely shifted after working with Marián. Marián is a highly perceptive and empathetic listener. Whenever my words said one thing but my body language said something else, he picked up on it and used it as an avenue to help me deconstruct my underlying motives and assumptions. What stood out was his ability to quickly understand my personality and temperament and adapt his coaching style to suit me. This knack allowed him to skillfully balance guiding me while encouraging self-direction. Most importantly, Marián was not afraid to nudge me out of my comfort zone, challenging my initial answers and steering me toward deeper reflection. Sometimes I found myself leaving a session shaken, yet profoundly contemplative. Other times, I was brimming with inspiration and energy, barely able to contain the excitement and eagerness stirring within me. Both kinds of sessions proved invaluable, offering unique insights into the underlying mental models that drive my personal and professional behavior. A few months into our collaboration, I realized a significant transformation. I did not leave our sessions burdened with a laundry list of goals and benchmarks to meet, which Marián would then hold me accountable for. Instead, I left with a new understanding of myself. I recognized that I did not thrive within rigid structures, something I had already been somewhat aware of. Through my journey with Marián, however, I learned not merely to acknowledge this trait but to harness it as a powerful tool. I can wholeheartedly recommend Marián to anyone looking for a coaching experience that is transformative, personalized, and insightful.`
   ];
 
   const longReview=[
@@ -1473,26 +1487,28 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   ];
 
   const entries=[
-    {id:'anna',length:'short',name:'Anna Nováková',role:'Senior Product Designer',company:'Studio N',mark:'✦',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=700&q=82',tags:['Design Coaching','Life Coaching'],copy:shortReview},
-    {id:'marek',length:'medium',name:'Marek Kováč',role:'Co-founder & CEO',company:'Bright Ops',mark:'●',country:'Slovakia',flag:'SK',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=82',tags:['Executive Coaching','Career Coaching'],copy:mediumReview},
-    {id:'michal',length:'long',name:'Michal',role:'Creative & Founder',company:'Independent',mark:'▲',country:'Czechia',flag:'CZ',photo:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=82',tags:['Transformational Coaching','Life Coaching'],copy:longReview},
-    {id:'alina',length:'short',name:'Alina Petrova',role:'Product Director',company:'Orbital',mark:'◆',country:'Russia',flag:'RU',photo:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=82',tags:['Executive Coaching','Transformational Coaching'],copy:`When you sit opposite Marián, you are the only person who matters in that moment. No one is more important than you. As if no one else had ever existed.`},
-    {id:'jordan',length:'short',name:'Jordan Lee',role:'Design Engineering Lead',company:'North Star',mark:'✚',country:'United States',flag:'US',photo:'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=700&q=82',tags:['Design Coaching','Executive Coaching'],copy:`If your organization is growing and you are looking for an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`},
-    {id:'elina',length:'short',name:'Elina Koskinen',role:'Design Lead',company:'Polar Labs',mark:'○',country:'Finland',flag:'FI',photo:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=82',tags:['Life Coaching','Career Coaching'],copy:`The only right path is your own, and no one has ever published a map of it. It is up to you to discover that path and find out what lies along it.`}
+    {id:'michal-bohac',length:'long',name:'Michal Bohac',role:'CEO',company:'Wonder Makers',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/michal-bohac.jpg',tags:['Transformational Coaching'],copy:longReview,parts:[longReview.slice(0,3),longReview.slice(3)]},
+    {id:'roman-bartos',length:'medium',name:'Roman Bartos',role:'Designer',company:'Freelance',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/roman-bartos.jpg',tags:['Transformational Coaching'],copy:romanReview},
+    {id:'darja-arefjeva',length:'medium',name:'Darja Arefjeva',role:'Product Designer',company:'Pipedrive',country:'Russia',flag:'RU',photo:'/media/guidance/coaching/darja-arefjeva.jpg',tags:['Design Coaching'],copy:darjaReview},
+    {id:'anastasiia-kozina',length:'short',name:'Anastasiia Kozina',role:'Founding Designer',company:'Illusian',country:'Finland',flag:'FI',photo:'/media/guidance/coaching/anastasiia-kozina.jpg',tags:['Life Coaching'],copy:anastasiiaReview},
+    {id:'mako-ueda',length:'medium',name:'Mako Ueda',role:'Business Operations Manager',company:'Career Break',country:'United States',flag:'US',photo:'/media/guidance/coaching/mako-ueda.jpg',tags:['Transformational Coaching'],copy:makoReview},
+    {id:'ilja-panic',length:'medium',name:'Ilja Panic',role:'CTO & Co-Founder',company:'Resolve',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/ilja-panic.jpg',tags:['Career Coaching'],copy:iljaReview}
   ];
 
   const modes={
-    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['anna','michal','alina','elina','marek','jordan']},
-    leadership:{title:'Team<br>Leadership',kicker:'GUIDANCE / 02 / ORGANISATIONAL',intro:'Team audits, leadership development and practical interventions for growing creative and technology organizations.',order:['marek','jordan','alina','anna','michal','elina']}
+    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic']},
+    leadership:{title:'Team<br>Leadership',kicker:'GUIDANCE / 02 / ORGANISATIONAL',intro:'Team audits, leadership development and practical interventions for growing creative and technology organizations.',order:[]}
   };
 
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[char]));
-  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt=""><span><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-role">${escapeHtml(entry.role)} · ${escapeHtml(entry.company)}</small><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small></span><span class="mf-guidance-company-logo" aria-label="Placeholder company logo">${escapeHtml(entry.mark)}</span></div><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div></div>`;
-  const copyMarkup=entry=>Array.isArray(entry.copy)?entry.copy.map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''):escapeHtml(entry.copy);
+  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}"><span class="mf-guidance-person-info"><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-company">${escapeHtml(entry.company)}</small></span></div></div>`;
+  const paragraphsMarkup=value=>Array.isArray(value)?value.map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''):escapeHtml(value);
+  const copyMarkup=entry=>paragraphsMarkup(entry.copy);
+  const partMarkup=entry=>entry.parts?`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-bio-menu-item is-active" type="button" data-review-part="0">PART 01</button><button class="mf-bio-menu-item" type="button" data-review-part="1">PART 02</button></nav><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${paragraphsMarkup(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${paragraphsMarkup(entry.parts[1])}</div></div></div>`:`<div class="mf-guidance-copy-shell">${copyMarkup(entry)}</div>`;
   const reviewMarkup=(entry,index)=>{
-    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div>${personMarkup(entry)}</div><div class="mf-guidance-long-copy">${copyMarkup(entry)}</div></article>`;
-    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div>${personMarkup(entry)}</div><blockquote>${copyMarkup(entry)}</blockquote></article>`;
-    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><blockquote>${copyMarkup(entry)}</blockquote>${personMarkup(entry)}</article>`;
+    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<div class="mf-guidance-long-copy">${partMarkup(entry)}</div></article>`;
+    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<blockquote>${copyMarkup(entry)}</blockquote></article>`;
+    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<blockquote>${copyMarkup(entry)}</blockquote></article>`;
   };
 
   let currentMode='mindset';
@@ -1533,6 +1549,32 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     reviewsHost.scrollTop+=event.deltaY;
   },{passive:false});
 
+  const bindReviewParts=()=>{
+    reviewsHost.querySelectorAll('.mf-guidance-copy-shell').forEach(shell=>{
+      const buttons=[...shell.querySelectorAll('[data-review-part]')];
+      const panels=[...shell.querySelectorAll('[data-review-part-panel]')];
+      if(buttons.length<2||panels.length<2)return;
+      let active=0,switching=false;
+      buttons.forEach(button=>button.addEventListener('click',()=>{
+        const next=Number(button.dataset.reviewPart);
+        if(switching||next===active||!panels[next])return;
+        switching=true;
+        const previousPanel=panels[active],nextPanel=panels[next];
+        previousPanel.classList.add('is-leaving');
+        setTimeout(()=>{
+          previousPanel.classList.remove('is-active','is-leaving');
+          previousPanel.setAttribute('aria-hidden','true');
+          nextPanel.classList.add('is-active','is-entering');
+          nextPanel.setAttribute('aria-hidden','false');
+          buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
+          requestAnimationFrame(()=>requestAnimationFrame(()=>nextPanel.classList.remove('is-entering')));
+          active=next;
+          setTimeout(()=>{switching=false;},260);
+        },180);
+      }));
+    });
+  };
+
   function render(mode){
     currentMode=mode in modes?mode:'mindset';
     const config=modes[currentMode];
@@ -1540,8 +1582,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     overlayTitle.innerHTML=config.title;
     overlayIntro.textContent=config.intro;
     kicker.textContent=config.kicker;
-    reviewsHost.innerHTML=ordered.map(reviewMarkup).join('');
+    reviewsHost.innerHTML=ordered.length?ordered.map(reviewMarkup).join(''):'<div class="mf-guidance-empty">LEADERSHIP REVIEWS / NEXT.</div>';
     reviewNav.innerHTML=ordered.map((entry,index)=>`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${escapeHtml(entry.country)}</span></button>`).join('');
+    bindReviewParts();
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>{
       markActiveReview(button.dataset.reviewTarget);
       document.getElementById(`guidance-review-${button.dataset.reviewTarget}`)?.scrollIntoView({behavior:'smooth',block:'start'});
