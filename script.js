@@ -263,10 +263,8 @@ if(indexExtra){
       "/media/projects/goballer/app/04-goballer-ios-1.jpg"
     ],
     "03":[
-      "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=900&q=76",
-      "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=76"
+      "/media/projects/aims/01-aims-logo.jpg",
+      "/media/projects/aims/02-aims-web.jpg"
     ],
     "04":[
       "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=76",
@@ -305,7 +303,7 @@ if(indexExtra){
     moreCard.className='mf-strip-preview-more';
     moreCard.style.setProperty('--preview-order',3);
     moreCard.textContent=`[+${more} MORE]`;
-    preview.appendChild(moreCard);
+    if(more>0)preview.appendChild(moreCard);
     strip.appendChild(preview);
     updateLeft(strip);
   });
@@ -372,10 +370,8 @@ if(indexExtra){
       context:"AIMS had technology with unusual depth, but its value was difficult to communicate outside technical conversations. Buyers needed to understand the advantage quickly while still believing the system could handle professional-scale catalogs. The brand had to bridge engineering precision and creative intuition.",
       approach:"I reframed the platform around the moments where search changes the work itself. Product language became more direct, the identity gained focus and the sales story moved from feature inventory to practical leverage. The system gives the technology room to feel sophisticated without becoming abstract.",
       images:[
-        "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=2200&q=88",
-        "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2200&q=88"
+        {type:"video",src:"/media/projects/aims/logo/01-aims-logo.mp4",title:"AIMS logo animation",note:"[Not part of the redesign]"},
+        {type:"iframe",src:"https://aimsapi.com",title:"AIMS live website",liveKey:"aimsWebsite",loaderCopy:"LOADING AIMSAPI.COM"}
       ]
     },
     "04":{
@@ -424,7 +420,7 @@ if(indexExtra){
   let wheelReset=0;
   let projectSwitching=false;
   let currentCarousel=null;
-  const liveStates={website:false,instagram:false,brandKit:false};
+  const liveStates={website:false,instagram:false,brandKit:false,aimsWebsite:false};
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
   const esc=s=>String(s).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
@@ -439,6 +435,11 @@ if(indexExtra){
       return active
         ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
         : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> MIUNĀE.COM / BRAND-KIT</span>';
+    }
+    if(key==="aimsWebsite"){
+      return active
+        ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
+        : '<span class="mf-live-toggle-label">BROWSE <em>[LIVE]</em> AIMSAPI.COM</span>';
     }
     return active
       ? '<span class="mf-live-toggle-label">EXIT THE WEB</span>'
@@ -479,7 +480,7 @@ if(indexExtra){
     if(media&&typeof media==="object"&&media.type==="iframe"){
       const key=media.liveKey||"website";
       const active=!!liveStates[key];
-      const loaderCopy=key==="brandKit"?"LOADING MIUNĀE BRAND KIT":"LOADING MIUNĀE.COM";
+      const loaderCopy=media.loaderCopy||(key==="brandKit"?"LOADING MIUNĀE BRAND KIT":"LOADING MIUNĀE.COM");
       return `<figure class="mf-project-slide mf-project-slide-live" data-slide="${i}" data-live-key="${key}">
         <div class="mf-live-site">
           <div class="mf-live-loader" aria-hidden="true"><div class="mf-live-loader-copy">${loaderCopy}<span>_</span></div><div class="mf-live-loader-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
@@ -505,7 +506,8 @@ if(indexExtra){
     }
     if(media&&typeof media==="object"&&media.type==="video"){
       const fallback=media.fallbackSrc?` data-fallback-src="${esc(media.fallbackSrc)}"`:"";
-      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}"${fallback} title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video>${projectVideoLoader()}</div>${projectMediaCurtain()}</figure>`;
+      const note=media.note?`<div class="mf-project-media-note">${esc(media.note)}</div>`:"";
+      return `<figure class="mf-project-slide mf-project-slide-image mf-project-slide-video" data-slide="${i}"><div class="mf-project-image-viewport mf-project-video-viewport"><video src="${esc(media.src)}"${fallback} title="${esc(media.title||project.title+' project video')}" autoplay muted loop playsinline preload="metadata" aria-label="${esc(media.title||project.title+' project video')}"></video>${projectVideoLoader()}${note}</div>${projectMediaCurtain()}</figure>`;
     }
     if(media&&typeof media==="object"&&(media.type==="carousel"||media.type==="mediaCarousel")){
       const mixed=media.type==="mediaCarousel";

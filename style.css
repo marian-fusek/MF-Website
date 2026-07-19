@@ -4732,6 +4732,26 @@ body.mf-page-revealed .mf-hero-name {
   }
 }
 
+/* AIMS logo-frame note — same restrained mono language as swipe guidance. */
+.mf-project-media-note {
+  position:absolute;
+  left:50%;
+  bottom:20px;
+  z-index:10;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,.68);
+  font:400 9px/1.2 "Geist Mono",monospace;
+  letter-spacing:.08em;
+  white-space:nowrap;
+  pointer-events:none;
+}
+@media (max-width:1024px) {
+  .mf-project-media-note {
+    bottom:max(18px,env(safe-area-inset-bottom));
+    font-size:8px;
+  }
+}
+
 @media (max-width: 620px) {
   .mf-nav-contact {
     display: none !important;
