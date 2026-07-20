@@ -1719,13 +1719,16 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-label="Show review from ${escapeHtml(entry.name)}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span></button>`).join('');
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
+    <figure class="mf-leadership-hero-photo">
+      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy">
+    </figure>
     <section class="mf-leadership-section" id="leadership-xp">
       <div class="mf-leadership-copy-block">
         <h3>XP</h3>
         <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
         <div class="mf-leadership-stats"><div><small>LED</small><strong>11 managers</strong></div><div><small>OVERSEEING</small><strong>120 people</strong></div></div>
         <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
-        <p>${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
+        <p class="mf-leadership-eleken-link">${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
       </div>
       <div class="mf-leadership-copy-block">
         <h3>UPTIME</h3>
@@ -1741,10 +1744,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
           <li>Listen, stuff was happening and I was around, so…</li>
         </ul>
       </div>
-      <div class="mf-leadership-photos">
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy"><figcaption>CHILLIN'</figcaption></figure>
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy"><figcaption>MY FIRST DESIGN GRADUATES</figcaption></figure>
-      </div>
+      <figure class="mf-leadership-graduates-photo">
+        <img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy">
+        <figcaption>MY FIRST DESIGN GRADUATES</figcaption>
+      </figure>
       <div class="mf-leadership-copy-block mf-leadership-reviews-intro">
         <h3>REVIEWS</h3>
         <p>Kind (no monetary transaction included) words from my ex-team members.</p>
@@ -2013,8 +2016,23 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
 
     const copyBtn=reviewsHost.querySelector('#mfLeadershipCopyButton');
     copyBtn?.addEventListener('click',async()=>{
-      try{ await navigator.clipboard.writeText('email@marianfusek.com'); copyBtn.textContent='Email copied to your clipboard .)'; }
-      catch(_){ copyBtn.textContent='Email copied to your clipboard .)'; }
+      const email='email@marianfusek.com';
+      let copied=false;
+      try{
+        await navigator.clipboard.writeText(email);
+        copied=true;
+      }catch(_){
+        const helper=document.createElement('textarea');
+        helper.value=email;
+        helper.setAttribute('readonly','');
+        helper.style.position='fixed';
+        helper.style.opacity='0';
+        document.body.appendChild(helper);
+        helper.select();
+        try{ copied=document.execCommand('copy'); }catch(__){ copied=false; }
+        helper.remove();
+      }
+      copyBtn.textContent=copied?'Email copied to your clipboard .)':'Copy email@marianfusek.com';
     });
   }
 

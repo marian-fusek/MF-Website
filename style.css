@@ -10387,3 +10387,224 @@ body.mf-name-revealed .mf-hero-name {
     transition-delay:0ms !important;
   }
 }
+
+/* ============================================================
+   V82 — Team Leadership image, rhythm, stats and review spacing
+   ============================================================ */
+
+@media (min-width:1025px) {
+  /* Match the top image to the title's vertical starting point. */
+  .mf-guidance-overlay.is-leadership .mf-leadership-page {
+    padding-top:clamp(50px,7vh,90px) !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+    display:block !important;
+    width:calc(50vw - 4vw) !important;
+    max-width:780px !important;
+    margin:0 4vw clamp(74px,10vh,132px) 50vw !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#0a0a0a !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
+    display:block !important;
+    width:100% !important;
+    height:clamp(330px,42vw,670px) !important;
+    object-fit:cover !important;
+    border:0 !important;
+    filter:none !important;
+    transform:scale(1) !important;
+    transition:transform .8s cubic-bezier(.16,1,.3,1) !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo:hover img {
+    transform:scale(1.014) !important;
+  }
+}
+
+/* The main section rhythm is half as tall as the previous pass. */
+.mf-guidance-overlay.is-leadership .mf-leadership-section {
+  margin-bottom:clamp(74px,11vh,150px) !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block {
+  margin-bottom:clamp(54px,8vh,104px) !important;
+}
+
+/* Section labels and stat labels are intentionally gray. */
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block h3,
+.mf-guidance-overlay.is-leadership .mf-leadership-stats small {
+  color:rgba(255,255,255,.46) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.46) !important;
+}
+
+/* Each stat reads label first, value directly below. */
+.mf-guidance-overlay.is-leadership .mf-leadership-stats {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:clamp(36px,5vw,78px) !important;
+  margin:clamp(38px,5vh,62px) 0 !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-stats > div {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  gap:12px !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-stats strong {
+  display:block !important;
+  font-size:clamp(40px,4.15vw,66px) !important;
+  line-height:.9 !important;
+  letter-spacing:-.055em !important;
+  font-weight:600 !important;
+  white-space:nowrap !important;
+}
+
+/* All Leadership links keep a visible underline; STRV keeps its custom red hover. */
+.mf-guidance-overlay.is-leadership .mf-weight-link {
+  border:0 !important;
+  border-bottom:1px solid rgba(255,255,255,.72) !important;
+  padding-bottom:.04em !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link {
+  position:relative !important;
+  padding-left:28px !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link::before {
+  content:"→" !important;
+  position:absolute !important;
+  left:0 !important;
+  top:.06em !important;
+  color:rgba(255,255,255,.42) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.42) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:.82em !important;
+  line-height:1.43 !important;
+}
+
+/* The graduates image breaks out toward the title and occupies almost the full width. */
+.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo {
+  display:flex !important;
+  flex-direction:column !important;
+  width:65vw !important;
+  margin:clamp(72px,10vh,130px) 0 clamp(74px,10vh,132px) 35vw !important;
+  padding:0 !important;
+  overflow:visible !important;
+  background:transparent !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo img {
+  display:block !important;
+  width:100% !important;
+  height:clamp(410px,54vw,820px) !important;
+  object-fit:cover !important;
+  border:0 !important;
+  filter:none !important;
+  transform:scale(1) !important;
+  transition:transform .8s cubic-bezier(.16,1,.3,1) !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo:hover img {
+  transform:scale(1.01) !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo figcaption {
+  align-self:flex-start !important;
+  margin:13px 0 0 !important;
+  color:rgba(255,255,255,.46) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.46) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+}
+
+/* Remove the legacy paired-photo block if old cached markup ever survives. */
+.mf-guidance-overlay.is-leadership .mf-leadership-photos {
+  display:none !important;
+}
+
+/* Reviews now begin almost immediately after their introduction. */
+.mf-guidance-overlay.is-leadership #leadership-xp {
+  margin-bottom:clamp(12px,1.8vh,24px) !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-reviews-intro {
+  margin-bottom:0 !important;
+}
+
+.mf-guidance-overlay.is-leadership #leadership-reviews {
+  margin-top:0 !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+  margin-top:0 !important;
+  margin-bottom:clamp(22px,3vh,36px) !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head {
+  margin-bottom:42px !important;
+}
+
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta {
+  margin-top:23px !important;
+}
+
+@media (max-width:1024px) {
+  .mf-guidance-overlay.is-leadership .mf-leadership-page {
+    padding-top:54px !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+    width:auto !important;
+    margin:0 18px 76px !important;
+    overflow:hidden !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:4/3 !important;
+    object-fit:cover !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-section {
+    margin-bottom:72px !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-copy-block {
+    margin-bottom:54px !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-stats {
+    grid-template-columns:1fr 1fr !important;
+    gap:24px !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-stats strong {
+    font-size:clamp(30px,9vw,46px) !important;
+    white-space:normal !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo {
+    width:calc(100% - 18px) !important;
+    margin:72px 0 76px 18px !important;
+  }
+
+  .mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo img {
+    height:auto !important;
+    aspect-ratio:4/3 !important;
+  }
+
+  .mf-guidance-overlay.is-leadership #leadership-xp {
+    margin-bottom:14px !important;
+  }
+}
