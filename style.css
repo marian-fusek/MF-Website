@@ -4831,7 +4831,7 @@ body.mf-page-revealed .mf-hero-name {
 .mf-guidance-portals:has(.mf-guidance-portal:hover) .mf-guidance-portal:hover { flex-basis:58%;background:#0b0b0b; }
 .mf-guidance-portal-index,
 .mf-guidance-portal-tags,
-.mf-guidance-open {
+.mf-guidance-open-label {
   position:relative;
   z-index:4;
   font-family:"Geist Mono",monospace;
@@ -4876,7 +4876,7 @@ body.mf-page-revealed .mf-hero-name {
   color:rgba(255,255,255,.68);
   font-style:normal;
 }
-.mf-guidance-open {
+.mf-guidance-open-label {
   position:absolute;
   left:clamp(22px,3vw,58px);
   right:clamp(22px,3vw,58px);
@@ -4886,8 +4886,8 @@ body.mf-page-revealed .mf-hero-name {
   color:#fff;
   opacity:.72;
 }
-.mf-guidance-open b { font-size:17px;font-weight:400;transition:transform .65s var(--ease); }
-.mf-guidance-portal:hover .mf-guidance-open b { transform:translate3d(7px,-7px,0); }
+.mf-guidance-open-label b { font-size:17px;font-weight:400;transition:transform .65s var(--ease); }
+.mf-guidance-portal:hover .mf-guidance-open-label b { transform:translate3d(7px,-7px,0); }
 
 .mf-guidance-faces {
   position:absolute;
@@ -4943,7 +4943,7 @@ body.mf-page-revealed .mf-hero-name {
 .mf-guidance-portal:hover .mf-guidance-network { opacity:.86;transform:scale(1.035); }
 .mf-guidance-portal:hover .mf-guidance-network i { transform:rotate(135deg) scale(1.45);background:#fff; }
 
-body.mf-guidance-open { overflow:hidden !important; }
+body.mf-guidance-open { overflow:hidden !important; opacity:1 !important; }
 .mf-guidance-overlay {
   position:fixed;
   inset:0;
@@ -5176,7 +5176,7 @@ body.mf-guidance-open { overflow:hidden !important; }
   .mf-guidance-portal-copy { left:50%;bottom:auto;top:22%;width:43%;font-size:12px; }
   .mf-guidance-portal-tags { left:50%;bottom:25%;gap:3px; }
   .mf-guidance-portal-tags i { padding:4px;font-size:7px; }
-  .mf-guidance-open { left:18px;right:18px;bottom:12px;font-size:8px; }
+  .mf-guidance-open-label { left:18px;right:18px;bottom:12px;font-size:8px; }
   .mf-guidance-faces { right:4%;top:3%;width:32%;height:68%;opacity:.18; }
   .mf-guidance-faces img { width:62px; }
   .mf-guidance-network { left:58%;right:3%;top:3%;bottom:17%;opacity:.2; }
@@ -9313,171 +9313,358 @@ body.mf-name-revealed .mf-hero-name {
 }
 
 /* ============================================================
-   V77 — Team Leadership focused redesign
+   V78 — Guidance precision pass
    ============================================================ */
 
-/* Flags stay fully saturated everywhere they are used on the site. */
+/* Full-opacity flags wherever flags remain in the interface. */
 .mf-guidance-flag,
+.mf-guidance-flag-emoji,
 .mf-guidance-review-nav .mf-guidance-flag,
-.mf-guidance-person-country .mf-guidance-flag {
+.mf-guidance-review-nav .mf-guidance-flag-emoji,
+.mf-guidance-person-country .mf-guidance-flag,
+.mf-guidance-person-country .mf-guidance-flag-emoji,
+.mf-guidance-review-nav button > span:last-child {
   opacity:1 !important;
   filter:none !important;
   mix-blend-mode:normal !important;
 }
-.mf-guidance-review-nav button > span:last-child {
-  opacity:1 !important;
+
+/* The Guidance overlay itself never blends with the page underneath. */
+.mf-guidance-overlay,
+.mf-guidance-overlay.is-mindset,
+.mf-guidance-overlay.is-leadership,
+.mf-guidance-overlay-aside,
+.mf-guidance-reviews {
+  background-color:#050505 !important;
+  mix-blend-mode:normal !important;
+  isolation:isolate;
 }
 
-/* Team Leadership keeps only the page title in the left rail. */
-.mf-guidance-overlay.is-leadership .mf-guidance-review-nav {
+/* ---------- Mindset Coaching ---------- */
+/* Remove parent-opacity ambiguity: the requested white text is actually white. */
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-wrap,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell {
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2 *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-name,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-name *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell p,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell p * {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  text-shadow:none !important;
+}
+
+/* Native snap is disabled so the final settle can use the controlled eased drift. */
+.mf-guidance-overlay.is-mindset .mf-guidance-reviews {
+  scroll-snap-type:none !important;
+  scroll-behavior:auto !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+  scroll-snap-align:none !important;
+  scroll-snap-stop:normal !important;
+}
+
+@media (min-width:1025px) {
+  /* Photo still begins at 50vw. Only the copy moves farther right. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    grid-template-columns:clamp(190px,14vw,260px) minmax(0,1fr) !important;
+    column-gap:clamp(62px,5.6vw,104px) !important;
+    padding-left:26vw !important;
+    padding-right:2.5vw !important;
+  }
+}
+
+/* PART 01/02 state must survive the broad white-copy rule above. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell .mf-guidance-part-button {
+  color:rgba(255,255,255,.34) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.34) !important;
+  opacity:1 !important;
+  font-weight:500 !important;
+  transition:color .28s cubic-bezier(.16,1,.3,1),-webkit-text-fill-color .28s cubic-bezier(.16,1,.3,1) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell .mf-guidance-part-button:hover,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell .mf-guidance-part-button.is-active {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* ---------- Team Leadership: one full-width page ---------- */
+.mf-guidance-overlay.is-leadership {
+  display:block !important;
+  grid-template-columns:none !important;
+  overflow:hidden !important;
+}
+.mf-guidance-overlay.is-leadership .mf-guidance-review-nav,
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside > p {
   display:none !important;
 }
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-top {
+  grid-template-columns:24vw 1fr auto !important;
+}
 .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside {
-  background:#050505 !important;
+  position:fixed !important;
+  z-index:4 !important;
+  top:58px !important;
+  bottom:0 !important;
+  left:0 !important;
+  width:24vw !important;
+  padding:clamp(50px,7vh,90px) 2.35vw 34px 18px !important;
+  border:0 !important;
+  background:transparent !important;
+  pointer-events:none !important;
+  opacity:1 !important;
+  overflow:visible !important;
   transition:none !important;
 }
 .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside:hover {
-  background:#050505 !important;
+  background:transparent !important;
 }
-.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 {
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 * {
+  margin:0 !important;
   color:#fff !important;
   -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
   font-family:"Geist",Arial,sans-serif !important;
   font-weight:650 !important;
   text-transform:none !important;
 }
-
-/* Desktop content begins at the exact horizontal midpoint of the viewport. */
-@media (min-width:1025px) {
-  .mf-guidance-overlay.is-leadership .mf-guidance-reviews {
-    padding-left:calc(50vw - 24vw) !important;
-    padding-right:4vw !important;
-    box-sizing:border-box !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-leadership-page {
-    width:auto !important;
-    max-width:none !important;
-    padding:clamp(84px,8vh,118px) 0 clamp(110px,12vh,170px) !important;
-    margin:0 !important;
-  }
+.mf-guidance-overlay.is-leadership .mf-guidance-reviews {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  width:100vw !important;
+  height:100vh !important;
+  height:100dvh !important;
+  padding:58px 0 0 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  box-sizing:border-box !important;
 }
-
-/* Every leadership title and paragraph uses Geist, natural casing and true white. */
-.mf-guidance-overlay.is-leadership .mf-leadership-page,
-.mf-guidance-overlay.is-leadership .mf-leadership-page h3,
-.mf-guidance-overlay.is-leadership .mf-leadership-page h4,
-.mf-guidance-overlay.is-leadership .mf-leadership-page p,
-.mf-guidance-overlay.is-leadership .mf-leadership-page li,
-.mf-guidance-overlay.is-leadership .mf-leadership-page strong,
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy b,
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy small,
-.mf-guidance-overlay.is-leadership .mf-leadership-photo-card figcaption {
-  font-family:"Geist",Arial,sans-serif !important;
-  text-transform:none !important;
+.mf-guidance-overlay.is-leadership .mf-leadership-page {
+  width:100vw !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:35vh 0 clamp(110px,14vh,190px) !important;
+  background:#050505 !important;
   color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-section {
+  width:100% !important;
+  margin:0 0 clamp(150px,22vh,300px) !important;
+  padding:0 !important;
+  border:0 !important;
+  opacity:1 !important;
+  transform:none !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block,
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-detail {
+  width:calc(50vw - 4vw) !important;
+  max-width:780px !important;
+  margin-left:50vw !important;
+  margin-right:4vw !important;
+  box-sizing:border-box !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-copy-block {
-  width:100% !important;
-  max-width:760px !important;
-  margin:0 0 58px !important;
+  margin-top:0 !important;
+  margin-bottom:clamp(110px,16vh,210px) !important;
 }
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block:last-child {
+  margin-bottom:0 !important;
+}
+
+/* Small all-caps Geist section labels; body stays natural-case Geist. */
 .mf-guidance-overlay.is-leadership .mf-leadership-copy-block h3 {
-  margin:0 0 20px !important;
-  font-size:clamp(27px,2.45vw,44px) !important;
-  line-height:.98 !important;
-  letter-spacing:-.045em !important;
-  font-weight:560 !important;
+  margin:0 0 30px !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  letter-spacing:.11em !important;
+  font-weight:600 !important;
+  text-transform:uppercase !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block p,
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head h4,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-body p,
+.mf-guidance-overlay.is-leadership .mf-leadership-stats strong,
+.mf-guidance-overlay.is-leadership .mf-weight-link,
+.mf-guidance-overlay.is-leadership .mf-weight-link span {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  text-transform:none !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-copy-block p,
 .mf-guidance-overlay.is-leadership .mf-leadership-copy-block li,
 .mf-guidance-overlay.is-leadership .mf-leadership-review-body p {
-  font-size:clamp(17px,1.22vw,21px) !important;
-  line-height:1.42 !important;
-  letter-spacing:-.012em !important;
-  font-weight:400 !important;
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
-  text-transform:none !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block ul {
-  padding-left:1.1em !important;
   margin:0 !important;
+  font-size:clamp(17px,1.22vw,21px) !important;
+  line-height:1.43 !important;
+  letter-spacing:-.014em !important;
+  font-weight:400 !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-inline-link,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block a {
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block p + p {
+  margin-top:28px !important;
 }
 
-/* Full-bleed photo pair leaves the 50% text column and spans the entire viewport. */
-@media (min-width:1025px) {
-  .mf-guidance-overlay.is-leadership .mf-leadership-photos {
-    width:100vw !important;
-    margin:72px 0 78px -50vw !important;
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:12px !important;
-  }
+/* Variable-weight hover reveals, left-to-right in and right-to-left out. */
+.mf-guidance-overlay.is-leadership .mf-weight-link {
+  display:inline-flex !important;
+  align-items:baseline !important;
+  border:0 !important;
+  text-decoration:none !important;
+  white-space:nowrap !important;
+}
+.mf-guidance-overlay.is-leadership .mf-weight-link span {
+  display:inline-block !important;
+  font-weight:400 !important;
+  font-variation-settings:"wght" 400 !important;
+  transition:font-variation-settings .28s cubic-bezier(.16,1,.3,1),font-weight .28s cubic-bezier(.16,1,.3,1),color .24s ease,-webkit-text-fill-color .24s ease !important;
+  transition-delay:calc(var(--r) * 16ms) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-weight-link:hover span {
+  font-weight:600 !important;
+  font-variation-settings:"wght" 600 !important;
+  transition-delay:calc(var(--i) * 16ms) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-weight-link.is-strv:hover,
+.mf-guidance-overlay.is-leadership .mf-weight-link.is-strv:hover span {
+  color:#f04444 !important;
+  -webkit-text-fill-color:#f04444 !important;
+}
+
+/* Thin-line bullets with a deliberate gap before the copy. */
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block ul {
+  display:grid !important;
+  gap:25px !important;
+  margin:0 !important;
+  padding:0 !important;
+  list-style:none !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li {
+  position:relative !important;
+  padding-left:50px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li::before {
+  content:"";
+  position:absolute;
+  left:0;
+  top:.7em;
+  width:24px;
+  height:1px;
+  background:rgba(255,255,255,.58);
+}
+
+/* Full-width photographs are now genuinely outside the text column. */
+.mf-guidance-overlay.is-leadership .mf-leadership-photos {
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:12px !important;
+  width:100vw !important;
+  margin:clamp(120px,18vh,230px) 0 clamp(120px,18vh,230px) !important;
+  padding:0 !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-photo-card {
+  display:flex !important;
+  flex-direction:column !important;
+  margin:0 !important;
+  padding:0 !important;
   overflow:visible !important;
   background:transparent !important;
+  border:0 !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-photo-card img {
   display:block !important;
   width:100% !important;
-  height:clamp(340px,43vw,690px) !important;
+  height:clamp(360px,43vw,720px) !important;
   object-fit:cover !important;
   border:0 !important;
+  filter:none !important;
   box-shadow:none !important;
-  transition:transform .8s cubic-bezier(.16,1,.3,1),filter .8s cubic-bezier(.16,1,.3,1) !important;
+  transform:scale(1) !important;
+  transition:transform .8s cubic-bezier(.16,1,.3,1) !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-photo-card:hover img {
-  transform:scale(1.018) !important;
+  transform:scale(1.014) !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-photo-card figcaption {
-  margin:12px 0 0 !important;
-  font-size:12px !important;
-  line-height:1.1 !important;
-  letter-spacing:-.01em !important;
+  align-self:flex-start !important;
+  margin:13px 0 0 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
   opacity:1 !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  letter-spacing:.09em !important;
+  text-transform:uppercase !important;
 }
 
-/* Compact, image-led review selector — no borders, strokes, flags or duplicate portraits. */
+/* Compact, image-only rotating review carousel. */
+.mf-guidance-overlay.is-leadership .mf-leadership-reviews-intro {
+  margin-bottom:clamp(70px,10vh,130px) !important;
+}
 .mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
   display:flex !important;
   align-items:flex-start !important;
-  gap:14px !important;
-  width:100% !important;
-  margin:34px 0 44px !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
+  gap:12px !important;
+  max-width:none !important;
+  margin-top:0 !important;
+  margin-bottom:48px !important;
+  overflow-x:hidden !important;
+  overflow-y:visible !important;
   scrollbar-width:none !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-people-strip::-webkit-scrollbar {
-  display:none !important;
-}
 .mf-guidance-overlay.is-leadership .mf-leadership-person-card {
-  flex:0 0 clamp(92px,7.6vw,122px) !important;
-  width:clamp(92px,7.6vw,122px) !important;
+  flex:0 0 clamp(72px,6vw,94px) !important;
+  width:clamp(72px,6vw,94px) !important;
   padding:0 !important;
   margin:0 !important;
   border:0 !important;
   outline:0 !important;
-  box-shadow:none !important;
   background:transparent !important;
-  opacity:.44 !important;
-  transform:translateY(0) !important;
-  transition:opacity .42s cubic-bezier(.16,1,.3,1),transform .52s cubic-bezier(.16,1,.3,1) !important;
+  box-shadow:none !important;
+  opacity:.42 !important;
+  cursor:pointer !important;
+  will-change:transform,opacity !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-person-card:hover,
 .mf-guidance-overlay.is-leadership .mf-leadership-person-card.is-active {
   opacity:1 !important;
-  transform:translateY(-5px) !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-person-photo-wrap {
   display:block !important;
+  width:100% !important;
   overflow:hidden !important;
   background:#101010 !important;
   border:0 !important;
@@ -9486,55 +9673,33 @@ body.mf-name-revealed .mf-hero-name {
 .mf-guidance-overlay.is-leadership .mf-leadership-person-photo-wrap img {
   display:block !important;
   width:100% !important;
-  aspect-ratio:4/5 !important;
+  aspect-ratio:3/4 !important;
   object-fit:cover !important;
-  filter:grayscale(1) contrast(.95) !important;
+  filter:grayscale(1) contrast(.96) !important;
   transform:scale(1.01) !important;
-  transition:filter .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1) !important;
+  transition:filter .62s cubic-bezier(.16,1,.3,1),transform .62s cubic-bezier(.16,1,.3,1) !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-person-card:hover img,
 .mf-guidance-overlay.is-leadership .mf-leadership-person-card.is-active img {
   filter:grayscale(0) contrast(1) !important;
   transform:scale(1.045) !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy {
-  display:block !important;
-  padding:9px 0 0 !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy b {
-  display:block !important;
-  margin:0 0 5px !important;
-  font-size:13px !important;
-  line-height:1.05 !important;
-  letter-spacing:-.025em !important;
-  font-weight:520 !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy small {
-  display:block !important;
-  margin:0 !important;
-  font-size:9px !important;
-  line-height:1.28 !important;
-  letter-spacing:0 !important;
-  opacity:.58 !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-person-flagline,
-.mf-guidance-overlay.is-leadership .mf-leadership-person-copy .mf-guidance-flag {
+.mf-guidance-overlay.is-leadership .mf-leadership-person-copy,
+.mf-guidance-overlay.is-leadership .mf-leadership-person-flagline {
   display:none !important;
 }
 
-/* The clicked review reveals as editorial copy only: no duplicated portrait and no stroke highlight. */
+/* One large review, no duplicate portrait or decorative strokes. */
 .mf-guidance-overlay.is-leadership .mf-leadership-review-detail {
-  min-height:340px !important;
-  width:100% !important;
-  max-width:780px !important;
+  min-height:370px !important;
   padding:0 !important;
   border:0 !important;
   box-shadow:none !important;
   opacity:1 !important;
-  transition:none !important;
+  transition:opacity .16s ease !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-detail.is-switching {
-  opacity:1 !important;
+  opacity:.12 !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-expanded {
   display:block !important;
@@ -9542,33 +9707,40 @@ body.mf-name-revealed .mf-hero-name {
   border:0 !important;
   box-shadow:none !important;
   opacity:0;
-  filter:blur(7px);
+  transform:translate3d(0,20px,0) scale(.985);
+  filter:blur(5px);
   clip-path:inset(0 0 100% 0);
-  transform:translateY(20px);
-  transition:opacity .55s cubic-bezier(.16,1,.3,1),filter .7s cubic-bezier(.16,1,.3,1),clip-path .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1) !important;
+  transform-origin:top left;
+  transition:opacity .52s cubic-bezier(.16,1,.3,1),transform .72s cubic-bezier(.16,1,.3,1),filter .62s cubic-bezier(.16,1,.3,1),clip-path .78s cubic-bezier(.16,1,.3,1) !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-expanded.is-visible {
   opacity:1;
-  filter:blur(0);
-  clip-path:inset(0 0 0 0);
   transform:none;
+  filter:none;
+  clip-path:inset(0 0 0 0);
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-head {
   display:block !important;
-  margin:0 0 26px !important;
+  margin:0 0 34px !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-head h4 {
-  margin:0 0 7px !important;
-  font-size:clamp(30px,2.7vw,48px) !important;
-  line-height:.95 !important;
-  letter-spacing:-.055em !important;
-  font-weight:560 !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-review-head p {
   margin:0 !important;
-  font-size:13px !important;
+  font-size:clamp(34px,3.15vw,56px) !important;
+  line-height:.94 !important;
+  letter-spacing:-.06em !important;
+  font-weight:570 !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  gap:3px !important;
+  margin-top:17px !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
   line-height:1.25 !important;
-  opacity:.64 !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
 }
 .mf-guidance-overlay.is-leadership .mf-leadership-review-body {
   width:100% !important;
@@ -9578,49 +9750,412 @@ body.mf-name-revealed .mf-hero-name {
   margin:0 !important;
 }
 
-/* More breathing room before the final action. */
+/* Final section and ART-gallery button treatment. */
 .mf-guidance-overlay.is-leadership #leadership-next {
-  min-height:90vh !important;
-  padding-top:16vh !important;
+  min-height:auto !important;
+  margin-bottom:0 !important;
+  padding-top:0 !important;
+}
+.mf-guidance-overlay.is-leadership #leadership-next .mf-leadership-copy-block {
   margin-bottom:0 !important;
 }
 .mf-guidance-overlay.is-leadership #leadership-next .mf-leadership-cta {
-  margin-top:clamp(110px,20vh,230px) !important;
+  margin-top:58px !important;
 }
 
 @media (max-width:1024px) {
+  .mf-guidance-overlay.is-leadership {
+    display:block !important;
+    overflow-y:auto !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside {
+    position:relative !important;
+    z-index:2 !important;
+    top:auto !important;
+    bottom:auto !important;
+    width:100% !important;
+    min-height:0 !important;
+    padding:92px 18px 0 !important;
+    pointer-events:auto !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 {
+    font-size:clamp(44px,15vw,76px) !important;
+  }
   .mf-guidance-overlay.is-leadership .mf-guidance-reviews {
+    position:relative !important;
+    inset:auto !important;
+    width:100% !important;
+    height:auto !important;
     padding:0 !important;
+    overflow:visible !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-page {
     width:100% !important;
-    padding:48px 18px 82px !important;
+    padding:22vh 0 90px !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-copy-block,
+  .mf-guidance-overlay.is-leadership .mf-leadership-people-strip,
+  .mf-guidance-overlay.is-leadership .mf-leadership-review-detail {
+    width:auto !important;
+    max-width:none !important;
+    margin-left:18px !important;
+    margin-right:18px !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-copy-block {
-    max-width:none !important;
+    margin-bottom:90px !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-section {
+    margin-bottom:120px !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-photos {
-    width:100vw !important;
-    margin:56px 0 64px -18px !important;
     grid-template-columns:1fr !important;
-    gap:30px !important;
+    gap:40px !important;
+    margin:100px 0 110px !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-photo-card img {
     height:auto !important;
     aspect-ratio:4/3 !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-person-card {
-    flex-basis:92px !important;
-    width:92px !important;
+    flex-basis:72px !important;
+    width:72px !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+    overflow-x:auto !important;
+    padding-bottom:4px !important;
   }
   .mf-guidance-overlay.is-leadership .mf-leadership-review-detail {
-    min-height:300px !important;
-  }
-  .mf-guidance-overlay.is-leadership #leadership-next {
-    min-height:auto !important;
-    padding-top:80px !important;
+    min-height:320px !important;
   }
   .mf-guidance-overlay.is-leadership #leadership-next .mf-leadership-cta {
-    margin-top:100px !important;
+    margin-top:48px !important;
+  }
+}
+
+/* ============================================================
+   V79 — INDEX additions: Vault 111 + Side Quests
+   ============================================================ */
+
+/* Side Quests uses the familiar case-study shell, but its left column carries
+   only the project title and the supplied introduction. */
+.mf-project-shell.is-sidequests-project .mf-project-scope-block,
+.mf-project-shell.is-sidequests-project .mf-project-bottom-copy {
+  display: none !important;
+}
+
+.mf-project-shell.is-sidequests-project .mf-project-intro {
+  max-width: 31em;
+  margin-top: clamp(28px, 5vh, 58px);
+  color: rgba(255,255,255,.82);
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(13px, .95vw, 17px);
+  line-height: 1.36;
+  letter-spacing: -.018em;
+}
+
+.mf-project-slide-sidequests {
+  padding: 54px 18px 18px 0;
+  overflow: hidden;
+}
+
+.mf-sidequests-accordion {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(255,255,255,.16);
+  overflow: hidden;
+}
+
+.mf-sidequest-panel {
+  position: relative;
+  flex: .72 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr);
+  overflow: hidden;
+  isolation: isolate;
+  background: #050505;
+  transition:
+    flex 1.05s cubic-bezier(.16,1,.3,1),
+    background-color .55s ease;
+}
+
+.mf-sidequest-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: linear-gradient(100deg, rgba(255,255,255,.035), transparent 45%);
+  transition: opacity .65s ease;
+}
+
+.mf-sidequest-panel.is-active {
+  flex: 4.4 1 0;
+  background: #0a0a0a;
+}
+
+.mf-sidequest-panel.is-active::before {
+  opacity: 1;
+}
+
+.mf-sidequest-trigger {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 clamp(18px, 2vw, 34px);
+  border: 0;
+  background: transparent;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 38px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
+.mf-sidequest-number {
+  font: 400 9px/1 "Geist Mono", monospace;
+  letter-spacing: .09em;
+  color: rgba(255,255,255,.42);
+  transition: color .4s ease;
+}
+
+.mf-sidequest-title {
+  display: block;
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(15px, 1.25vw, 22px);
+  line-height: 1;
+  letter-spacing: -.025em;
+  font-weight: 470;
+  transform-origin: left center;
+  transition:
+    font-size .8s cubic-bezier(.16,1,.3,1),
+    font-weight .7s cubic-bezier(.16,1,.3,1),
+    transform .65s cubic-bezier(.16,1,.3,1),
+    opacity .45s ease;
+}
+
+.mf-sidequest-mark {
+  font: 400 13px/1 "Geist Mono", monospace;
+  color: rgba(255,255,255,.38);
+  transform: rotate(0deg);
+  transition:
+    transform .7s cubic-bezier(.16,1,.3,1),
+    color .35s ease;
+}
+
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-title {
+  transform: translateX(9px);
+  opacity: 1;
+}
+
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-number,
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-mark {
+  color: #fff;
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-trigger {
+  min-height: clamp(70px, 10vh, 104px);
+  align-items: end;
+  padding-bottom: clamp(14px, 2vh, 24px);
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-title {
+  font-size: clamp(30px, 4vw, 64px);
+  font-weight: 680;
+  letter-spacing: -.055em;
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-number {
+  color: rgba(255,255,255,.78);
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-mark {
+  color: #fff;
+  transform: rotate(45deg);
+}
+
+.mf-sidequest-content {
+  min-height: 0;
+  padding: 0 clamp(18px, 2vw, 34px) clamp(20px, 3vh, 34px) calc(clamp(18px, 2vw, 34px) + 50px);
+  display: grid;
+  grid-template-columns: minmax(250px, .95fr) minmax(150px, .42fr);
+  align-items: end;
+  gap: clamp(30px, 5vw, 78px);
+  opacity: 0;
+  transform: translateY(22px);
+  visibility: hidden;
+  transition:
+    opacity .42s ease,
+    transform .78s cubic-bezier(.16,1,.3,1),
+    visibility 0s linear .5s;
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-content {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition-delay: .22s, .12s, 0s;
+}
+
+.mf-sidequest-copy {
+  max-width: 47em;
+  color: rgba(255,255,255,.88);
+  font-family: "Geist", Arial, sans-serif;
+  font-size: clamp(13px, 1vw, 17px);
+  line-height: 1.46;
+  letter-spacing: -.014em;
+}
+
+.mf-sidequest-copy a {
+  position: relative;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mf-sidequest-copy a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -.12em;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(.22);
+  transform-origin: left;
+  transition: transform .55s cubic-bezier(.16,1,.3,1);
+}
+
+.mf-sidequest-copy a:hover::after,
+.mf-sidequest-copy a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.mf-sidequest-image {
+  width: min(100%, 300px);
+  aspect-ratio: 4 / 5;
+  justify-self: end;
+  align-self: end;
+  margin: 0;
+  overflow: hidden;
+  background: #111;
+}
+
+.mf-project-slide-sidequests .mf-sidequest-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.18) brightness(.72) !important;
+  transform: scale(1.07);
+  transition:
+    transform 1.1s cubic-bezier(.16,1,.3,1),
+    filter .7s ease !important;
+}
+
+.mf-sidequest-panel.is-active .mf-sidequest-image img {
+  transform: scale(1);
+}
+
+.mf-sidequest-image:hover img {
+  transform: scale(1.025) !important;
+  filter: grayscale(1) contrast(1.08) brightness(.88) !important;
+}
+
+@media (max-width: 1024px) {
+  .mf-project-shell.is-sidequests-project .mf-project-info-inner {
+    min-height: 78svh !important;
+  }
+
+  .mf-project-slide-sidequests {
+    height: 100svh !important;
+    padding: 54px 10px 10px !important;
+  }
+
+  .mf-sidequest-panel {
+    flex: .62 1 0;
+  }
+
+  .mf-sidequest-panel.is-active {
+    flex: 4.7 1 0;
+  }
+
+  .mf-sidequest-trigger {
+    min-height: 46px;
+    grid-template-columns: 30px minmax(0,1fr) auto;
+    padding-inline: 15px;
+  }
+
+  .mf-sidequest-panel.is-active .mf-sidequest-trigger {
+    min-height: 76px;
+    padding-bottom: 13px;
+  }
+
+  .mf-sidequest-panel.is-active .mf-sidequest-title {
+    font-size: clamp(28px, 8vw, 48px);
+  }
+
+  .mf-sidequest-content {
+    padding: 0 15px 17px 45px;
+    grid-template-columns: 1fr minmax(110px, 27vw);
+    gap: 18px;
+  }
+
+  .mf-sidequest-copy {
+    font-size: 12px;
+    line-height: 1.38;
+  }
+
+  .mf-sidequest-image {
+    width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .mf-project-shell.is-sidequests-project .mf-project-info-inner {
+    min-height: 82svh !important;
+  }
+
+  .mf-project-shell.is-sidequests-project .mf-project-intro {
+    margin-top: 24px;
+    font-size: 13px;
+  }
+
+  .mf-sidequest-content {
+    grid-template-columns: minmax(0,1fr) 94px;
+    gap: 14px;
+    padding-left: 15px;
+  }
+
+  .mf-sidequest-title {
+    font-size: 14px;
+  }
+
+  .mf-sidequest-panel.is-active .mf-sidequest-title {
+    font-size: clamp(26px, 9vw, 40px);
+  }
+
+  .mf-sidequest-copy {
+    max-height: 34vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    font-size: 11px;
+  }
+
+  .mf-sidequest-image {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mf-sidequest-panel,
+  .mf-sidequest-title,
+  .mf-sidequest-content,
+  .mf-sidequest-image img {
+    transition-duration: .01ms !important;
   }
 }

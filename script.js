@@ -299,6 +299,18 @@ if(indexExtra){
       "/media/projects/aims/02-aims-web.jpg",
       "/media/projects/aims/socials/03-aims-socials-1.jpg",
       "/media/projects/aims/merch/04-aims-merch-1.jpg"
+    ],
+    "04":[
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=80&sat=-100"
+    ],
+    "05":[
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=1400&q=80&sat=-100",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80&sat=-100"
     ]
   };
   const strips=[...document.querySelectorAll('.mf-strip')];
@@ -388,7 +400,7 @@ if(indexExtra){
     "03":{
       title:"AIMS",
       intro:"The most advanced AI search for music catalogs. AIMS translates complex machine-learning capability into a product story that music professionals can understand, trust and use.",
-      scope:"Website, brand refresh, product narrative, sales deck, launch materials and interface direction.",
+      scope:"Website, brand refresh, marketing & sales assets.",
       context:"AIMS had technology with unusual depth, but its value was difficult to communicate outside technical conversations. Buyers needed to understand the advantage quickly while still believing the system could handle professional-scale catalogs. The brand had to bridge engineering precision and creative intuition.",
       approach:"I reframed the platform around the moments where search changes the work itself. Product language became more direct, the identity gained focus and the sales story moved from feature inventory to practical leverage. The system gives the technology room to feel sophisticated without becoming abstract.",
       images:[
@@ -409,6 +421,53 @@ if(indexExtra){
         ],title:"AIMS social gallery"},
         "/media/projects/aims/merch/04-aims-merch-1.jpg"
       ]
+    },
+    "04":{
+      title:"Vault 111",
+      intro:"TBD",
+      scope:"TBD",
+      context:"TBD",
+      approach:"TBD",
+      images:[
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88&sat=-100",
+        "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88&sat=-100",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=88&sat=-100",
+        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88&sat=-100"
+      ]
+    },
+    "05":{
+      title:"Side Quests.",
+      intro:"Every now and then, luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
+      scope:"",
+      context:"",
+      approach:"",
+      compactInfo:true,
+      images:[{
+        type:"sideQuests",
+        title:"Side Quests archive",
+        items:[
+          {
+            title:"Ūndersurface",
+            image:"https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            descriptionHtml:`Co-founded (with <a href="https://www.pac.al/" target="_blank" rel="noopener">Joe Pacal</a>) an enclosed community of entrepreneurs, designers and tinkerers. It was a peer-accountability community that ran for more than five years on Slack, combining structured goal-pushing sessions, sharing circles and talks to help members grow personally and professionally. Beyond the digital space, Joe and I organized an in-person retreat — including a three-day trip to Estonia — built around deep-sharing, introspective and task-driven exercises designed to get people sharing honestly and working through personal blocks.`
+          },
+          {
+            title:"TBD",
+            image:"https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            descriptionHtml:"TBD"
+          },
+          {
+            title:"TBD",
+            image:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            descriptionHtml:"TBD"
+          },
+          {
+            title:"TBD",
+            image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            descriptionHtml:"TBD"
+          }
+        ]
+      }]
     }
   };
 
@@ -509,6 +568,24 @@ if(indexExtra){
         ${projectMediaCurtain()}
       </figure>`;
     }
+    if(media&&typeof media==="object"&&media.type==="sideQuests"){
+      const items=Array.isArray(media.items)?media.items:[];
+      return `<figure class="mf-project-slide mf-project-slide-sidequests" data-slide="${i}">
+        <div class="mf-sidequests-accordion" aria-label="${esc(media.title||'Side Quests')}">
+          ${items.map((item,itemIndex)=>`<section class="mf-sidequest-panel${itemIndex===0?' is-active':''}" data-sidequest-index="${itemIndex}">
+            <button class="mf-sidequest-trigger" type="button" aria-expanded="${itemIndex===0?'true':'false'}">
+              <span class="mf-sidequest-number">${String(itemIndex+1).padStart(2,'0')}</span>
+              <span class="mf-sidequest-title">${esc(item.title||'TBD')}</span>
+              <span class="mf-sidequest-mark" aria-hidden="true">↗</span>
+            </button>
+            <div class="mf-sidequest-content">
+              <div class="mf-sidequest-copy">${item.descriptionHtml||'TBD'}</div>
+              <figure class="mf-sidequest-image"><img src="${esc(item.image||'')}" alt="${esc(item.title||'Side Quest')}" draggable="false"></figure>
+            </div>
+          </section>`).join('')}
+        </div>
+      </figure>`;
+    }
     if(media&&typeof media==="object"&&media.type==="verticalGallery"){
       const cards=Array.isArray(media.cards)?media.cards:[];
       const first=cards[0]||"";
@@ -555,6 +632,7 @@ if(indexExtra){
   function renderProject(key){
     currentProjectKey=key;
     const project=projectData[key]||projectData["01"];
+    shell.classList.toggle('is-sidequests-project',!!project.compactInfo);
     fields.index.textContent=`PROJECT ${key}`;
     fields.title.textContent=project.title;
     fields.intro.textContent=project.intro;
@@ -569,6 +647,7 @@ if(indexExtra){
     setupStaticImageSlides();
     setupCarousels(project);
     setupVerticalGalleries(project);
+    setupSideQuests();
     setupEndCard();
 
     activeIndex=0;
@@ -577,6 +656,27 @@ if(indexExtra){
     overlay.scrollTop=0;
     updateCounter();
     updateActiveExtras();
+  }
+
+  function setupSideQuests(){
+    const accordion=slides.querySelector('.mf-sidequests-accordion');
+    if(!accordion)return;
+    const panels=[...accordion.querySelectorAll('.mf-sidequest-panel')];
+    const activate=panel=>{
+      if(!panel||panel.classList.contains('is-active'))return;
+      panels.forEach(item=>{
+        const active=item===panel;
+        item.classList.toggle('is-active',active);
+        item.querySelector('.mf-sidequest-trigger')?.setAttribute('aria-expanded',active?'true':'false');
+      });
+    };
+    panels.forEach(panel=>{
+      panel.querySelector('.mf-sidequest-trigger')?.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        activate(panel);
+      });
+    });
   }
 
   function setupProjectVideoLoaders(){
@@ -1493,6 +1593,11 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const flagMarkup=flag=>`<span class="mf-guidance-flag-emoji" data-flag="${escapeHtml(flag)}" aria-hidden="true">${flagEmoji[flag]||'◻'}</span>`;
   const personMarkup=entry=>`<div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"><span class="mf-guidance-person-info"><small class="mf-guidance-person-country">${flagMarkup(entry.flag)}<span>${escapeHtml(entry.country)}</span></small><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><span class="mf-guidance-person-gap" aria-hidden="true"></span><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-company">${escapeHtml(entry.company)}</small></span></div>`;
   const tagsMarkup=entry=>(entry.tags||[]).length?`<div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div>`:'';
+  const weightLinkMarkup=(label,className,href)=>{
+    const chars=[...label];
+    const letters=chars.map((char,index)=>`<span style="--i:${index};--r:${chars.length-index-1}">${char===' '?'&nbsp;':escapeHtml(char)}</span>`).join('');
+    return `<a class="mf-weight-link ${className}" href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${letters}</a>`;
+  };
 
   const romanReview=[
     `I started seeing Marián because I wanted to do something about my work ethic and discipline. I had left the company to work independently. Work began piling up, and very quickly I no longer knew what to tackle first.`,
@@ -1585,55 +1690,55 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   };
 
 
-  const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span><span class="mf-leadership-person-copy"><b>${escapeHtml(entry.name)}</b><small>${escapeHtml(entry.role)}</small><small>${escapeHtml(entry.company)}</small></span></button>`).join('');
+  const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-label="Show review from ${escapeHtml(entry.name)}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span></button>`).join('');
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
     <section class="mf-leadership-section" id="leadership-xp">
       <div class="mf-leadership-copy-block">
         <h3>XP</h3>
-        <p>My leadership experience comes mostly from my time at <a href="https://www.strv.com" target="_blank" rel="noopener">STRV</a>. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design & QA.</p>
+        <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
         <div class="mf-leadership-stats"><div><small>LED</small><strong>11 managers</strong></div><div><small>OVERSEEING</small><strong>120 people</strong></div></div>
         <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
-        <p><a class="mf-leadership-inline-link" href="https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders" target="_blank" rel="noopener">Musing about leadership in my interview for Eleken.</a></p>
+        <p>${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
       </div>
       <div class="mf-leadership-copy-block">
-        <h3>Uptime</h3>
+        <h3>UPTIME</h3>
         <p>I’m at my best when things are still being established — early-stage, lots of heavy lifting, real progress. That’s also where my coaching background kicks in — I’m good at navigating chaos and clearing the air. Once everything’s clicking, stagnation creeps in, and everyone’s obsessing over optimizing 91% into 92%, I’m ready for a shift.</p>
       </div>
       <div class="mf-leadership-copy-block">
-        <h3>Highlights</h3>
+        <h3>HIGHLIGHTS</h3>
         <ul>
           <li>Started the company’s first regular performance reviews — later adopted company-wide</li>
-          <li>Built the first career ladder for designers — later adopted by other D&E departments</li>
-          <li>Co-ran the first company academy for new talent in D&E</li>
+          <li>Built the first career ladder for designers — later adopted by other D&amp;E departments</li>
+          <li>Co-ran the first company academy for new talent in D&amp;E</li>
           <li>Mentored the first company academy track for designers</li>
           <li>Listen, stuff was happening and I was around, so…</li>
         </ul>
       </div>
       <div class="mf-leadership-photos">
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy"><figcaption>Chillin'</figcaption></figure>
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy"><figcaption>My first academy graduates</figcaption></figure>
+        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy"><figcaption>CHILLIN'</figcaption></figure>
+        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy"><figcaption>MY FIRST DESIGN GRADUATES</figcaption></figure>
       </div>
-      <div class="mf-leadership-copy-block">
-        <h3>Reviews</h3>
-        <p>Kind (NO MONETARY TRANSACTION INCLUDED) words from my ex-team members.</p>
+      <div class="mf-leadership-copy-block mf-leadership-reviews-intro">
+        <h3>REVIEWS</h3>
+        <p>Kind (no monetary transaction included) words from my ex-team members.</p>
       </div>
     </section>
     <section class="mf-leadership-section" id="leadership-reviews">
-      <div class="mf-leadership-people-strip">${leadershipPeopleMarkup()}</div>
+      <div class="mf-leadership-people-strip" aria-label="Team review carousel">${leadershipPeopleMarkup()}</div>
       <div class="mf-leadership-review-detail" id="mfLeadershipReviewDetail"></div>
     </section>
     <section class="mf-leadership-section" id="leadership-next">
       <div class="mf-leadership-copy-block">
-        <h3>Next?</h3>
+        <h3>NEXT?</h3>
         <p>If you’ve got a team out there and need support — hit me up. I treat leadership with the utmost respect. It’s sensitive territory, so job descriptions go aside here. Just tell me what’s going on, and we’ll figure it out from there.</p>
         <p>Design, coaching, leadership — whatever the label, if something I do feels relevant to what you need, that’s enough reason to reach out. We’ll cook up the collab that actually fits, together. [hits the table]</p>
-        <button class="mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
+        <button class="mf-art-cta mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
       </div>
     </section>
   </div>`;
 
-  const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded"><header class="mf-leadership-review-head"><h4>${escapeHtml(entry.name)}</h4><p>${escapeHtml(entry.role)} · ${escapeHtml(entry.company)}</p></header><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
+  const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded"><header class="mf-leadership-review-head"><h4>${escapeHtml(entry.name)}</h4><div class="mf-leadership-review-meta"><span>${escapeHtml(entry.role)}</span><span>${escapeHtml(entry.company)}</span></div></header><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
 
   let currentMode='mindset';
   let guidanceReturnY=0;
@@ -1664,6 +1769,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   }
 
   let snapInFlight=false;
+  let snapAnimationFrame=0;
+  const easeOutQuint=t=>1-Math.pow(1-t,5);
   const getDominantMindsetReview=()=>{
     const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
     if(!articles.length)return null;
@@ -1681,21 +1788,35 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     });
     return best;
   };
+  function animateGuidanceScroll(destination,duration=900){
+    cancelAnimationFrame(snapAnimationFrame);
+    const start=reviewsHost.scrollTop;
+    const distance=destination-start;
+    if(Math.abs(distance)<2){snapInFlight=false;return;}
+    snapInFlight=true;
+    const started=performance.now();
+    const frame=now=>{
+      const progress=Math.min(1,(now-started)/duration);
+      reviewsHost.scrollTop=start+distance*easeOutQuint(progress);
+      if(progress<1){snapAnimationFrame=requestAnimationFrame(frame);return;}
+      reviewsHost.scrollTop=destination;
+      snapInFlight=false;
+      const target=getDominantMindsetReview();
+      if(target)markActiveReview(target.dataset.reviewId);
+    };
+    snapAnimationFrame=requestAnimationFrame(frame);
+  }
   function settleMindsetReview(){
     if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open')||snapInFlight)return;
     const target=getDominantMindsetReview();
     if(!target)return;
     markActiveReview(target.dataset.reviewId);
-    const destination=target.offsetTop;
-    if(Math.abs(reviewsHost.scrollTop-destination)<2)return;
-    snapInFlight=true;
-    reviewsHost.scrollTo({top:destination,behavior:'smooth'});
-    setTimeout(()=>{snapInFlight=false;markActiveReview(target.dataset.reviewId);},620);
+    animateGuidanceScroll(target.offsetTop,980);
   }
   function queueMindsetSettle(){
     if(currentMode!=='mindset'||mobileGuidance.matches||snapInFlight)return;
     clearTimeout(snapTimer);
-    snapTimer=setTimeout(settleMindsetReview,120);
+    snapTimer=setTimeout(settleMindsetReview,150);
   }
 
   function stopGuidanceAscii(){
@@ -1777,62 +1898,64 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const target=document.getElementById(`guidance-review-${button.dataset.reviewTarget}`);
       if(!target)return;
       markActiveReview(button.dataset.reviewTarget);
-      snapInFlight=true;
-      reviewsHost.scrollTo({top:target.offsetTop,behavior:'smooth'});
-      setTimeout(()=>{snapInFlight=false;},620);
+      animateGuidanceScroll(target.offsetTop,760);
     }));
   }
 
   function bindLeadership(){
     const detail=reviewsHost.querySelector('#mfLeadershipReviewDetail');
-    const cards=[...reviewsHost.querySelectorAll('[data-leadership-person]')];
-    const paint=id=>{
+    const strip=reviewsHost.querySelector('.mf-leadership-people-strip');
+    if(!detail||!strip)return;
+
+    const paint=(id,animate=true)=>{
       const entry=leadershipEntries.find(item=>item.id===id)||leadershipEntries[0];
-      if(!entry||!detail)return;
-      detail.classList.add('is-switching');
-      setTimeout(()=>{
+      if(!entry)return;
+      const cards=[...strip.querySelectorAll('[data-leadership-person]')];
+      const clicked=cards.find(card=>card.dataset.leadershipPerson===entry.id);
+      if(!clicked)return;
+
+      const firstRects=new Map(cards.map(card=>[card,card.getBoundingClientRect()]));
+      while(strip.firstElementChild!==clicked)strip.appendChild(strip.firstElementChild);
+      const reordered=[...strip.querySelectorAll('[data-leadership-person]')];
+      const lastRects=new Map(reordered.map(card=>[card,card.getBoundingClientRect()]));
+      reordered.forEach(card=>{
+        const first=firstRects.get(card),last=lastRects.get(card);
+        if(!first||!last)return;
+        card.style.transition='none';
+        card.style.transform=`translate3d(${first.left-last.left}px,${first.top-last.top}px,0)`;
+      });
+      strip.offsetHeight;
+      reordered.forEach(card=>{
+        card.style.transition='transform .78s cubic-bezier(.16,1,.3,1), opacity .48s cubic-bezier(.16,1,.3,1)';
+        card.style.transform='translate3d(0,0,0)';
+        const active=card===clicked;
+        card.classList.toggle('is-active',active);
+        card.setAttribute('aria-pressed',active?'true':'false');
+      });
+      strip.scrollTo({left:0,behavior:'smooth'});
+
+      const swap=()=>{
         detail.innerHTML=leadershipDetailMarkup(entry);
-        cards.forEach(card=>{
-          const active=card.dataset.leadershipPerson===entry.id;
-          card.classList.toggle('is-active',active);
-          card.setAttribute('aria-pressed',active?'true':'false');
-        });
         const panel=detail.querySelector('.mf-leadership-review-expanded');
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{
-          panel?.classList.add('is-visible');
-          detail.classList.remove('is-switching');
-        }));
-      },140);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>panel?.classList.add('is-visible')));
+      };
+      if(!animate){swap();return;}
+      detail.classList.add('is-switching');
+      setTimeout(()=>{swap();detail.classList.remove('is-switching');},150);
     };
-    cards.forEach(card=>card.addEventListener('click',()=>paint(card.dataset.leadershipPerson)));
-    if(cards[0])paint(cards[0].dataset.leadershipPerson);
+
+    strip.addEventListener('click',event=>{
+      const card=event.target.closest('[data-leadership-person]');
+      if(card)paint(card.dataset.leadershipPerson,true);
+    });
+    const first=strip.querySelector('[data-leadership-person]');
+    if(first)paint(first.dataset.leadershipPerson,false);
 
     const copyBtn=reviewsHost.querySelector('#mfLeadershipCopyButton');
     copyBtn?.addEventListener('click',async()=>{
       try{ await navigator.clipboard.writeText('email@marianfusek.com'); copyBtn.textContent='Email copied to your clipboard .)'; }
       catch(_){ copyBtn.textContent='Email copied to your clipboard .)'; }
     });
-
-    if(!mobileGuidance.matches){
-      reviewsHost.addEventListener('pointermove',event=>{
-        const page=reviewsHost.querySelector('.mf-leadership-page');
-        if(!page)return;
-        const rect=reviewsHost.getBoundingClientRect();
-        const x=((event.clientX-rect.left)/rect.width-.5)*10;
-        const y=((event.clientY-rect.top)/rect.height-.5)*8;
-        page.style.setProperty('--guide-parallax-x',`${(x*.45).toFixed(2)}px`);
-        page.style.setProperty('--guide-parallax-y',`${(y*.45).toFixed(2)}px`);
-        page.style.setProperty('--guide-parallax-x-neg',`${(-x*.35).toFixed(2)}px`);
-        page.style.setProperty('--guide-parallax-y-neg',`${(-y*.35).toFixed(2)}px`);
-      },{passive:true});
-      reviewsHost.addEventListener('pointerleave',()=>{
-        const page=reviewsHost.querySelector('.mf-leadership-page');
-        page?.style.setProperty('--guide-parallax-x','0px');
-        page?.style.setProperty('--guide-parallax-y','0px');
-        page?.style.setProperty('--guide-parallax-x-neg','0px');
-        page?.style.setProperty('--guide-parallax-y-neg','0px');
-      },{passive:true});
-    }
   }
 
   function render(mode){
