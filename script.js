@@ -1578,14 +1578,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     leadership:{title:'Team<br>Leadership',kicker:'',intro:'',order:leadershipEntries.map(entry=>entry.id)}
   };
 
-  const reviewCopyLength=entry=>Array.isArray(entry.copy)?entry.copy.join(' ').length:String(entry.copy||'').length;
-  const shortDensity=entry=>reviewCopyLength(entry)>1050?' is-copy-dense':reviewCopyLength(entry)>560?' is-copy-mid':'';
-  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-guidance-part-button is-active" type="button" data-review-part="0">PART 01</button><button class="mf-guidance-part-button" type="button" data-review-part="1">PART 02</button></nav><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${nl(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${nl(entry.parts[1])}</div></div></div>`;
-  const reviewMarkup=(entry)=>{
-    if(entry.length==='big-parts')return `<article class="mf-guidance-review is-big is-big-parts" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}${tagsMarkup(entry)}</div><div class="mf-guidance-big-copy">${partMarkup(entry)}</div></article>`;
-    if(entry.length==='big-single')return `<article class="mf-guidance-review is-big is-big-single" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}${tagsMarkup(entry)}</div><div class="mf-guidance-big-copy mf-guidance-big-single-copy">${nl(entry.copy)}</div></article>`;
-    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}${tagsMarkup(entry)}</div><blockquote>${nl(entry.copy)}</blockquote></article>`;
-    return `<article class="mf-guidance-review is-short${shortDensity(entry)}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-short-meta">${tagsMarkup(entry)}</div><div class="mf-guidance-short-copy"><blockquote>${nl(entry.copy)}</blockquote></div><div class="mf-guidance-short-profile">${personMarkup(entry)}</div></article>`;
+  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${nl(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${nl(entry.parts[1])}</div></div><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-guidance-part-button is-active" type="button" data-review-part="0">PART 01</button><button class="mf-guidance-part-button" type="button" data-review-part="1">PART 02</button></nav></div>`;
+  const reviewMarkup=entry=>{
+    const copy=entry.parts?partMarkup(entry):`<div class="mf-guidance-copy-shell"><div class="mf-guidance-single-copy">${nl(entry.copy)}</div></div>`;
+    return `<article class="mf-guidance-review mf-guidance-review-universal${entry.parts?' has-parts':''}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}</div><div class="mf-guidance-review-content">${tagsMarkup(entry)}${copy}</div></article>`;
   };
 
 
@@ -1773,8 +1769,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
           buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
           requestAnimationFrame(()=>requestAnimationFrame(()=>panels[next].classList.remove('is-entering')));
           active=next;
-          setTimeout(()=>{switching=false;},280);
-        },190);
+          setTimeout(()=>{switching=false;},220);
+        },130);
       }));
     });
   }
