@@ -5,7 +5,38 @@ document.addEventListener("visibilitychange",()=>{document.title=document.hidden
    of scrollTo calls could fire during normal use and looked like a reload. */
 
 const loader=document.getElementById("mfLoader");
+const mfMobileRecovery=window.matchMedia("(max-width: 1024px), (pointer: coarse)").matches;
+let mfLoaderAlreadySeen=false;
+try{mfLoaderAlreadySeen=mfMobileRecovery&&sessionStorage.getItem("mfLoaderSeen")==="1";}catch(_){ }
+
+/* Mobile Safari may discard a graphics-heavy page and reconstruct it later.
+   Persisting the position and skipping the intro on that recovery prevents the
+   reconstruction from looking like a fresh restart. Only one restore attempt
+   is made; there are no delayed scroll loops. */
+(function(){
+  if(!mfMobileRecovery)return;
+  let saveFrame=0;
+  const save=()=>{
+    saveFrame=0;
+    try{sessionStorage.setItem("mfLastScrollY",String(Math.max(0,window.scrollY)));}catch(_){ }
+  };
+  window.addEventListener("scroll",()=>{if(!saveFrame)saveFrame=requestAnimationFrame(save);},{passive:true});
+  window.addEventListener("pagehide",save,{passive:true});
+  window.addEventListener("pageshow",()=>{
+    if(!mfLoaderAlreadySeen)return;
+    let y=0;
+    try{y=Number(sessionStorage.getItem("mfLastScrollY")||0);}catch(_){ }
+    if(y>8)setTimeout(()=>window.scrollTo({top:y,left:0,behavior:"auto"}),90);
+  },{once:true});
+})();
+
+function revealMfSiteImmediately(){
+  document.body.classList.remove("mf-preload-locked");
+  document.body.classList.add("mf-site-entered","mf-loader-revealing","mf-page-revealed","mf-name-revealed");
+  loader?.classList.add("done");
+}
 function startMfSite(){
+  if(mfLoaderAlreadySeen){revealMfSiteImmediately();return;}
   document.body.classList.remove("mf-preload-locked");
   document.body.classList.add("mf-site-entered");
   runMfSiteLoader();
@@ -92,6 +123,7 @@ function runMfSiteLoader(){
       if(asciiEl)asciiEl.textContent='// signal released';
       setTimeout(()=>{
         document.body.classList.add('mf-loader-revealing','mf-page-revealed');
+        try{sessionStorage.setItem("mfLoaderSeen","1");}catch(_){ }
         loader.classList.add('is-revealing');
         setTimeout(()=>document.body.classList.add('mf-name-revealed'),950);
         setTimeout(()=>loader.classList.add('done'),1500);
@@ -1475,7 +1507,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   ];
 
   const iljaReview=[
-    `Before meeting Marián, my history with coaching was a mixed bag. Until then, I had thought of coaches as self-assured gurus who applied a predefined set of techniques to help you clarify your goals and boost your productivity and performance. My perspective completely shifted after working with Marián. Marián is a highly perceptive and empathetic listener. Whenever my words said one thing but my body language said something else, he picked up on it and used it as an avenue to help me deconstruct my underlying motives and assumptions. What stood out was his ability to quickly understand my personality and temperament and adapt his coaching style to suit me. This knack allowed him to skillfully balance guiding me while encouraging self-direction. Most importantly, Marián was not afraid to nudge me out of my comfort zone, challenging my initial answers and steering me toward deeper reflection. Sometimes I found myself leaving a session shaken, yet profoundly contemplative. Other times, I was brimming with inspiration and energy, barely able to contain the excitement and eagerness stirring within me. Both kinds of sessions proved invaluable, offering unique insights into the underlying mental models that drive my personal and professional behavior. A few months into our collaboration, I realized a significant transformation. I did not leave our sessions burdened with a laundry list of goals and benchmarks to meet, which Marián would then hold me accountable for. Instead, I left with a new understanding of myself. I recognized that I did not thrive within rigid structures, something I had already been somewhat aware of. Through my journey with Marián, however, I learned not merely to acknowledge this trait but to harness it as a powerful tool. I can wholeheartedly recommend Marián to anyone looking for a coaching experience that is transformative, personalized, and insightful.`
+    `Before meeting Marián, my history with coaching was a mixed bag. Until then, I had thought of coaches as self-assured gurus who applied a predefined set of techniques to help you clarify your goals and boost your productivity and performance. My perspective completely shifted after working with Marián. Marián is a highly perceptive and empathetic listener. Whenever my words said one thing but my body language said something else, he picked up on it and used it as an avenue to help me deconstruct my underlying motives and assumptions. What stood out was his ability to quickly understand my personality and temperament and adapt his coaching style to suit me. This knack allowed him to skillfully balance guiding me while encouraging self-direction. Most importantly, Marián was not afraid to nudge me out of my comfort zone, challenging my initial answers and steering me toward deeper reflection.`,
+    `Sometimes I found myself leaving a session shaken, yet profoundly contemplative. Other times, I was brimming with inspiration and energy, barely able to contain the excitement and eagerness stirring within me. Both kinds of sessions proved invaluable, offering unique insights into the underlying mental models that drive my personal and professional behavior. A few months into our collaboration, I realized a significant transformation. I did not leave our sessions burdened with a laundry list of goals and benchmarks to meet, which Marián would then hold me accountable for. Instead, I left with a new understanding of myself. I recognized that I did not thrive within rigid structures, something I had already been somewhat aware of. Through my journey with Marián, however, I learned not merely to acknowledge this trait but to harness it as a powerful tool. I can wholeheartedly recommend Marián to anyone looking for a coaching experience that is transformative, personalized, and insightful.`
   ];
 
   const longReview=[
@@ -1486,29 +1519,56 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     `I leave my work with Marián a free, self-aware person, able to interpret my life in my own favor, whatever happens in it. You cannot always control which cards land on the table or whether you run into snakes in the sand along the way (Marián will never promise otherwise). But you can always play as well as you possibly can, despite everything and everyone. You can always enjoy your game, your journey, so that one day you can calmly say, from a good place: I followed my own path, and it was a ride no one else experienced. And perhaps, through that, inspire others never to stop searching for their own path for a very good reason, and never to settle for anything less. That is what this is all about. Thank you, my friend, for teaching me to play as if my life depended on it!`
   ];
 
+  const tomasLodnanReview=[
+    `I have to say, we had many mentors and consultants. Many of them helped us move forward, gave us feedback and created a space where we could talk about our challenges despite the daily routine.`,
+    `Marián was on another level for us. To be honest, I was extremely surprised by how quickly and precisely he was able to understand who we are, what our challenges are and identify the problems without any unnecessary fluff. His presentation was so valuable that I went through it several times. :) Based on his suggestions and his ability to identify potential issues in the future, we made important changes to our organisational structure and prioritised our focus on areas where we had pain points.`,
+    `Marián continues to be our long-term mentor and coach. We regularly return to discuss specific topics and validate whether he confirms that our approach is good or provides a different perspective. If your organisation is growing and you are seeking an expert in leadership and team management for your tech company, Marián is definitely the person I would recommend first.`
+  ];
+
+  const kristynaPeckovaReview=[
+    `When I started in design several years ago, I was looking for someone who could open the door to that world and help me launch my career. Marián became one of the key people who guided me through that process. His support, advice and knowledge were indispensable to me, and thanks to him I found courage and confidence in my abilities. Marián gave me foundational design knowledge, explained it in a practical and entertaining way, gave me constructive feedback on my designs and stood by me when I landed my first client. His coaching and support contributed significantly to building my confidence in design and in my personal life.`,
+    `It is great to see how he has combined two things he genuinely enjoys—design and coaching. There is no question that he is a great designer, but I am glad I could be part of his professional growth and see him develop as a coach and share his know-how with others with such passion. I can only recommend working with him in any capacity!`
+  ];
+
+  const jakubNesporReview=`I would say I have a pretty good history with Marián. He was there for me during the most crucial phase of my career as my Team Leader, always striking the right balance between friendliness and professionalism. He introduced me to the fundamentals of coaching, so it is no surprise that, even years later, he was there to lend a hand when I needed it. What I love most about our sessions is how authentic they are, even when things are not always smooth sailing. And my favorite part? Leaving! Not because I am eager to go home, but because I always feel so pumped and happy that I have just learned something new about myself.`;
+
+  const tomasBruzdaReview=`I have been attending sessions with Marián in waves. We have already gone through two waves. The first dealt with both personal and work life a bit. The second was primarily about work life. Regardless, in both cases, I left very satisfied. Marián helped me organize my thoughts, set priorities and, most importantly, figure out what I really want. Even when we did not have a specific topic to address, it helped me a lot just to vent about what was bothering me. Sometimes we followed up on something, sometimes we did not, but I always left with peace of mind. If a third wave comes, it will certainly be with Marián again.`;
+
+  const marosNovakReview=[
+    `After eight years as iOS Lead at GoodRequest, I started wondering what should come next. The team was finely tuned, with no weak links—technologically strong and motivated—while I found myself digging deeper into how the company operated. Around that time, we invited Marián to come in and look at the company from a distance. After years inside it, we lacked that perspective because we were deep in operations, business and everyday problems. During our conversation, he wanted to understand how we worked, and he asked exactly the questions I needed to answer but had never asked myself.`,
+    `One of the outcomes after his week with us was the recommendation that the tech leaders needed a leader: a Head of Design & Engineering who would motivate them, listen to them, help guide them and launch them to the moon. Simply someone who would be there for them in the same way they were there for their teams. The recommendation came with my name, followed by an offer from the board asking whether I was in. I was. Naturally, I had respect and concerns, but I was not alone in it—we started sessions with Marián.`,
+    `Our coaching sessions are pure gold. Whether I was looking for a replacement for myself on the iOS platform and thinking about how to tell the team, figuring out how to take the right first steps as Head of D&E, preparing for difficult conversations or finding ways to connect the tech leads more closely, we found answers to everything together—or rather, I found them. Marián asked the questions. His empathy, spark, ability to step out of the role and precisely targeted advice make me feel more confident in what I do. Our leadership styles are similar, and our vibe and shared perspective help me immensely. Also thanks to lines like: “Hele, jsem tu for you,” “Pojďme ti odlehnout,” “Fandím ti,” “Pojď si to urvat,” and “This is the shit.”`
+  ];
+
   const entries=[
-    {id:'michal-bohac',length:'long',name:'Michal Bohac',role:'CEO',company:'Wonder Makers',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/michal-bohac.jpg',tags:['Transformational Coaching'],copy:longReview,parts:[longReview.slice(0,3),longReview.slice(3)]},
+    {id:'michal-bohac',length:'long',name:'Michal Boháč',role:'CEO',company:'Wonder Makers',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/michal-bohac.jpg',tags:['Transformational Coaching'],copy:longReview,parts:[longReview.slice(0,3),longReview.slice(3)]},
     {id:'roman-bartos',length:'medium',name:'Roman Bartos',role:'Designer',company:'Freelance',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/roman-bartos.jpg',tags:['Transformational Coaching'],copy:romanReview},
     {id:'darja-arefjeva',length:'medium',name:'Darja Arefjeva',role:'Product Designer',company:'Pipedrive',country:'Russia',flag:'RU',photo:'/media/guidance/coaching/darja-arefjeva.jpg',tags:['Design Coaching'],copy:darjaReview},
     {id:'anastasiia-kozina',length:'short',name:'Anastasiia Kozina',role:'Founding Designer',company:'Illusian',country:'Finland',flag:'FI',photo:'/media/guidance/coaching/anastasiia-kozina.jpg',tags:['Life Coaching'],copy:anastasiiaReview},
     {id:'mako-ueda',length:'medium',name:'Mako Ueda',role:'Business Operations Manager',company:'Career Break',country:'United States',flag:'US',photo:'/media/guidance/coaching/mako-ueda.jpg',tags:['Transformational Coaching'],copy:makoReview},
-    {id:'ilja-panic',length:'medium',name:'Ilja Panic',role:'CTO & Co-Founder',company:'Resolve',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/ilja-panic.jpg',tags:['Career Coaching'],copy:iljaReview}
+    {id:'ilja-panic',length:'medium',name:'Ilja Panić',role:'CTO & Co-Founder',company:'Resolve',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/ilja-panic.jpg',tags:['Career Coaching'],copy:iljaReview},
+    {id:'tomas-lodnan',length:'long',name:'Tomáš Lodňan',role:'CEO',company:'Good Request',country:'Slovakia',flag:'SK',photo:'/media/guidance/coaching/tomas-lodnan.jpg',tags:['Executive Coaching'],copy:tomasLodnanReview,parts:[tomasLodnanReview.slice(0,2),tomasLodnanReview.slice(2)]},
+    {id:'kristyna-peckova',length:'medium',name:'Kristýna Pecková',role:'UX/UI Designer',company:'Freelance',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/kristyna-peckova.jpg',tags:['Design Coaching'],copy:kristynaPeckovaReview},
+    {id:'jakub-nespor',length:'medium',name:'Jakub Nešpor',role:'Design Engineer',company:'Entire',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/jakub-nespor.jpg',tags:['Transformational Coaching'],copy:jakubNesporReview},
+    {id:'tomas-bruzda',length:'medium',name:'Tomáš Bruzda',role:'Designer',company:'Freelance',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/tomas-bruzda.jpg',tags:['Coaching'],copy:tomasBruzdaReview},
+    {id:'maros-novak',length:'long',name:'Maroš Novák',role:'Head of Design & Engineering',company:'GoodRequest',country:'Slovakia',flag:'SK',photo:'/media/guidance/coaching/maros-novak.jpg',tags:['Leadership Coaching'],copy:marosNovakReview,parts:[marosNovakReview.slice(0,2),marosNovakReview.slice(2)]}
   ];
 
   const modes={
-    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic']},
+    mindset:{title:'Mindset<br>Coaching',kicker:'GUIDANCE / 01 / PERSONAL',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic','tomas-lodnan','kristyna-peckova','jakub-nespor','tomas-bruzda','maros-novak']},
     leadership:{title:'Team<br>Leadership',kicker:'GUIDANCE / 02 / ORGANISATIONAL',intro:'Team audits, leadership development and practical interventions for growing creative and technology organizations.',order:[]}
   };
 
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[char]));
-  const personMarkup=entry=>`<div class="mf-guidance-person-wrap"><div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div><div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}"><span class="mf-guidance-person-info"><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-company">${escapeHtml(entry.company)}</small></span></div></div>`;
+  const tagsMarkup=entry=>`<div class="mf-guidance-review-tags">${entry.tags.map(tag=>`<span>${escapeHtml(tag)}</span>`).join('')}</div>`;
+  const personMarkup=entry=>`<div class="mf-guidance-person"><img class="mf-guidance-person-photo" src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"><span class="mf-guidance-person-info"><b class="mf-guidance-person-name">${escapeHtml(entry.name)}</b><small class="mf-guidance-person-country"><i class="mf-guidance-flag" data-flag="${escapeHtml(entry.flag)}"></i>${escapeHtml(entry.country)}</small><small class="mf-guidance-person-role">${escapeHtml(entry.role)}</small><small class="mf-guidance-person-company">${escapeHtml(entry.company)}</small></span></div>`;
   const paragraphsMarkup=value=>Array.isArray(value)?value.map(paragraph=>`<p>${escapeHtml(paragraph)}</p>`).join(''):escapeHtml(value);
   const copyMarkup=entry=>paragraphsMarkup(entry.copy);
   const partMarkup=entry=>entry.parts?`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-bio-menu-item is-active" type="button" data-review-part="0">PART 01</button><button class="mf-bio-menu-item" type="button" data-review-part="1">PART 02</button></nav><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${paragraphsMarkup(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${paragraphsMarkup(entry.parts[1])}</div></div></div>`:`<div class="mf-guidance-copy-shell">${copyMarkup(entry)}</div>`;
   const reviewMarkup=(entry,index)=>{
-    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<div class="mf-guidance-long-copy">${partMarkup(entry)}</div></article>`;
-    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<blockquote>${copyMarkup(entry)}</blockquote></article>`;
-    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${personMarkup(entry)}<blockquote>${copyMarkup(entry)}</blockquote></article>`;
+    if(entry.length==='long')return `<article class="mf-guidance-review is-long" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap mf-guidance-person-wrap-long">${personMarkup(entry)}${tagsMarkup(entry)}</div><div class="mf-guidance-long-copy">${partMarkup(entry)}</div></article>`;
+    if(entry.length==='medium')return `<article class="mf-guidance-review is-medium" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap mf-guidance-person-wrap-medium">${tagsMarkup(entry)}${personMarkup(entry)}</div><blockquote>${copyMarkup(entry)}</blockquote></article>`;
+    return `<article class="mf-guidance-review is-short" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-short-profile">${personMarkup(entry)}</div><div class="mf-guidance-short-copy"><blockquote>${copyMarkup(entry)}</blockquote>${tagsMarkup(entry)}</div></article>`;
   };
 
   let currentMode='mindset';
@@ -1837,7 +1897,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 (function(){
   const container=document.getElementById("xpShape");
   if(!container||typeof p5==="undefined")return;
-  const COUNT=window.matchMedia("(max-width: 1024px)").matches?360:760;
+  const COUNT=window.matchMedia("(max-width: 1024px)").matches?190:760;
   const SHAPE_MAP={independent:"triangle",coach:"heart",strv:"fourStar",symbio:"sinusoid",fg:"spiral"};
   let currentShape="circle",targetShape="circle",morphFrom="circle";
   let morphStarted=0,morphDuration=2000,isMorphing=false,isHovering=false;
@@ -2006,6 +2066,106 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   function easeInOut(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 })();
 
+/* GUIDANCE PORTAL PARTICLES — lightweight isometric heart / STRV star. */
+(function(){
+  const canvases=[...document.querySelectorAll('.mf-guidance-particle-canvas')];
+  if(!canvases.length)return;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile=window.matchMedia('(max-width: 1024px), (pointer: coarse)').matches;
+  const states=canvases.map((canvas,index)=>{
+    const ctx=canvas.getContext('2d',{alpha:true});
+    const shape=canvas.dataset.guidanceShape||'heart';
+    const count=mobile?92:170;
+    const particles=Array.from({length:count},(_,i)=>({
+      u:i/count,
+      phase:Math.random()*Math.PI*2,
+      phase2:Math.random()*Math.PI*2,
+      size:.55+Math.random()*1.9,
+      alpha:.18+Math.random()*.64,
+      depth:.55+Math.random()*.75
+    }));
+    return {canvas,ctx,shape,particles,index,hover:false,width:0,height:0,dpr:1};
+  });
+  let visible=false,frame=0,start=performance.now();
+  function point(shape,u,r){
+    const a=u*Math.PI*2;
+    let x=0,y=0;
+    if(shape==='heart'){
+      x=16*Math.pow(Math.sin(a),3)/18;
+      y=-(13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a))/18;
+    }else{
+      const seg=u*8;
+      const k=Math.floor(seg)%8;
+      const t=seg-Math.floor(seg);
+      const a1=-Math.PI/2+k*Math.PI/4;
+      const a2=-Math.PI/2+(k+1)*Math.PI/4;
+      const r1=k%2===0?1:.30;
+      const r2=(k+1)%2===0?1:.30;
+      x=(Math.cos(a1)*r1*(1-t)+Math.cos(a2)*r2*t);
+      y=(Math.sin(a1)*r1*(1-t)+Math.sin(a2)*r2*t);
+    }
+    x*=r;y*=r;
+    /* Isometric projection: a shallow rotated plane rather than a flat icon. */
+    const isoX=(x-y)*.82;
+    const isoY=(x+y)*.40;
+    return [isoX,isoY];
+  }
+  function resize(state){
+    const rect=state.canvas.getBoundingClientRect();
+    const dpr=Math.min(window.devicePixelRatio||1,mobile?1:1.5);
+    const w=Math.max(1,Math.round(rect.width*dpr));
+    const h=Math.max(1,Math.round(rect.height*dpr));
+    if(w===state.canvas.width&&h===state.canvas.height)return;
+    state.canvas.width=w;state.canvas.height=h;state.width=rect.width;state.height=rect.height;state.dpr=dpr;
+    state.ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function draw(now){
+    frame=0;
+    if(!visible||document.hidden)return;
+    const t=(now-start)*.001;
+    states.forEach(state=>{
+      resize(state);
+      const {ctx,width,height}=state;
+      ctx.clearRect(0,0,width,height);
+      const r=Math.min(width,height)*(mobile?.24:.31);
+      const cx=width*.54,cy=height*.48;
+      const hoverBoost=state.hover?1.08:1;
+      state.particles.forEach((pt,i)=>{
+        const [px,py]=point(state.shape,pt.u,r*hoverBoost);
+        const drift=(state.hover?3.2:5.8);
+        const x=cx+px+Math.sin(t*1.15+pt.phase)*drift*pt.depth;
+        const y=cy+py+Math.cos(t*.92+pt.phase2)*drift*.65*pt.depth;
+        const vx=Math.cos(t*1.15+pt.phase)*drift*.16;
+        const vy=-Math.sin(t*.92+pt.phase2)*drift*.10;
+        const motion=state.hover?.58:.34;
+        ctx.strokeStyle=`rgba(255,255,255,${pt.alpha*motion})`;
+        ctx.lineWidth=Math.max(.35,pt.size*.34);
+        ctx.beginPath();ctx.moveTo(x-vx*5,y-vy*5);ctx.lineTo(x,y);ctx.stroke();
+        ctx.fillStyle=`rgba(255,255,255,${Math.min(.92,pt.alpha+(state.hover?.12:0))})`;
+        ctx.beginPath();ctx.arc(x,y,pt.size*(state.hover?1.12:1),0,Math.PI*2);ctx.fill();
+      });
+    });
+    if(!reduced)frame=requestAnimationFrame(draw);
+  }
+  function sync(){
+    if(visible&&!document.hidden&&!reduced){if(!frame)frame=requestAnimationFrame(draw);}
+    else if(frame){cancelAnimationFrame(frame);frame=0;}
+    if(reduced&&visible)draw(performance.now());
+  }
+  states.forEach(state=>{
+    const portal=state.canvas.closest('.mf-guidance-portal');
+    portal?.addEventListener('mouseenter',()=>{state.hover=true;sync();});
+    portal?.addEventListener('mouseleave',()=>{state.hover=false;sync();});
+  });
+  const section=document.getElementById('guidance');
+  if(section&&'IntersectionObserver' in window){
+    const observer=new IntersectionObserver(entries=>{visible=!!entries[0]?.isIntersecting;sync();},{rootMargin:'15% 0px',threshold:0});
+    observer.observe(section);
+  }else{visible=true;sync();}
+  document.addEventListener('visibilitychange',sync);
+  window.addEventListener('resize',()=>{states.forEach(resize);sync();},{passive:true});
+})();
+
 
 /* MF ART — magnetic button + infinitely wrapping draggable field */
 (function(){
@@ -2171,16 +2331,29 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   }
   let artMotionFrame=0;
   let miniVisible=!miniWorld;
+  const shouldAnimateArt=()=>!document.hidden&&!expanded&&(miniVisible||overlay.classList.contains("active"));
+  function animateArt(now){
+    artMotionFrame=0;
+    if(!shouldAnimateArt())return;
+    render(now);
+    artMotionFrame=requestAnimationFrame(animateArt);
+  }
+  function syncArtMotion(){
+    if(shouldAnimateArt()){
+      if(!artMotionFrame)artMotionFrame=requestAnimationFrame(animateArt);
+    }else if(artMotionFrame){
+      cancelAnimationFrame(artMotionFrame);
+      artMotionFrame=0;
+    }
+  }
   if(miniWorld){
     const miniObserver=new IntersectionObserver(entries=>{
       miniVisible=!!entries[0]?.isIntersecting;
+      syncArtMotion();
     },{rootMargin:"15% 0px",threshold:0});
     miniObserver.observe(miniWorld);
   }
-  function animateArt(now){
-    if(!document.hidden&&!expanded&&(miniVisible||overlay.classList.contains("active")))render(now);
-    artMotionFrame=requestAnimationFrame(animateArt);
-  }
+  document.addEventListener("visibilitychange",syncArtMotion);
   function ensureArtBuilt(){
     if(artInitPromise)return artInitPromise;
     artInitPromise=Promise.resolve().then(()=>{
@@ -2247,10 +2420,11 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     },{rootMargin:'260px 0px',threshold:0});
     obs.observe(artPreviewTrigger);
   }
-  artMotionFrame=requestAnimationFrame(animateArt);
+  syncArtMotion();
   function expandPiece(piece){
     if(expanded)return;
     expanded=piece;
+    syncArtMotion();
     overlay.classList.add("is-image-open");
     pieces.forEach(p=>p.el.classList.toggle("is-expanded",p===piece));
   }
@@ -2258,6 +2432,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     if(!expanded)return;
     expanded=null;
     overlay.classList.remove("is-image-open");
+    syncArtMotion();
     pieces.forEach(p=>p.el.classList.remove("is-expanded"));
     render();
   }
@@ -2316,6 +2491,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     overlay.setAttribute("aria-hidden","false");
     document.body.classList.add("art-open");
     requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add("is-visible")));
+    syncArtMotion();
     await ensureArtWorldLoaded();
   }
   function closeArt(){
@@ -2325,6 +2501,11 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       overlay.classList.remove("active","is-dragging");
       overlay.setAttribute("aria-hidden","true");
       document.body.classList.remove("art-open");
+      if(window.matchMedia('(max-width: 1024px), (pointer: coarse)').matches){
+        pieces.forEach(piece=>piece.img?.removeAttribute('src'));
+        artReady=false;
+      }
+      syncArtMotion();
     },720);
   }
   button.addEventListener("click",openArt);
