@@ -9270,3 +9270,44 @@ body.mf-name-revealed .mf-hero-name {
     line-height:1.34 !important;
   }
 }
+
+/* ============================================================
+   V76 — Mindset white text + desktop content origin
+   ============================================================ */
+
+/* These three elements must render as literal full white, independent of
+   inherited opacity, variable-text effects, blend modes or older rules. */
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2 *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-name,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-name *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel *,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal p,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal p * {
+  color: rgb(255,255,255) !important;
+  -webkit-text-fill-color: rgb(255,255,255) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+}
+
+@media (min-width:1025px) {
+  /* The overlay's left panel is 24vw. The review article therefore receives
+     26vw of internal left space, placing the photo exactly at 50vw. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    grid-template-columns: clamp(190px,14vw,260px) minmax(0,1fr) !important;
+    column-gap: clamp(30px,3.5vw,58px) !important;
+    padding-left: 26vw !important;
+    padding-right: 2.5vw !important;
+  }
+
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-wrap {
+    width: clamp(190px,14vw,260px) !important;
+  }
+}
