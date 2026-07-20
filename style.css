@@ -8512,3 +8512,521 @@ body.mf-name-revealed .mf-hero-name {
   }
   .mf-guidance-ascii { display:none !important; }
 }
+
+/* ============================================================
+   V74 — Mindset review system correction
+   ============================================================ */
+.mf-guidance-overlay-kicker {
+  display:none !important;
+}
+.mf-guidance-overlay,
+.mf-guidance-overlay.is-mindset,
+.mf-guidance-overlay.is-leadership {
+  background:#050505 !important;
+  color:#fff !important;
+}
+.mf-guidance-overlay-aside {
+  padding-top:74px !important;
+}
+.mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 {
+  margin:0 !important;
+  color:#fff !important;
+  opacity:1 !important;
+  -webkit-text-fill-color:#fff !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-weight:400 !important;
+  line-height:.84 !important;
+}
+.mf-guidance-overlay-aside > p,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+  width:min(26vw,390px) !important;
+  margin:24px 0 0 !important;
+  color:rgba(255,255,255,.58) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.58) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:10px !important;
+  line-height:1.5 !important;
+  letter-spacing:.025em !important;
+  white-space:pre-line !important;
+}
+
+/* The left review menu moves as one highlighted row. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav {
+  left:3vw !important;
+  right:2.5vw !important;
+  bottom:30px !important;
+  border:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button {
+  width:100% !important;
+  grid-template-columns:28px minmax(0,1fr) 28px !important;
+  gap:8px !important;
+  padding:8px 9px !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:rgba(255,255,255,.42) !important;
+  transition:background-color .42s var(--ease),color .42s var(--ease),transform .48s var(--ease) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button > span {
+  color:inherit !important;
+  -webkit-text-fill-color:currentColor !important;
+  transition:transform .48s var(--ease),color .42s var(--ease) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active {
+  background:#151515 !important;
+  color:#fff !important;
+  transform:translateX(0) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover > span,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active > span {
+  transform:translateX(8px) !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover .mf-guidance-flag-emoji,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active .mf-guidance-flag-emoji {
+  transform:translateX(8px) scale(1.02) !important;
+}
+.mf-guidance-flag-emoji {
+  display:inline-flex;
+  width:22px;
+  min-width:22px;
+  height:16px;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  line-height:1;
+  font-family:Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif;
+  -webkit-text-fill-color:initial !important;
+  transition:transform .48s var(--ease) !important;
+}
+
+/* Mandatory native snap, plus JS scrollend settling to the review with the
+   greatest visible area. This prevents a resting state between reviews. */
+.mf-guidance-overlay.is-mindset .mf-guidance-reviews {
+  scroll-snap-type:y mandatory !important;
+  scroll-padding-top:0 !important;
+  scroll-behavior:smooth !important;
+  overscroll-behavior-y:contain !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review {
+  scroll-snap-align:start !important;
+  scroll-snap-stop:always !important;
+}
+
+/* Absolutely white review typography. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review,
+.mf-guidance-overlay.is-mindset .mf-guidance-review blockquote,
+.mf-guidance-overlay.is-mindset .mf-guidance-review p,
+.mf-guidance-overlay.is-mindset .mf-guidance-long-copy,
+.mf-guidance-overlay.is-mindset .mf-guidance-big-copy,
+.mf-guidance-overlay.is-mindset .mf-guidance-part-panel,
+.mf-guidance-overlay.is-mindset .mf-guidance-part-panel p {
+  color:#fff !important;
+  opacity:1;
+  -webkit-text-fill-color:#fff !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-name {
+  color:#fff !important;
+  opacity:1 !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+/* Identical portrait and identity formatting for every review type. */
+.mf-guidance-overlay.is-mindset .mf-guidance-person-wrap {
+  width:clamp(210px,18vw,300px) !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  align-self:start !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person {
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-photo {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  filter:none !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-info {
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:flex-start !important;
+  align-items:flex-start !important;
+  width:100% !important;
+  min-width:0 !important;
+  padding:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-country {
+  order:0;
+  display:flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  margin:11px 0 0 !important;
+  color:rgba(255,255,255,.72) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.72) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-name {
+  order:1;
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:8px 0 0 !important;
+  transform:none !important;
+  white-space:nowrap !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:clamp(23px,1.62vw,32px) !important;
+  font-weight:450 !important;
+  line-height:.94 !important;
+  letter-spacing:-.045em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-gap {
+  order:2;
+  display:block !important;
+  height:21px !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-role,
+.mf-guidance-overlay.is-mindset .mf-guidance-person-company {
+  display:block !important;
+  margin:0 !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  line-height:1.32 !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-role {
+  order:3;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-company {
+  order:4;
+  margin-top:3px !important;
+  color:rgba(255,255,255,.55) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.55) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-person-wrap > .mf-guidance-review-tags {
+  margin:auto 0 0 !important;
+  padding-top:24px !important;
+}
+
+/* Shared review page frame. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review {
+  min-height:calc(100vh - 58px) !important;
+  min-height:calc(100dvh - 58px) !important;
+  padding:74px clamp(34px,4.4vw,80px) 30px !important;
+  gap:clamp(42px,5vw,90px) !important;
+  background:#050505 !important;
+}
+
+/* BIG, two-part and one-part, use a strict 50/50 horizontal split. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-big {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  align-items:stretch !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-big .mf-guidance-person-wrap {
+  align-self:start !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-big-copy {
+  min-width:0 !important;
+  width:100% !important;
+  max-width:none !important;
+  align-self:start !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:clamp(13px,.92vw,17px) !important;
+  line-height:1.31 !important;
+  letter-spacing:-.012em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-big-copy p {
+  margin:0 0 1.2em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-big-single .mf-guidance-big-single-copy {
+  align-self:end !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:flex-end !important;
+  padding-bottom:0 !important;
+}
+.mf-guidance-review-parts {
+  display:flex !important;
+  gap:22px !important;
+  margin:0 0 28px !important;
+}
+.mf-guidance-part-button {
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  color:rgba(255,255,255,.4) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.4) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:9px !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  cursor:pointer;
+  transition:color .35s var(--ease),transform .35s var(--ease) !important;
+}
+.mf-guidance-part-button:hover,
+.mf-guidance-part-button.is-active {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  transform:translateY(-1px);
+}
+.mf-guidance-part-panel {
+  display:none;
+  opacity:0;
+  transform:translate3d(0,-8px,0);
+  transition:opacity .22s var(--ease),transform .28s var(--ease);
+}
+.mf-guidance-part-panel.is-active { display:block;opacity:1;transform:none; }
+.mf-guidance-part-panel.is-leaving { opacity:0;transform:translate3d(0,8px,0); }
+.mf-guidance-part-panel.is-entering { opacity:0;transform:translate3d(0,-8px,0); }
+
+/* MID keeps the established split, now with the standard person card. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-medium {
+  display:grid !important;
+  grid-template-columns:minmax(230px,38%) minmax(0,1fr) !important;
+  align-items:center !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-medium .mf-guidance-person-wrap {
+  align-self:center !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-medium blockquote {
+  align-self:center !important;
+  margin:0 !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:clamp(16px,1.23vw,22px) !important;
+  line-height:1.27 !important;
+  letter-spacing:-.018em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-medium blockquote p {
+  margin:0 0 1em !important;
+}
+
+/* SHORT: type top-left, copy bottom-left, person top-right. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(230px,1fr) !important;
+  grid-template-rows:auto minmax(0,1fr) !important;
+  align-items:stretch !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-meta {
+  grid-column:1;
+  grid-row:1;
+  align-self:start;
+  margin:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-copy {
+  grid-column:1;
+  grid-row:2;
+  align-self:end !important;
+  margin:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-profile {
+  grid-column:2;
+  grid-row:1 / span 2;
+  align-self:start !important;
+  justify-self:start !important;
+  margin:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-profile .mf-guidance-person {
+  width:clamp(210px,18vw,300px) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short blockquote {
+  width:min(18ch,100%) !important;
+  margin:0 !important;
+  font-family:"Geist",Arial,sans-serif !important;
+  font-size:clamp(28px,3vw,54px) !important;
+  line-height:1.02 !important;
+  letter-spacing:-.047em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short.is-copy-mid blockquote {
+  width:min(29ch,100%) !important;
+  font-size:clamp(20px,2vw,34px) !important;
+  line-height:1.08 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short.is-copy-dense blockquote {
+  width:100% !important;
+  font-size:clamp(15px,1.22vw,21px) !important;
+  line-height:1.24 !important;
+  letter-spacing:-.018em !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-short blockquote p {
+  margin:0 0 .9em !important;
+}
+
+/* Leadership uses the same left-panel title and white content language. */
+.mf-guidance-overlay.is-leadership .mf-guidance-reviews,
+.mf-guidance-overlay.is-leadership .mf-leadership-page,
+.mf-guidance-overlay.is-leadership .mf-leadership-page p,
+.mf-guidance-overlay.is-leadership .mf-leadership-page li,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-expanded p,
+.mf-guidance-overlay.is-leadership .mf-guidance-person-name {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+@media (max-width:1024px) {
+  .mf-guidance-overlay-aside {
+    padding:76px 18px 26px !important;
+  }
+  .mf-guidance-overlay-aside h2,
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2,
+  .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 {
+    font-size:clamp(43px,14vw,70px) !important;
+  }
+  .mf-guidance-overlay-aside > p,
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+    width:100% !important;
+    max-width:42em !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav {
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:100% !important;
+    margin-top:26px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button {
+    flex:0 0 auto !important;
+    min-width:160px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-reviews {
+    scroll-snap-type:none !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review {
+    display:block !important;
+    min-height:auto !important;
+    padding:58px 18px 44px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-person-wrap,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-profile .mf-guidance-person {
+    width:min(72vw,300px) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-person-name {
+    font-size:clamp(24px,7vw,32px) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-big .mf-guidance-big-copy,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-medium blockquote,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-copy {
+    margin-top:52px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-profile {
+    margin-top:0 !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short .mf-guidance-short-meta {
+    margin-bottom:24px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short blockquote,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short.is-copy-mid blockquote,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-short.is-copy-dense blockquote {
+    width:100% !important;
+    font-size:clamp(18px,5.2vw,28px) !important;
+    line-height:1.15 !important;
+  }
+}
+
+/* Team Leadership inherits the corrected Guidance visual language. */
+.mf-guidance-overlay.is-leadership .mf-guidance-anchor-link {
+  padding:8px 9px !important;
+  background:transparent !important;
+  color:rgba(255,255,255,.42) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.42) !important;
+  transition:background-color .42s var(--ease),color .42s var(--ease),transform .48s var(--ease) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-guidance-anchor-link:hover,
+.mf-guidance-overlay.is-leadership .mf-guidance-anchor-link.is-active {
+  background:#151515 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  transform:translateX(8px) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person {
+  display:flex !important;
+  flex-direction:column !important;
+  width:min(100%,280px) !important;
+  gap:0 !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-photo {
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-width:none !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-info {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  width:100% !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-country {
+  order:0;
+  display:flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  margin:11px 0 0 !important;
+  color:rgba(255,255,255,.72) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.72) !important;
+  font:9px/1 "Geist Mono",monospace !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-name {
+  order:1;
+  width:100% !important;
+  margin:8px 0 0 !important;
+  transform:none !important;
+  white-space:nowrap !important;
+  font-size:clamp(23px,1.62vw,32px) !important;
+  line-height:.94 !important;
+  letter-spacing:-.045em !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-gap {
+  order:2;
+  display:block !important;
+  height:21px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-role,
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-company {
+  display:block !important;
+  margin:0 !important;
+  font:9px/1.32 "Geist Mono",monospace !important;
+  letter-spacing:.055em !important;
+  text-transform:uppercase !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-role {
+  order:3;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head .mf-guidance-person-company {
+  order:4;
+  margin-top:3px !important;
+  color:rgba(255,255,255,.55) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.55) !important;
+}
