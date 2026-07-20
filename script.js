@@ -1796,7 +1796,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
 
   let snapInFlight=false;
   let snapAnimationFrame=0;
-  const easeOutQuint=t=>1-Math.pow(1-t,5);
+  let mindsetWheelTotal=0;
+  let mindsetWheelReset=0;
+  const easeInOutCubic=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
   const getDominantMindsetReview=()=>{
     const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
     if(!articles.length)return null;
@@ -1814,16 +1816,22 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     });
     return best;
   };
-  function animateGuidanceScroll(destination,duration=900){
+  function animateGuidanceScroll(destination,duration=760){
     cancelAnimationFrame(snapAnimationFrame);
     const start=reviewsHost.scrollTop;
     const distance=destination-start;
-    if(Math.abs(distance)<2){snapInFlight=false;return;}
+    if(Math.abs(distance)<2){
+      reviewsHost.scrollTop=destination;
+      snapInFlight=false;
+      const target=getDominantMindsetReview();
+      if(target)markActiveReview(target.dataset.reviewId);
+      return;
+    }
     snapInFlight=true;
     const started=performance.now();
     const frame=now=>{
       const progress=Math.min(1,(now-started)/duration);
-      reviewsHost.scrollTop=start+distance*easeOutQuint(progress);
+      reviewsHost.scrollTop=start+distance*easeInOutCubic(progress);
       if(progress<1){snapAnimationFrame=requestAnimationFrame(frame);return;}
       reviewsHost.scrollTop=destination;
       snapInFlight=false;
@@ -1832,12 +1840,22 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     };
     snapAnimationFrame=requestAnimationFrame(frame);
   }
+  function scrollToMindsetReview(next){
+    const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
+    if(!articles.length||snapInFlight)return;
+    next=Math.max(0,Math.min(articles.length-1,next));
+    const currentIndex=Math.max(0,articles.findIndex(article=>article.dataset.reviewId===activeReviewId));
+    if(next===currentIndex)return;
+    clearTimeout(snapTimer);
+    mindsetWheelTotal=0;
+    animateGuidanceScroll(articles[next].offsetTop,760);
+  }
   function settleMindsetReview(){
     if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open')||snapInFlight)return;
     const target=getDominantMindsetReview();
     if(!target)return;
     markActiveReview(target.dataset.reviewId);
-    animateGuidanceScroll(target.offsetTop,980);
+    animateGuidanceScroll(target.offsetTop,760);
   }
   function queueMindsetSettle(){
     if(currentMode!=='mindset'||mobileGuidance.matches||snapInFlight)return;
@@ -1891,6 +1909,22 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     if(!supportsScrollEnd)queueMindsetSettle();
   },{passive:true});
   if(supportsScrollEnd)reviewsHost.addEventListener('scrollend',settleMindsetReview,{passive:true});
+  reviewsHost.addEventListener('wheel',event=>{
+    if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
+    event.preventDefault();
+    if(snapInFlight)return;
+    mindsetWheelTotal+=event.deltaY;
+    clearTimeout(mindsetWheelReset);
+    mindsetWheelReset=setTimeout(()=>{mindsetWheelTotal=0;},140);
+    if(Math.abs(mindsetWheelTotal)<34)return;
+    const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
+    if(!articles.length)return;
+    const activeIndex=articles.findIndex(article=>article.dataset.reviewId===activeReviewId);
+    const currentIndex=activeIndex>=0?activeIndex:Math.max(0,articles.indexOf(getDominantMindsetReview()));
+    const direction=mindsetWheelTotal>0?1:-1;
+    mindsetWheelTotal=0;
+    scrollToMindsetReview(currentIndex+direction);
+  },{passive:false});
   overlay.addEventListener('scroll',scheduleReviewTracking,{passive:true});
 
   function bindReviewParts(){
@@ -1995,6 +2029,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     reviewsHost.scrollTop=0;
     overlay.scrollTop=0;
     activeReviewId='';
+    mindsetWheelTotal=0;
+    clearTimeout(mindsetWheelReset);
 
     if(currentMode==='mindset'){
       const ordered=config.order.map(id=>mindsetEntries.find(entry=>entry.id===id)).filter(Boolean);
