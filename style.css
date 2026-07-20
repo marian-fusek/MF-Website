@@ -7973,3 +7973,542 @@ body.mf-name-revealed .mf-hero-name {
     font-size:clamp(22px,6.2vw,32px) !important;
   }
 }
+
+
+/* ============================================================
+   V72 — Guidance redesign (Mindset + Team Leadership)
+   ============================================================ */
+.mf-guidance-portals,
+.mf-guidance-portal,
+.mf-guidance-portal + .mf-guidance-portal,
+.mf-guidance,
+.mf-guidance-overlay-top,
+.mf-guidance-overlay-aside,
+.mf-guidance-review { border-color: transparent !important; }
+.mf-guidance-portals { gap: 1px !important; background: transparent !important; }
+.mf-guidance-portal { background: transparent !important; }
+.mf-guidance-portals:has(.mf-guidance-portal:hover) .mf-guidance-portal:hover { background:#0c0c0c !important; }
+.mf-guidance-particle-stage { display:none !important; }
+.mf-guidance-portal-title,
+.mf-guidance-portal-copy,
+.mf-guidance-portal-tags,
+.mf-guidance-portal-tags i,
+.mf-guidance-portal-index,
+.mf-guidance-person-name,
+.mf-guidance-overlay-aside h2,
+.mf-guidance-review blockquote,
+.mf-guidance-review p,
+.mf-guidance-review li,
+.mf-leadership-page,
+.mf-leadership-page p,
+.mf-leadership-page li,
+.mf-leadership-page h3,
+.mf-leadership-person-card b,
+.mf-leadership-review-expanded,
+.mf-leadership-review-expanded p,
+.mf-leadership-photo-card figcaption { color:#fff !important; }
+
+.mf-guidance-overlay {
+  background:#050505 !important;
+  grid-template-columns:minmax(320px,35vw) 1fr !important;
+}
+.mf-guidance-overlay-top {
+  grid-template-columns:35vw 1fr auto !important;
+  background:rgba(5,5,5,.92) !important;
+  border-bottom:none !important;
+}
+.mf-guidance-overlay-aside {
+  padding:clamp(108px,13vh,148px) 3vw 34px !important;
+  background:#050505 !important;
+  transition:background .6s var(--ease) !important;
+}
+.mf-guidance-overlay-aside:hover { background:#101010 !important; }
+.mf-guidance-overlay-aside h2 {
+  margin:0 0 34px !important;
+  width:min(31vw,420px);
+  font-size:clamp(50px,5.4vw,96px) !important;
+  letter-spacing:-.065em !important;
+}
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside { align-content:start; }
+.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside > p { display:none !important; }
+.mf-guidance-overlay.is-leadership .mf-guidance-review-nav {
+  position:static !important;
+  border-top:none !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:8px !important;
+  margin-top:24px !important;
+}
+.mf-guidance-anchor-link,
+.mf-guidance-review-nav button {
+  color:rgba(255,255,255,.45) !important;
+}
+.mf-guidance-anchor-link {
+  display:block; width:100%; padding:0; border:0; background:transparent; text-align:left;
+  font-family:"Geist Mono",monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  cursor:pointer; transition:color .35s var(--ease), transform .35s var(--ease);
+}
+.mf-guidance-anchor-link:hover,
+.mf-guidance-anchor-link.is-active { color:#fff !important; transform:translateX(4px); }
+
+.mf-guidance-reviews {
+  scroll-behavior:smooth !important;
+  scroll-snap-type:y proximity;
+  scroll-padding-top:58px;
+  background:#050505 !important;
+}
+.mf-guidance-review {
+  scroll-snap-align:start;
+  min-height:calc(100vh - 58px);
+}
+.mf-guidance-review-nav button {
+  align-items:center !important;
+}
+.mf-guidance-review-nav button .mf-guidance-flag { margin-right:0 !important; }
+.mf-guidance-review-nav button:hover,
+.mf-guidance-review-nav button.is-active { color:#fff !important; }
+.mf-guidance-person-role,
+.mf-guidance-person-company,
+.mf-guidance-person-country,
+.mf-guidance-review-tags span,
+.mf-guidance-review-nav button,
+.mf-guidance-overlay-kicker,
+.mf-guidance-overlay-logo { color:rgba(255,255,255,.7) !important; }
+.mf-guidance-person-role,
+.mf-guidance-person-company,
+.mf-guidance-person-country,
+.mf-guidance-review-tags span { letter-spacing:.06em !important; }
+
+.mf-guidance-review.is-short {
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-template-rows:auto 1fr auto !important;
+  gap:28px !important;
+}
+.mf-guidance-short-meta { justify-self:start; }
+.mf-guidance-short-copy { margin:0 !important; }
+.mf-guidance-short-profile { justify-self:start; align-self:end; }
+.mf-guidance-short-profile .mf-guidance-person { align-items:end !important; }
+.mf-guidance-short-profile .mf-guidance-person-photo { width:clamp(140px,12vw,200px) !important; }
+.mf-guidance-review.is-short blockquote { width:min(20ch,100%) !important; }
+
+.mf-guidance-flag[data-flag="SK"]{
+  background:linear-gradient(#fff 0 33.33%,#0b4ea2 33.33% 66.66%,#ee1c25 66.66%) !important;
+}
+.mf-guidance-flag[data-flag="SK"]:before{
+  content:""; position:absolute; left:3px; top:2px; width:7px; height:8px; background:#fff;
+  clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);
+}
+.mf-guidance-flag[data-flag="SK"]:after{
+  content:""; position:absolute; left:5px; top:3px; width:3px; height:4px; background:#ee1c25;
+  box-shadow: 0 1.3px 0 0 #ee1c25;
+}
+.mf-guidance-flag[data-flag="EE"]{background:linear-gradient(#4891d9 0 33.33%,#111 33.33% 66.66%,#fff 66.66%) !important}
+.mf-guidance-flag[data-flag="UA"]{background:linear-gradient(#0057b7 0 50%,#ffd700 50%) !important}
+.mf-guidance-flag[data-flag="JP"]{background:#fff !important}
+.mf-guidance-flag[data-flag="JP"]:before{content:"";position:absolute;inset:50% auto auto 50%;width:6px;height:6px;border-radius:50%;background:#bc002d;transform:translate(-50%,-50%)}
+.mf-guidance-flag[data-flag="RS"]{background:linear-gradient(#c6363c 0 33.33%,#0c4076 33.33% 66.66%,#fff 66.66%) !important}
+
+.mf-leadership-page {
+  min-height:100%;
+  padding:clamp(72px,7vw,110px) clamp(28px,4vw,68px) clamp(80px,8vw,120px);
+}
+.mf-leadership-section { margin:0 0 84px; animation:mfGuideFade .75s var(--ease) both; }
+.mf-leadership-section:nth-child(2){ animation-delay:.08s; }
+.mf-leadership-section:nth-child(3){ animation-delay:.16s; }
+.mf-leadership-copy-block { max-width:720px; margin:0 0 42px; }
+.mf-leadership-copy-block h3,
+.mf-leadership-copy-block ul { margin:0 0 18px; }
+.mf-leadership-copy-block h3 {
+  font-size:clamp(18px,1.9vw,26px);
+  letter-spacing:-.03em;
+}
+.mf-leadership-copy-block p,
+.mf-leadership-copy-block li,
+.mf-leadership-review-body p {
+  font-size:clamp(16px,1.15vw,20px);
+  line-height:1.38;
+  color:rgba(255,255,255,.86) !important;
+}
+.mf-leadership-copy-block ul { padding-left:18px; display:grid; gap:10px; }
+.mf-leadership-copy-block a,
+.mf-leadership-inline-link { color:#fff; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.55); transition:border-color .35s var(--ease), color .35s var(--ease); }
+.mf-leadership-copy-block a:hover,
+.mf-leadership-inline-link:hover { color:#e8e8e8; border-color:#fff; }
+.mf-leadership-stats { display:flex; flex-wrap:wrap; gap:26px; margin:30px 0; }
+.mf-leadership-stats div { display:grid; grid-template-columns:auto auto; gap:12px; align-items:start; }
+.mf-leadership-stats small,
+.mf-leadership-photo-card figcaption,
+.mf-leadership-person-card small,
+.mf-leadership-cta { font-family:"Geist Mono",monospace; text-transform:uppercase; letter-spacing:.08em; }
+.mf-leadership-stats small { color:rgba(255,255,255,.55); font-size:10px; }
+.mf-leadership-stats strong { font-size:clamp(18px,1.55vw,24px); font-weight:500; }
+.mf-leadership-photos { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:28px 0 46px; }
+.mf-leadership-photo-card { position:relative; overflow:hidden; background:#0a0a0a; }
+.mf-leadership-photo-card img { display:block; width:100%; height:clamp(260px,34vw,430px); object-fit:cover; transition:transform .7s var(--ease); }
+.mf-leadership-photo-card:hover img { transform:scale(1.025); }
+.mf-leadership-photo-card figcaption { margin-top:10px; font-size:9px; color:rgba(255,255,255,.72) !important; }
+.mf-leadership-people-strip {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:12px; margin:0 0 34px;
+}
+.mf-leadership-person-card {
+  padding:0; border:0; background:transparent; text-align:left; cursor:pointer; color:#fff;
+  transition:transform .4s var(--ease), opacity .35s var(--ease);
+}
+.mf-leadership-person-card:hover { transform:translateY(-3px); }
+.mf-leadership-person-card.is-active { opacity:1; }
+.mf-leadership-person-photo-wrap { display:block; overflow:hidden; background:#0b0b0b; }
+.mf-leadership-person-photo-wrap img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; transition:transform .55s var(--ease); }
+.mf-leadership-person-card:hover img { transform:scale(1.03); }
+.mf-leadership-person-copy { display:block; padding-top:10px; }
+.mf-leadership-person-copy b { display:block; font-size:14px; line-height:1.1; margin-bottom:6px; }
+.mf-leadership-person-copy small { display:block; font-size:9px; color:rgba(255,255,255,.64) !important; }
+.mf-leadership-person-flagline .mf-guidance-flag { margin-top:7px; }
+.mf-leadership-review-detail { min-height:320px; transition:opacity .3s var(--ease); }
+.mf-leadership-review-detail.is-switching { opacity:.18; }
+.mf-leadership-review-expanded {
+  display:grid; grid-template-columns:minmax(220px,290px) minmax(0,1fr); gap:36px; align-items:start;
+  padding-top:16px;
+}
+.mf-leadership-review-head .mf-guidance-person { grid-template-columns:minmax(0,1fr) !important; }
+.mf-leadership-review-head .mf-guidance-person-photo { width:100% !important; max-width:260px !important; }
+.mf-leadership-review-body { max-width:760px; }
+.mf-leadership-cta {
+  display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 18px;
+  border:1px solid rgba(255,255,255,.26); background:transparent; color:#fff; cursor:pointer;
+  transition:background .35s var(--ease), border-color .35s var(--ease), transform .35s var(--ease);
+}
+.mf-leadership-cta:hover { background:#111; border-color:rgba(255,255,255,.6); transform:translateY(-1px); }
+
+@keyframes mfGuideFade { from { opacity:0; transform:translateY(18px);} to { opacity:1; transform:none;} }
+
+@media (max-width:1024px){
+  .mf-guidance-overlay { display:block !important; }
+  .mf-guidance-overlay-top { grid-template-columns:1fr auto auto !important; }
+  .mf-guidance-overlay-aside { padding:90px 18px 30px !important; }
+  .mf-guidance-overlay-aside h2 { width:auto; font-size:clamp(44px,16vw,78px) !important; margin-bottom:18px !important; }
+  .mf-guidance-review-nav { position:static !important; left:auto !important; right:auto !important; bottom:auto !important; }
+  .mf-guidance-review-nav button { padding:9px 0 !important; }
+  .mf-guidance-reviews { height:auto !important; scroll-snap-type:none; }
+  .mf-guidance-review { min-height:auto !important; padding:64px 18px 34px !important; }
+  .mf-guidance-review.is-short blockquote { width:100% !important; }
+  .mf-leadership-page { padding:44px 18px 64px; }
+  .mf-leadership-copy-block p,
+  .mf-leadership-copy-block li,
+  .mf-leadership-review-body p { font-size:15px; }
+  .mf-leadership-photos { grid-template-columns:1fr; }
+  .mf-leadership-photo-card img { height:auto; aspect-ratio:4/3; }
+  .mf-leadership-people-strip { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .mf-leadership-review-expanded { grid-template-columns:1fr; gap:24px; }
+  .mf-leadership-review-head .mf-guidance-person-photo { max-width:100% !important; }
+}
+
+/* ============================================================
+   V73 — Guidance motion, spacing and mobile refinement
+   ============================================================ */
+.mf-guidance-overlay.is-entering .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-entering .mf-guidance-overlay-aside > p,
+.mf-guidance-overlay.is-entering .mf-guidance-review-nav,
+.mf-guidance-overlay.is-entering .mf-guidance-reviews {
+  opacity:0;
+  transform:translate3d(0,18px,0);
+}
+.mf-guidance-overlay.is-open .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-open .mf-guidance-overlay-aside > p,
+.mf-guidance-overlay.is-open .mf-guidance-review-nav,
+.mf-guidance-overlay.is-open .mf-guidance-reviews {
+  opacity:1;
+  transform:none;
+  transition:opacity .72s var(--ease),transform .82s var(--ease);
+}
+.mf-guidance-overlay.is-open .mf-guidance-overlay-aside > p { transition-delay:.08s; }
+.mf-guidance-overlay.is-open .mf-guidance-review-nav { transition-delay:.16s; }
+.mf-guidance-overlay.is-open .mf-guidance-reviews { transition-delay:.2s; }
+
+.mf-guidance-review,
+.mf-leadership-section,
+.mf-leadership-photo-card,
+.mf-leadership-person-card {
+  opacity:0;
+  transform:translate3d(0,22px,0);
+  transition:opacity .72s var(--ease),transform .82s var(--ease),background-color .55s var(--ease);
+  transition-delay:var(--guide-delay,0ms);
+}
+.mf-guidance-review.is-in-view,
+.mf-leadership-section.is-in-view,
+.mf-leadership-photo-card.is-in-view,
+.mf-leadership-person-card.is-in-view {
+  opacity:1;
+  transform:none;
+}
+.mf-guidance-review.is-long.is-in-view .mf-guidance-long-copy p,
+.mf-guidance-review.is-medium.is-in-view blockquote p {
+  animation:mfGuideParagraph .72s var(--ease) both;
+}
+.mf-guidance-review.is-long.is-in-view .mf-guidance-long-copy p:nth-child(2),
+.mf-guidance-review.is-medium.is-in-view blockquote p:nth-child(2){animation-delay:.09s}
+.mf-guidance-review.is-long.is-in-view .mf-guidance-long-copy p:nth-child(3){animation-delay:.16s}
+.mf-guidance-review.is-long.is-in-view .mf-guidance-long-copy p:nth-child(4){animation-delay:.23s}
+@keyframes mfGuideParagraph { from{opacity:0;transform:translate3d(0,-12px,0)} to{opacity:1;transform:none} }
+
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside {
+  padding-right:2.5vw !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+  width:min(25vw,380px) !important;
+  margin-top:22px !important;
+  font-size:clamp(14px,1vw,18px) !important;
+  line-height:1.3 !important;
+  color:rgba(255,255,255,.64) !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav {
+  left:3vw !important;
+  right:2.5vw !important;
+  bottom:30px !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button {
+  padding:8px 0 !important;
+  grid-template-columns:28px minmax(0,1fr) 24px !important;
+  gap:8px !important;
+  border-bottom:0 !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review-nav button + button {
+  margin-top:2px;
+}
+.mf-guidance-person {
+  gap:clamp(16px,1.7vw,28px) !important;
+}
+.mf-guidance-person-info {
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+}
+.mf-guidance-person-name {
+  line-height:.92 !important;
+  letter-spacing:-.045em !important;
+}
+.mf-guidance-person-country,
+.mf-guidance-person-role,
+.mf-guidance-person-company {
+  margin-top:6px !important;
+  line-height:1.18 !important;
+}
+.mf-guidance-review.is-long,
+.mf-guidance-review.is-medium {
+  gap:clamp(34px,5vw,88px) !important;
+}
+.mf-guidance-review.is-long .mf-guidance-long-copy {
+  max-width:820px !important;
+}
+.mf-guidance-review.is-short {
+  padding-top:clamp(44px,6vw,92px) !important;
+  padding-bottom:clamp(44px,6vw,92px) !important;
+}
+.mf-guidance-short-meta { margin-bottom:12px; }
+.mf-guidance-short-copy { align-self:center; }
+.mf-guidance-short-profile { margin-top:24px; }
+
+.mf-guidance-overlay.is-leadership .mf-guidance-reviews {
+  background:#050505 !important;
+}
+.mf-leadership-page {
+  --guide-parallax-x:0px;
+  --guide-parallax-y:0px;
+  --guide-parallax-x-neg:0px;
+  --guide-parallax-y-neg:0px;
+}
+.mf-leadership-photo-card:first-child img {
+  transform:translate3d(var(--guide-parallax-x),var(--guide-parallax-y),0) scale(1.015);
+}
+.mf-leadership-photo-card:last-child img {
+  transform:translate3d(var(--guide-parallax-x-neg),var(--guide-parallax-y-neg),0) scale(1.015);
+}
+.mf-leadership-photo-card:hover img { transform:scale(1.035) !important; }
+.mf-leadership-section { scroll-margin-top:76px; }
+.mf-leadership-copy-block { margin-bottom:52px !important; }
+.mf-leadership-copy-block h3 { margin-bottom:20px !important; }
+.mf-leadership-copy-block p + p { margin-top:18px; }
+.mf-leadership-stats { margin:34px 0 38px !important; gap:42px !important; }
+.mf-leadership-stats div {
+  min-width:190px;
+  grid-template-columns:minmax(70px,auto) auto !important;
+}
+.mf-leadership-people-strip { gap:16px !important; }
+.mf-leadership-person-card {
+  opacity:.78;
+}
+.mf-leadership-person-card:hover,
+.mf-leadership-person-card.is-active {
+  opacity:1;
+}
+.mf-leadership-person-card.is-active .mf-leadership-person-photo-wrap {
+  box-shadow:0 0 0 1px rgba(255,255,255,.6);
+}
+.mf-leadership-review-expanded {
+  animation:mfLeadershipReviewIn .58s var(--ease) both;
+}
+@keyframes mfLeadershipReviewIn { from{opacity:0;transform:translate3d(0,16px,0)} to{opacity:1;transform:none} }
+.mf-guidance-ascii {
+  position:absolute;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  transform:translate3d(0,8px,0);
+  color:rgba(255,255,255,.48);
+  font:400 9px/1 "Geist Mono",monospace;
+  letter-spacing:.08em;
+  white-space:nowrap;
+  transition:opacity .18s linear,transform .75s var(--ease);
+}
+.mf-guidance-ascii.is-visible { opacity:1; transform:translate3d(0,-8px,0); }
+
+.mf-guidance-close {
+  position:fixed !important;
+  top:12px !important;
+  right:12px !important;
+  z-index:30 !important;
+}
+
+@media (max-width:1024px){
+  .mf-guidance-overlay {
+    overscroll-behavior:none !important;
+    background:#050505 !important;
+  }
+  .mf-guidance-overlay-top {
+    position:sticky !important;
+    top:0 !important;
+    height:52px !important;
+    padding:0 14px !important;
+    z-index:25 !important;
+  }
+  .mf-guidance-close {
+    top:9px !important;
+    right:10px !important;
+  }
+  .mf-guidance-overlay-aside {
+    min-height:auto !important;
+    padding:86px 18px 24px !important;
+    border-bottom:0 !important;
+  }
+  .mf-guidance-overlay-aside h2 {
+    font-size:clamp(44px,15vw,72px) !important;
+    line-height:.84 !important;
+    margin-bottom:20px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+    width:100% !important;
+    max-width:520px !important;
+    font-size:14px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav,
+  .mf-guidance-overlay.is-leadership .mf-guidance-review-nav {
+    display:flex !important;
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    width:calc(100vw - 36px) !important;
+    margin-top:28px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    gap:8px !important;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .mf-guidance-review-nav::-webkit-scrollbar { display:none; }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button {
+    flex:0 0 auto !important;
+    min-width:154px !important;
+    grid-template-columns:22px minmax(0,1fr) 22px !important;
+    padding:10px 11px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-guidance-review-nav {
+    flex-direction:row !important;
+  }
+  .mf-guidance-anchor-link {
+    flex:0 0 auto;
+    width:auto !important;
+    min-width:max-content;
+    padding:10px 12px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+  }
+  .mf-guidance-anchor-link.is-active { background:#111 !important; }
+  .mf-guidance-reviews {
+    overflow:visible !important;
+    padding-top:0 !important;
+  }
+  .mf-guidance-review,
+  .mf-guidance-review.is-short,
+  .mf-guidance-review.is-medium,
+  .mf-guidance-review.is-long {
+    min-height:auto !important;
+    padding:54px 18px 40px !important;
+  }
+  .mf-guidance-person-wrap,
+  .mf-guidance-person-wrap-long,
+  .mf-guidance-person-wrap-medium {
+    gap:22px !important;
+  }
+  .mf-guidance-person-photo {
+    width:min(58vw,236px) !important;
+    max-width:236px !important;
+  }
+  .mf-guidance-person-name {
+    font-size:clamp(26px,8.1vw,42px) !important;
+    transform:translateX(-3px) !important;
+  }
+  .mf-guidance-person-role,
+  .mf-guidance-person-company,
+  .mf-guidance-person-country {
+    font-size:8px !important;
+  }
+  .mf-guidance-review.is-long .mf-guidance-long-copy,
+  .mf-guidance-review.is-medium blockquote {
+    margin-top:38px !important;
+    font-size:15px !important;
+    line-height:1.36 !important;
+  }
+  .mf-guidance-review.is-short blockquote {
+    font-size:clamp(22px,6.6vw,31px) !important;
+    line-height:1.08 !important;
+  }
+  .mf-guidance-short-profile .mf-guidance-person {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  .mf-guidance-short-profile .mf-guidance-person-photo {
+    width:min(48vw,190px) !important;
+  }
+  .mf-leadership-page { padding:36px 18px 70px !important; }
+  .mf-leadership-section { margin-bottom:64px !important; }
+  .mf-leadership-copy-block { margin-bottom:40px !important; }
+  .mf-leadership-stats {
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:18px !important;
+  }
+  .mf-leadership-stats div {
+    min-width:0 !important;
+    grid-template-columns:1fr !important;
+    gap:5px !important;
+  }
+  .mf-leadership-stats strong { font-size:18px !important; }
+  .mf-leadership-photos { gap:28px !important; }
+  .mf-leadership-people-strip {
+    display:flex !important;
+    overflow-x:auto !important;
+    gap:10px !important;
+    padding-bottom:10px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .mf-leadership-people-strip::-webkit-scrollbar { display:none; }
+  .mf-leadership-person-card {
+    flex:0 0 148px !important;
+  }
+  .mf-leadership-review-expanded { gap:20px !important; }
+  .mf-leadership-review-head .mf-guidance-person-photo {
+    width:min(64vw,240px) !important;
+  }
+  .mf-guidance-ascii { display:none !important; }
+}
