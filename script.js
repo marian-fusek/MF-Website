@@ -1585,11 +1585,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   };
 
 
-  const leadershipMenuMarkup=()=>[
-    ['xp','Leadership XP'],['reviews','Team Reviews'],['next','Next?']
-  ].map(([id,label])=>`<button type="button" class="mf-guidance-anchor-link${id==='xp'?' is-active':''}" data-guidance-anchor="leadership-${id}">${escapeHtml(label)}</button>`).join('');
-
-  const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span><span class="mf-leadership-person-copy"><b>${escapeHtml(entry.name)}</b><small>${escapeHtml(entry.role)}</small><small>${escapeHtml(entry.company)}</small><small class="mf-leadership-person-flagline">${flagMarkup(entry.flag)}</small></span></button>`).join('');
+  const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span><span class="mf-leadership-person-copy"><b>${escapeHtml(entry.name)}</b><small>${escapeHtml(entry.role)}</small><small>${escapeHtml(entry.company)}</small></span></button>`).join('');
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
     <section class="mf-leadership-section" id="leadership-xp">
@@ -1615,12 +1611,12 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
         </ul>
       </div>
       <div class="mf-leadership-photos">
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy"><figcaption>CHILLIN'</figcaption></figure>
-        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy"><figcaption>MY FIRST ACADEMY GRADUATES</figcaption></figure>
+        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy"><figcaption>Chillin'</figcaption></figure>
+        <figure class="mf-leadership-photo-card"><img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy"><figcaption>My first academy graduates</figcaption></figure>
       </div>
       <div class="mf-leadership-copy-block">
         <h3>Reviews</h3>
-        <p>Kind (maybe even unpaid) words from my ex-team members.</p>
+        <p>Kind (NO MONETARY TRANSACTION INCLUDED) words from my ex-team members.</p>
       </div>
     </section>
     <section class="mf-leadership-section" id="leadership-reviews">
@@ -1637,7 +1633,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     </section>
   </div>`;
 
-  const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded is-visible"><div class="mf-leadership-review-head">${personMarkup(entry)}</div><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
+  const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded"><header class="mf-leadership-review-head"><h4>${escapeHtml(entry.name)}</h4><p>${escapeHtml(entry.role)} · ${escapeHtml(entry.company)}</p></header><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
 
   let currentMode='mindset';
   let guidanceReturnY=0;
@@ -1788,11 +1784,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   }
 
   function bindLeadership(){
-    reviewNav.querySelectorAll('[data-guidance-anchor]').forEach(button=>button.addEventListener('click',()=>{
-      reviewNav.querySelectorAll('[data-guidance-anchor]').forEach(item=>item.classList.toggle('is-active',item===button));
-      document.getElementById(button.dataset.guidanceAnchor)?.scrollIntoView({behavior:'smooth',block:'start'});
-    }));
-
     const detail=reviewsHost.querySelector('#mfLeadershipReviewDetail');
     const cards=[...reviewsHost.querySelectorAll('[data-leadership-person]')];
     const paint=id=>{
@@ -1801,9 +1792,17 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       detail.classList.add('is-switching');
       setTimeout(()=>{
         detail.innerHTML=leadershipDetailMarkup(entry);
-        cards.forEach(card=>card.classList.toggle('is-active',card.dataset.leadershipPerson===entry.id));
-        requestAnimationFrame(()=>detail.classList.remove('is-switching'));
-      },160);
+        cards.forEach(card=>{
+          const active=card.dataset.leadershipPerson===entry.id;
+          card.classList.toggle('is-active',active);
+          card.setAttribute('aria-pressed',active?'true':'false');
+        });
+        const panel=detail.querySelector('.mf-leadership-review-expanded');
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          panel?.classList.add('is-visible');
+          detail.classList.remove('is-switching');
+        }));
+      },140);
     };
     cards.forEach(card=>card.addEventListener('click',()=>paint(card.dataset.leadershipPerson)));
     if(cards[0])paint(cards[0].dataset.leadershipPerson);
@@ -1859,7 +1858,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       return;
     }
 
-    reviewNav.innerHTML=leadershipMenuMarkup();
+    reviewNav.innerHTML='';
     reviewsHost.innerHTML=leadershipContent();
     bindLeadership();
     requestAnimationFrame(()=>{
