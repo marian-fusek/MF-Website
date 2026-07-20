@@ -436,7 +436,7 @@ if(indexExtra){
       ]
     },
     "05":{
-      title:"Side Quests.",
+      title:"Side Quests",
       intro:"Every now and then luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
       scope:"",
       context:"",
@@ -1709,7 +1709,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     leadership:{title:'Team<br>Leadership',kicker:'',intro:'',order:leadershipEntries.map(entry=>entry.id)}
   };
 
-  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${nl(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${nl(entry.parts[1])}</div></div><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-guidance-part-button is-active" type="button" data-review-part="0">PART 01</button><button class="mf-guidance-part-button" type="button" data-review-part="1">PART 02</button></nav></div>`;
+  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-guidance-part-button is-active" type="button" data-review-part="0">PART 01</button><button class="mf-guidance-part-button" type="button" data-review-part="1">PART 02</button></nav><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${nl(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${nl(entry.parts[1])}</div></div></div>`;
   const reviewMarkup=entry=>{
     const copy=entry.parts?partMarkup(entry):`<div class="mf-guidance-copy-shell"><div class="mf-guidance-single-copy">${nl(entry.copy)}</div></div>`;
     return `<article class="mf-guidance-review mf-guidance-review-universal${entry.parts?' has-parts':''}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}</div><div class="mf-guidance-review-content">${tagsMarkup(entry)}${copy}</div></article>`;
@@ -1719,52 +1719,58 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-label="Show review from ${escapeHtml(entry.name)}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span></button>`).join('');
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
-    <figure class="mf-leadership-hero-photo">
-      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy">
-    </figure>
-    <section class="mf-leadership-section" id="leadership-xp">
-      <div class="mf-leadership-copy-block">
-        <h3>XP</h3>
-        <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
-        <div class="mf-leadership-stats"><div><small>LED</small><strong>11 managers</strong></div><div><small>OVERSEEING</small><strong>120 people</strong></div></div>
-        <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
-        <p class="mf-leadership-eleken-link">${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
-      </div>
-      <div class="mf-leadership-copy-block">
-        <h3>UPTIME</h3>
-        <p>I’m at my best when things are still being established — early-stage, lots of heavy lifting, real progress. That’s also where my coaching background kicks in — I’m good at navigating chaos and clearing the air. Once everything’s clicking, stagnation creeps in, and everyone’s obsessing over optimizing 91% into 92%, I’m ready for a shift.</p>
-      </div>
-      <div class="mf-leadership-copy-block">
-        <h3>HIGHLIGHTS</h3>
-        <ul>
-          <li>Started the company’s first regular performance reviews — later adopted company-wide</li>
-          <li>Built the first career ladder for designers — later adopted by other D&amp;E departments</li>
-          <li>Co-ran the first company academy for new talent in D&amp;E</li>
-          <li>Mentored the first company academy track for designers</li>
-          <li>Listen, stuff was happening and I was around, so…</li>
-        </ul>
-      </div>
-      <figure class="mf-leadership-graduates-photo">
-        <img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy">
-        <figcaption>MY FIRST DESIGN GRADUATES</figcaption>
+    <section class="mf-leadership-intro" id="mfLeadershipIntro" aria-label="Team Leadership introduction">
+      <figure class="mf-leadership-hero-photo">
+        <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="eager" decoding="async">
+        <button class="mf-leadership-scroll-cue" id="mfLeadershipScrollCue" type="button" aria-label="Scroll to Team Leadership content"><span>↓</span><small>SCROLL</small></button>
       </figure>
-      <div class="mf-leadership-copy-block mf-leadership-reviews-intro">
-        <h3>REVIEWS</h3>
-        <p>Kind (no monetary transaction included) words from my ex-team members.</p>
-      </div>
     </section>
-    <section class="mf-leadership-section" id="leadership-reviews">
-      <div class="mf-leadership-people-strip" aria-label="Team review carousel">${leadershipPeopleMarkup()}</div>
-      <div class="mf-leadership-review-detail" id="mfLeadershipReviewDetail"></div>
-    </section>
-    <section class="mf-leadership-section" id="leadership-next">
-      <div class="mf-leadership-copy-block">
-        <h3>NEXT?</h3>
-        <p>If you’ve got a team out there and need support — hit me up. I treat leadership with the utmost respect. It’s sensitive territory, so job descriptions go aside here. Just tell me what’s going on, and we’ll figure it out from there.</p>
-        <p>Design, coaching, leadership — whatever the label, if something I do feels relevant to what you need, that’s enough reason to reach out. We’ll cook up the collab that actually fits, together. [hits the table]</p>
-        <button class="mf-art-cta mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
-      </div>
-    </section>
+    <div class="mf-leadership-content">
+      <section class="mf-leadership-section" id="leadership-xp">
+        <div class="mf-leadership-copy-block">
+          <h3>XP</h3>
+          <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
+          <div class="mf-leadership-stats"><div><small>LED</small><strong>11 managers</strong></div><div><small>OVERSEEING</small><strong>120 people</strong></div></div>
+          <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
+          <p class="mf-leadership-eleken-link">${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
+        </div>
+        <div class="mf-leadership-copy-block">
+          <h3>UPTIME</h3>
+          <p>I’m at my best when things are still being established — early-stage, lots of heavy lifting, real progress. That’s also where my coaching background kicks in — I’m good at navigating chaos and clearing the air. Once everything’s clicking, stagnation creeps in, and everyone’s obsessing over optimizing 91% into 92%, I’m ready for a shift.</p>
+        </div>
+        <div class="mf-leadership-copy-block">
+          <h3>HIGHLIGHTS</h3>
+          <ul>
+            <li>Started the company’s first regular performance reviews — later adopted company-wide</li>
+            <li>Built the first career ladder for designers — later adopted by other D&amp;E departments</li>
+            <li>Co-ran the first company academy for new talent in D&amp;E</li>
+            <li>Mentored the first company academy track for designers</li>
+            <li>Listen, stuff was happening and I was around, so…</li>
+          </ul>
+        </div>
+        <figure class="mf-leadership-graduates-photo">
+          <img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy">
+          <figcaption>MY FIRST DESIGN GRADUATES</figcaption>
+        </figure>
+        <div class="mf-leadership-copy-block mf-leadership-reviews-intro">
+          <h3>REVIEWS</h3>
+          <p>Kind (no monetary transaction included) words from my ex-team members.</p>
+        </div>
+      </section>
+      <section class="mf-leadership-section" id="leadership-reviews">
+        <div class="mf-leadership-people-strip" aria-label="Team review carousel">${leadershipPeopleMarkup()}</div>
+        <div class="mf-leadership-review-detail" id="mfLeadershipReviewDetail"></div>
+      </section>
+      <section class="mf-leadership-section" id="leadership-next">
+        <div class="mf-leadership-copy-block">
+          <h3>NEXT?</h3>
+          <p>If you’ve got a team out there and need support — hit me up. I treat leadership with the utmost respect. It’s sensitive territory, so job descriptions go aside here. Just tell me what’s going on, and we’ll figure it out from there.</p>
+          <p>Design, coaching, leadership — whatever the label, if something I do feels relevant to what you need, that’s enough reason to reach out. We’ll cook up the collab that actually fits, together. [hits the table]</p>
+          <button class="mf-art-cta mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
+        </div>
+      </section>
+    </div>
+    <div class="mf-leadership-viewport-blur" aria-hidden="true"></div>
   </div>`;
 
   const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded"><header class="mf-leadership-review-head"><h4>${escapeHtml(entry.name)}</h4><div class="mf-leadership-review-meta"><span>${escapeHtml(entry.role)}</span><span>${escapeHtml(entry.company)}</span></div></header><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
@@ -1777,11 +1783,28 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   let snapTimer=0;
   let asciiTimer=0;
   const mobileGuidance=window.matchMedia('(max-width:1024px)');
+  let leadershipIntroFrame=0;
+  function updateLeadershipIntro(){
+    leadershipIntroFrame=0;
+    if(currentMode!=='leadership')return;
+    const page=reviewsHost.querySelector('.mf-leadership-page');
+    if(!page)return;
+    const travel=Math.max(1,reviewsHost.clientHeight*.82);
+    const progress=Math.max(0,Math.min(1,reviewsHost.scrollTop/travel));
+    page.style.setProperty('--leadership-progress',progress.toFixed(4));
+    page.style.setProperty('--leadership-image-opacity',Math.max(.04,1-progress*.96).toFixed(4));
+    page.style.setProperty('--leadership-image-scale',(1+progress*.035).toFixed(4));
+    page.style.setProperty('--leadership-cue-opacity',Math.max(0,1-progress*3.1).toFixed(4));
+    page.style.setProperty('--leadership-content-y',`${Math.max(0,(1-progress)*34).toFixed(2)}px`);
+  }
+  const scheduleLeadershipIntro=()=>{
+    if(!leadershipIntroFrame)leadershipIntroFrame=requestAnimationFrame(updateLeadershipIntro);
+  };
 
   function setupGuidanceReveals(){
     guidanceObserver?.disconnect();
-    const root=mobileGuidance.matches?overlay:reviewsHost;
-    const targets=[...reviewsHost.querySelectorAll('.mf-guidance-review, .mf-leadership-section, .mf-leadership-photo-card, .mf-leadership-person-card')];
+    const root=currentMode==='leadership'?reviewsHost:(mobileGuidance.matches?overlay:reviewsHost);
+    const targets=[...reviewsHost.querySelectorAll('.mf-guidance-review, .mf-leadership-section, .mf-leadership-copy-block, .mf-leadership-graduates-photo, .mf-leadership-photo-card, .mf-leadership-person-card')];
     if(!targets.length)return;
     guidanceObserver=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
@@ -1909,6 +1932,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
+    if(currentMode==='leadership')scheduleLeadershipIntro();
     if(!supportsScrollEnd)queueMindsetSettle();
   },{passive:true});
   if(supportsScrollEnd)reviewsHost.addEventListener('scrollend',settleMindsetReview,{passive:true});
@@ -2014,6 +2038,17 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     const first=strip.querySelector('[data-leadership-person]');
     if(first)paint(first.dataset.leadershipPerson,false);
 
+    const scrollCue=reviewsHost.querySelector('#mfLeadershipScrollCue');
+    const firstContent=reviewsHost.querySelector('#leadership-xp');
+    scrollCue?.addEventListener('click',()=>{
+      if(!firstContent)return;
+      const hostRect=reviewsHost.getBoundingClientRect();
+      const contentRect=firstContent.getBoundingClientRect();
+      const destination=Math.max(0,reviewsHost.scrollTop+(contentRect.top-hostRect.top)-Math.min(120,reviewsHost.clientHeight*.12));
+      reviewsHost.scrollTo({top:destination,behavior:'smooth'});
+    });
+    scheduleLeadershipIntro();
+
     const copyBtn=reviewsHost.querySelector('#mfLeadershipCopyButton');
     copyBtn?.addEventListener('click',async()=>{
       const email='email@marianfusek.com';
@@ -2066,6 +2101,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     bindLeadership();
     requestAnimationFrame(()=>{
       setupGuidanceReveals();
+      updateLeadershipIntro();
       startGuidanceAscii();
     });
   }
@@ -3240,4 +3276,47 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     }
   }
   loop();
+})();
+
+
+/* GLOBAL CUSTOM CURSOR — direct pointer tracking, no smoothing delay */
+(function(){
+  const cursor=document.getElementById('mfSiteCursor');
+  if(!cursor)return;
+  const finePointer=window.matchMedia('(pointer:fine)');
+  if(!finePointer.matches)return;
+
+  document.documentElement.classList.add('mf-custom-cursor');
+  let visible=false;
+  const show=()=>{
+    if(visible)return;
+    visible=true;
+    cursor.classList.add('is-visible');
+  };
+  const hide=()=>{
+    visible=false;
+    cursor.classList.remove('is-visible');
+  };
+  const move=event=>{
+    const points=typeof event.getCoalescedEvents==='function'?event.getCoalescedEvents():null;
+    const point=points&&points.length?points[points.length-1]:event;
+    cursor.style.transform=`translate3d(${point.clientX}px,${point.clientY}px,0) translate3d(-50%,-50%,0)`;
+    if(!(event.target instanceof HTMLIFrameElement))show();
+  };
+  const moveEvent='onpointerrawupdate' in window?'pointerrawupdate':'pointermove';
+  window.addEventListener(moveEvent,move,{passive:true});
+  window.addEventListener('pointerout',event=>{if(!event.relatedTarget)hide();},{passive:true});
+  window.addEventListener('blur',hide);
+  document.addEventListener('pointerover',event=>{
+    if(event.target instanceof HTMLIFrameElement)hide();
+  },{passive:true});
+  document.addEventListener('pointerdown',event=>{
+    if(event.pointerType==='touch'||event.button!==0)return;
+    const ripple=document.createElement('span');
+    ripple.className='mf-cursor-ripple';
+    ripple.style.left=`${event.clientX}px`;
+    ripple.style.top=`${event.clientY}px`;
+    document.body.appendChild(ripple);
+    ripple.addEventListener('animationend',()=>ripple.remove(),{once:true});
+  },{passive:true});
 })();
