@@ -1,0 +1,29 @@
+MF PORTFOLIO — UPDATE 85
+
+Mindset Coaching
+- Slower layered review entrances for photo, person information and review copy.
+- Smoother Michal PART 01 / PART 02 crossfade.
+- Gray coaching tags.
+- Full-width intro copy in the left panel.
+- Larger review typography.
+
+Team Leadership
+- Scroll cue moved to the lower-right.
+- Increased review spacing around the portrait strip and expanded review.
+- Role and company metadata changed to gray.
+- Larger expanded review copy.
+- Restored variable-weight link animation and red STRV hover.
+- Underlines moved closer to link text.
+
+Side Quests
+- Entire collapsed panel is clickable.
+- Reduced title weights and kept subtitles gray.
+- Increased gap before body copy.
+- Mentions are bottom-anchored to the image and grow upward.
+- Corrected active and collapsed number/title alignment.
+- Project description now matches the other case-study descriptions.
+
+Build markers
+- HTML meta/body marker: 85
+- CSS and JavaScript build comments: 85
+- CSS/JS cache-busting query: ?v=85

@@ -1,3 +1,4 @@
+/* MF UPDATE 85 */
 const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
@@ -700,6 +701,11 @@ if(indexExtra){
       panel.querySelector('.mf-sidequest-trigger')?.addEventListener('click',event=>{
         event.preventDefault();
         event.stopPropagation();
+        activate(panel);
+      });
+      panel.addEventListener('click',event=>{
+        if(panel.classList.contains('is-active'))return;
+        if(event.target.closest('a,button'))return;
         activate(panel);
       });
     });
@@ -1964,17 +1970,22 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
         const next=Number(button.dataset.reviewPart);
         if(switching||next===active||!panels[next])return;
         switching=true;
-        panels[active].classList.add('is-leaving');
+        const current=panels[active];
+        const incoming=panels[next];
+
+        incoming.classList.add('is-active','is-entering');
+        incoming.setAttribute('aria-hidden','false');
+        current.classList.add('is-leaving');
+        buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
+
+        requestAnimationFrame(()=>requestAnimationFrame(()=>incoming.classList.remove('is-entering')));
+        const previous=active;
+        active=next;
         setTimeout(()=>{
-          panels[active].classList.remove('is-active','is-leaving');
-          panels[active].setAttribute('aria-hidden','true');
-          panels[next].classList.add('is-active','is-entering');
-          panels[next].setAttribute('aria-hidden','false');
-          buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
-          requestAnimationFrame(()=>requestAnimationFrame(()=>panels[next].classList.remove('is-entering')));
-          active=next;
-          setTimeout(()=>{switching=false;},220);
-        },130);
+          panels[previous].classList.remove('is-active','is-leaving');
+          panels[previous].setAttribute('aria-hidden','true');
+          switching=false;
+        },860);
       }));
     });
   }
