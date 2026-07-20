@@ -10159,3 +10159,231 @@ body.mf-name-revealed .mf-hero-name {
     transition-duration: .01ms !important;
   }
 }
+
+/* ============================================================
+   V80 — Side Quests complete content + Mentions links
+   ============================================================ */
+
+/* One shared variable-weight link behavior. STRV keeps its custom red state
+   through the existing, more-specific Team Leadership rule. */
+.mf-project-overlay .mf-weight-link,
+.mf-guidance-overlay .mf-weight-link {
+  display:inline-flex;
+  align-items:baseline;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  font-family:"Geist",Arial,sans-serif;
+  font-weight:400;
+  text-decoration:none;
+  border:0;
+  white-space:nowrap;
+}
+.mf-project-overlay .mf-weight-link > span,
+.mf-guidance-overlay .mf-weight-link > span {
+  display:inline-block;
+  color:inherit;
+  -webkit-text-fill-color:inherit;
+  font-weight:400;
+  font-variation-settings:"wght" 400;
+  transition:
+    font-variation-settings .28s cubic-bezier(.16,1,.3,1),
+    font-weight .28s cubic-bezier(.16,1,.3,1),
+    color .22s ease,
+    -webkit-text-fill-color .22s ease;
+  transition-delay:calc(var(--r) * 16ms);
+}
+.mf-project-overlay .mf-weight-link:hover > span,
+.mf-project-overlay .mf-weight-link:focus-visible > span,
+.mf-guidance-overlay .mf-weight-link:hover > span,
+.mf-guidance-overlay .mf-weight-link:focus-visible > span {
+  font-weight:600;
+  font-variation-settings:"wght" 600;
+  transition-delay:calc(var(--i) * 16ms);
+}
+
+.mf-sidequest-heading {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:6px;
+}
+.mf-sidequest-subtitle {
+  display:block;
+  color:rgba(255,255,255,.48);
+  -webkit-text-fill-color:rgba(255,255,255,.48);
+  font-family:"Geist Mono",monospace;
+  font-size:9px;
+  line-height:1.1;
+  letter-spacing:.075em;
+  font-weight:400;
+  text-transform:uppercase;
+  opacity:.72;
+  transform-origin:left center;
+  transition:
+    color .45s ease,
+    -webkit-text-fill-color .45s ease,
+    opacity .45s ease,
+    transform .72s cubic-bezier(.16,1,.3,1);
+}
+.mf-sidequest-panel.is-active .mf-sidequest-subtitle {
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  opacity:1;
+  transform:translateY(2px);
+}
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-heading {
+  transform:translateX(9px);
+}
+.mf-sidequest-heading {
+  transition:transform .65s cubic-bezier(.16,1,.3,1);
+}
+/* The heading wrapper now moves; prevent the old title-only rule from doubling it. */
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-title {
+  transform:none;
+}
+
+.mf-sidequest-content {
+  align-items:stretch;
+}
+.mf-sidequest-copy-wrap {
+  min-width:0;
+  min-height:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-self:stretch;
+  overflow:hidden;
+}
+.mf-sidequest-copy {
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.28) transparent;
+  padding-right:clamp(8px,1vw,16px);
+}
+.mf-sidequest-copy::-webkit-scrollbar { width:3px; }
+.mf-sidequest-copy::-webkit-scrollbar-track { background:transparent; }
+.mf-sidequest-copy::-webkit-scrollbar-thumb { background:rgba(255,255,255,.28); }
+.mf-sidequest-copy p {
+  margin:0;
+}
+.mf-sidequest-copy p + p {
+  margin-top:1.1em;
+}
+
+.mf-sidequest-mentions {
+  flex:0 0 auto;
+  margin-top:auto;
+  padding-top:clamp(20px,3vh,34px);
+}
+.mf-sidequest-mentions > small {
+  display:block;
+  margin:0 0 11px;
+  color:rgba(255,255,255,.42);
+  -webkit-text-fill-color:rgba(255,255,255,.42);
+  font-family:"Geist Mono",monospace;
+  font-size:8px;
+  line-height:1;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.mf-sidequest-mention-list {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:7px;
+}
+.mf-sidequest-mention-row {
+  display:flex;
+  align-items:baseline;
+  min-width:0;
+  color:#fff;
+  font-family:"Geist",Arial,sans-serif;
+  font-size:clamp(12px,.86vw,15px);
+  line-height:1.15;
+}
+.mf-sidequest-mention-dash {
+  flex:0 0 auto;
+  width:17px;
+  color:rgba(255,255,255,.48);
+  -webkit-text-fill-color:rgba(255,255,255,.48);
+}
+.mf-sidequest-mention-link {
+  min-width:0;
+}
+.mf-sidequest-mention-arrow {
+  display:inline-block;
+  margin-left:7px;
+  color:#fff;
+  font-family:"Geist Mono",monospace;
+  font-size:.82em;
+  font-style:normal;
+  opacity:0;
+  transform:translate(-5px,5px);
+  transition:
+    opacity .24s ease,
+    transform .45s cubic-bezier(.16,1,.3,1);
+}
+.mf-sidequest-mention-row:hover .mf-sidequest-mention-arrow,
+.mf-sidequest-mention-row:focus-within .mf-sidequest-mention-arrow {
+  opacity:1;
+  transform:translate(0,0);
+}
+
+/* Long active headings remain controlled inside the accordion. */
+.mf-sidequest-panel.is-active .mf-sidequest-heading {
+  max-width:min(100%,54vw);
+}
+.mf-sidequest-panel.is-active .mf-sidequest-title {
+  max-width:100%;
+  text-wrap:balance;
+}
+
+@media (max-width:1024px) {
+  .mf-sidequest-heading { gap:4px; }
+  .mf-sidequest-subtitle { font-size:8px; }
+  .mf-sidequest-panel.is-active .mf-sidequest-heading { max-width:75vw; }
+  .mf-sidequest-mentions { padding-top:18px; }
+  .mf-sidequest-mention-row { font-size:12px; }
+}
+
+@media (max-width:620px) {
+  .mf-sidequest-panel.is-active .mf-sidequest-heading { max-width:68vw; }
+  .mf-sidequest-panel.is-active .mf-sidequest-title {
+    font-size:clamp(23px,7.5vw,34px);
+    line-height:.95;
+  }
+  .mf-sidequest-content {
+    align-items:stretch;
+  }
+  .mf-sidequest-copy-wrap {
+    overflow:visible;
+  }
+  .mf-sidequest-copy {
+    max-height:29vh;
+    padding-right:5px;
+  }
+  .mf-sidequest-mentions {
+    padding-top:14px;
+  }
+  .mf-sidequest-mentions > small {
+    margin-bottom:8px;
+    font-size:7px;
+  }
+  .mf-sidequest-mention-list { gap:5px; }
+  .mf-sidequest-mention-row { font-size:11px; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .mf-project-overlay .mf-weight-link > span,
+  .mf-guidance-overlay .mf-weight-link > span,
+  .mf-sidequest-heading,
+  .mf-sidequest-subtitle,
+  .mf-sidequest-mention-arrow {
+    transition-duration:.01ms !important;
+    transition-delay:0ms !important;
+  }
+}

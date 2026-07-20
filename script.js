@@ -437,7 +437,7 @@ if(indexExtra){
     },
     "05":{
       title:"Side Quests.",
-      intro:"Every now and then, luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
+      intro:"Every now and then luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
       scope:"",
       context:"",
       approach:"",
@@ -448,23 +448,40 @@ if(indexExtra){
         items:[
           {
             title:"Ūndersurface",
+            subtitle:"Community co-founder",
             image:"https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:`Co-founded (with <a href="https://www.pac.al/" target="_blank" rel="noopener">Joe Pacal</a>) an enclosed community of entrepreneurs, designers and tinkerers. It was a peer-accountability community that ran for more than five years on Slack, combining structured goal-pushing sessions, sharing circles and talks to help members grow personally and professionally. Beyond the digital space, Joe and I organized an in-person retreat — including a three-day trip to Estonia — built around deep-sharing, introspective and task-driven exercises designed to get people sharing honestly and working through personal blocks.`
+            descriptionHtml:`<p>Co-founded an enclosed community of entrepreneurs, designers and tinkerers. A peer accountability community that ran for 5+ years on Slack, combining structured goal-pushing sessions, sharing circles and talks to help members grow personally and professionally. Beyond the digital space, Joe and I organized an in-person retreat — including a 3-day trip to Estonia — built around deep-sharing, introspective and task-driven exercises designed to get people sharing honestly and working through personal blocks.</p><p>It moved me so much that when I got back, I enrolled in a one-year coaching program to become a certified life coach.</p>`,
+            mentions:[
+              {name:"Joe Pacal",url:"https://www.pac.al/"}
+            ]
           },
           {
-            title:"TBD",
+            title:"Tomas Bata University in Zlin",
+            subtitle:"Member of Dissertation Committee",
             image:"https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:"TBD"
+            descriptionHtml:`<p>I was twice invited to serve on a panel of industry professionals evaluating final bachelor's and master's thesis presentations at university.</p><p>On top of this, while leading a design team, we held full-day design talks for students on the Multimedia &amp; Design track twice over two years. The sessions continued even after I got promoted out of the Design Team Leadership role.</p><p>I made friends with the faculty lead. Had students applying to STRV years later. Lovely stuff.</p>`,
+            mentions:[]
           },
           {
-            title:"TBD",
+            title:"Nollie",
+            subtitle:"Creative Studio",
             image:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:"TBD"
+            descriptionHtml:`<p>Co-founded this creative studio with a longtime friend and former colleague, Ales Nesetril, until we both decided to pivot into our own things — all in good heart. During this time we launched the NEXT WORKOUT iOS app, which you can check out next in line.</p><p>Sharing this to also openly admit that not everything I touch always fully “works out.” Duh! Here, the studio. The app is fine and works great! Hehe.</p>`,
+            mentions:[
+              {name:"Ales Nesetril",url:"https://www.instagram.com/alesnesetril"}
+            ]
           },
           {
-            title:"TBD",
+            title:"NEXT WORKOUT",
+            subtitle:"Fitness trainer iOS App",
             image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:"TBD"
+            descriptionHtml:`<p>This was a sweet collab between Next.Move (client), Yiskra Creative Studio (brand) — and my former Creative Studio Nollie (Design &amp; Ops w/ Ales Nesetril).</p><p>I sourced and managed developers, tracked the timeline and reported progress to the client side represented by Veronika Huna.</p><p>The app launched and keeps growing. People work out. Life's good.</p>`,
+            mentions:[
+              {name:"Next.Move",url:"https://www.instagram.com/nextmove.cz/"},
+              {name:"Yiskra Creative Studio",url:"https://www.instagram.com/nextmove.cz/"},
+              {name:"Ales Nesetril",url:"https://www.instagram.com/alesnesetril"},
+              {name:"Veronika Huna",url:"https://www.instagram.com/fitveronika"}
+            ]
           }
         ]
       }]
@@ -493,6 +510,15 @@ if(indexExtra){
   const mobileProjectLayout=window.matchMedia("(max-width: 1024px)");
 
   const esc=s=>String(s).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
+  const projectWeightLinkMarkup=(label,href,className='')=>{
+    const chars=[...String(label)];
+    const letters=chars.map((char,index)=>`<span style="--i:${index};--r:${chars.length-index-1}">${char===' '?'&nbsp;':esc(char)}</span>`).join('');
+    return `<a class="mf-weight-link ${className}" href="${esc(href)}" target="_blank" rel="noopener" aria-label="${esc(label)}">${letters}</a>`;
+  };
+  const sideQuestMentionsMarkup=mentions=>{
+    if(!Array.isArray(mentions)||!mentions.length)return '';
+    return `<aside class="mf-sidequest-mentions"><small>Mentions</small><div class="mf-sidequest-mention-list">${mentions.map(mention=>`<div class="mf-sidequest-mention-row"><span class="mf-sidequest-mention-dash" aria-hidden="true">–</span>${projectWeightLinkMarkup(mention.name,mention.url,'mf-sidequest-mention-link')}<i class="mf-sidequest-mention-arrow" aria-hidden="true">↗</i></div>`).join('')}</div></aside>`;
+  };
 
   function liveLabel(key,active){
     if(key==="instagram"){
@@ -575,11 +601,11 @@ if(indexExtra){
           ${items.map((item,itemIndex)=>`<section class="mf-sidequest-panel${itemIndex===0?' is-active':''}" data-sidequest-index="${itemIndex}">
             <button class="mf-sidequest-trigger" type="button" aria-expanded="${itemIndex===0?'true':'false'}">
               <span class="mf-sidequest-number">${String(itemIndex+1).padStart(2,'0')}</span>
-              <span class="mf-sidequest-title">${esc(item.title||'TBD')}</span>
+              <span class="mf-sidequest-heading"><span class="mf-sidequest-title">${esc(item.title||'TBD')}</span><span class="mf-sidequest-subtitle">${esc(item.subtitle||'')}</span></span>
               <span class="mf-sidequest-mark" aria-hidden="true">↗</span>
             </button>
             <div class="mf-sidequest-content">
-              <div class="mf-sidequest-copy">${item.descriptionHtml||'TBD'}</div>
+              <div class="mf-sidequest-copy-wrap"><div class="mf-sidequest-copy">${item.descriptionHtml||'<p>TBD</p>'}</div>${sideQuestMentionsMarkup(item.mentions)}</div>
               <figure class="mf-sidequest-image"><img src="${esc(item.image||'')}" alt="${esc(item.title||'Side Quest')}" draggable="false"></figure>
             </div>
           </section>`).join('')}
