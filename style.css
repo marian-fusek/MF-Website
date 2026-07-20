@@ -10888,8 +10888,8 @@ body.mf-guidance-open .mf-nav-guidance {
   z-index:2147483646;
   left:0;
   top:0;
-  width:20px;
-  height:20px;
+  width:6px;
+  height:6px;
   border-radius:50%;
   background:#fff;
   mix-blend-mode:difference;
@@ -10904,19 +10904,20 @@ body.mf-guidance-open .mf-nav-guidance {
 .mf-cursor-ripple {
   position:fixed;
   z-index:2147483645;
-  width:20px;
-  height:20px;
-  margin:-10px 0 0 -10px;
-  border:1px solid #fff;
+  width:6px;
+  height:6px;
+  margin:-3px 0 0 -3px;
+  border:.5px solid #fff;
   border-radius:50%;
   background:transparent;
   mix-blend-mode:difference;
   pointer-events:none;
-  animation:mfCursorRipple .58s cubic-bezier(.16,1,.3,1) forwards;
+  animation:mfCursorRipple 1.9s cubic-bezier(.22,.78,.26,1) forwards;
 }
 @keyframes mfCursorRipple {
-  from { transform:scale(1); opacity:1; }
-  to { transform:scale(6); opacity:0; }
+  0% { transform:scale(1); opacity:.9; }
+  68% { opacity:.42; }
+  100% { transform:scale(6); opacity:0; }
 }
 @media (pointer:fine) {
   html.mf-custom-cursor,
