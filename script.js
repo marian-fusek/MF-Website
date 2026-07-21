@@ -424,15 +424,17 @@ if(indexExtra){
     },
     "04":{
       title:"Vault 111",
-      intro:"TBD",
-      scope:"TBD",
-      context:"TBD",
-      approach:"TBD",
+      intro:"Not gonna hide these old-ass random designs just because they're not flashy enough, fully MF on-brand or were never published. Also — I would otherwise have four projects, and I needed one more because I like odd numbers.",
+      scope:"Web, iOS, brand stuff",
+      context:"Sometimes the night hits and you're like: “How would this layout look?” or “Can I get more minimalistic than clinical minimalism?” or “I WANT TO DESIGN A SKATE BRAND, NOW!” Hmm.",
+      approach:"After all these years in agencies, giving it all I had, there was a point when I felt like I couldn't design anymore. What helped bring it back was surrounding myself with people who still wanted to design and build new stuff, with all that unbroken enthusiasm — then reflecting on myself, feeling bad, starting to design again and realizing: “Oh, it's coming back!”",
       images:[
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2200&q=88&sat=-100",
-        "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2200&q=88&sat=-100",
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=88&sat=-100",
-        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=2200&q=88&sat=-100"
+        "/media/projects/vault/01-nofakie-1.jpg",
+        "/media/projects/vault/02-nofakie-2.jpg",
+        "/media/projects/vault/03-one3.jpg",
+        "/media/projects/vault/04-ennui.jpg",
+        "/media/projects/vault/05-cultureboard.jpg",
+        "/media/projects/vault/06-apod.jpg"
       ]
     },
     "05":{
