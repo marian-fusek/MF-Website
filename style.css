@@ -12412,3 +12412,29 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
 .mf-leadership-graduates-photo .mf-image-grid-distortion {
   will-change:opacity,transform,-webkit-mask-image,mask-image;
 }
+
+
+/* ============================================================
+   V#104 — align coaching engagement label with submenu bottom
+   ============================================================ */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    position:relative !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+    bottom:24px !important;
+  }
+}
+
+
+/* ============================================================
+   V#105 — stable mobile section spacing
+   ============================================================ */
+@media (max-width:1024px) {
+  /* Keep the Guidance block physically separated from the INDEX / Side Quests
+     strip above it and the following practice section on every phone height. */
+  .mf-guidance {
+    margin-top:64px !important;
+    margin-bottom:64px !important;
+  }
+}
