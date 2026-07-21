@@ -12310,3 +12310,36 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
 .mf-hero-grid-cell {
   overflow:visible !important;
 }
+
+
+/* ============================================================
+   V#101 — stable photographic overlays + hero glyph bleed
+   ============================================================ */
+.mf-hero-name,
+.mf-hero-grid-distortion,
+.mf-hero-grid-cell,
+.mf-hero-grid-clone {
+  overflow:visible !important;
+}
+
+.mf-photo-wrap.mf-image-grid-host {
+  position:relative !important;
+  isolation:isolate !important;
+}
+.mf-photo-wrap .mf-photo-card {
+  position:relative !important;
+  z-index:1 !important;
+}
+.mf-photo-wrap .mf-image-grid-distortion {
+  position:absolute !important;
+  z-index:4 !important;
+  margin:0 !important;
+  transform:none !important;
+}
+
+.mf-leadership-hero-photo .mf-image-grid-distortion,
+.mf-leadership-graduates-photo .mf-image-grid-distortion {
+  contain:layout paint style;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}

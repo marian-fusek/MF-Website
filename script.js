@@ -1730,7 +1730,11 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   ];
 
   const modes={
-    mindset:{title:'Mindset<br>Coaching',kicker:'',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No “do it like this.” Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic','marie-lauren','tomas-lodnan','kristyna-peckova','jakub-nespor','tomas-bruzda','maros-novak','next-leadership']},
+    mindset:{title:'Mindset<br>Coaching',kicker:'',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No "do it like this." Your style all the way — nothing forced.
+
+70+ people coached and mentored — designers, engineers, QA testers, team leaders, C-level executives. Individual sessions, team work, all of it.
+
+Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic','marie-lauren','tomas-lodnan','kristyna-peckova','jakub-nespor','tomas-bruzda','maros-novak','next-leadership']},
     leadership:{title:'Team<br>Leadership',kicker:'',intro:'',order:leadershipEntries.map(entry=>entry.id)}
   };
 
@@ -3248,7 +3252,9 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       clone.removeAttribute("id");
       clone.classList.add("mf-hero-grid-clone");
       clone.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
-      cell.style.clipPath=`inset(${row/rows*100}% ${(columns-column-1)/columns*100}% ${(rows-row-1)/rows*100}% ${column/columns*100}%)`;
+      const clipTop=row===0?-24:row/rows*100;
+      const clipBottom=row===rows-1?-18:(rows-row-1)/rows*100;
+      cell.style.clipPath=`inset(${clipTop}% ${(columns-column-1)/columns*100}% ${clipBottom}% ${column/columns*100}%)`;
       cell.appendChild(clone);
       overlay.appendChild(cell);
       cells.push({cell,clone,column,row,x:(column+.5)/columns,y:(row+.5)/rows,tx:0,ty:0,cx:0,cy:0});
@@ -3519,7 +3525,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
 
 /* ============================================================
-   V96 — shared RGB grid deformation for photographic assets
+   V#101 — stable RGB grid deformation for photographic assets
    ============================================================ */
 (function(){
   const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');
@@ -3540,16 +3546,33 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     host.appendChild(overlay);
 
     const syncOverlayGeometry=()=>{
-      const hostRect=host.getBoundingClientRect();
-      const sourceRect=source.getBoundingClientRect();
-      overlay.style.left=`${sourceRect.left-hostRect.left}px`;
-      overlay.style.top=`${sourceRect.top-hostRect.top}px`;
-      overlay.style.width=`${sourceRect.width}px`;
-      overlay.style.height=`${sourceRect.height}px`;
+      /* Local layout coordinates avoid double-applying reveal and scroll
+         transforms to the BIO overlay. */
+      let left=0,top=0,width=source.offsetWidth,height=source.offsetHeight;
+      if(source.offsetParent===host){
+        left=source.offsetLeft;
+        top=source.offsetTop;
+      }else{
+        const hostRect=host.getBoundingClientRect();
+        const sourceRect=source.getBoundingClientRect();
+        left=sourceRect.left-hostRect.left;
+        top=sourceRect.top-hostRect.top;
+        width=sourceRect.width;
+        height=sourceRect.height;
+      }
+      overlay.style.setProperty('left',`${left}px`,'important');
+      overlay.style.setProperty('top',`${top}px`,'important');
+      overlay.style.setProperty('right','auto','important');
+      overlay.style.setProperty('bottom','auto','important');
+      overlay.style.width=`${width}px`;
+      overlay.style.height=`${height}px`;
     };
     syncOverlayGeometry();
     source.addEventListener('load',syncOverlayGeometry,{passive:true});
     window.addEventListener('resize',syncOverlayGeometry,{passive:true});
+    const resizeObserver='ResizeObserver' in window?new ResizeObserver(syncOverlayGeometry):null;
+    resizeObserver?.observe(source);
+    resizeObserver?.observe(host);
 
     const columns=8;
     const rows=5;
@@ -3576,17 +3599,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         cell.style.clipPath=`inset(${row/rows*100}% ${(columns-column-1)/columns*100}% ${(rows-row-1)/rows*100}% ${column/columns*100}%)`;
         cell.append(buildLayer('base'),buildLayer('red'),buildLayer('cyan'));
         overlay.appendChild(cell);
-        cells.push({
-          cell,
-          x:(column+.5)/columns,
-          y:(row+.5)/rows,
-          column,
-          row,
-          tx:0,
-          ty:0,
-          cx:0,
-          cy:0
-        });
+        cells.push({cell,x:(column+.5)/columns,y:(row+.5)/rows,column,row,tx:0,ty:0,cx:0,cy:0});
       }
     }
 
@@ -3602,11 +3615,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
     const animate=()=>{
       raf=0;
-      syncOverlayGeometry();
       const rect=overlay.getBoundingClientRect();
+      if(rect.width<1||rect.height<1)return;
       const radius=Math.max(130,Math.min(Math.min(rect.width,rect.height)*.58,330));
       overlay.style.setProperty('--mf-image-grid-radius',`${radius}px`);
-
       cells.forEach(item=>{
         const centerX=item.x*rect.width;
         const centerY=item.y*rect.height;
@@ -3621,58 +3633,58 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
         item.cy+=(item.ty-item.cy)*.22;
         item.cell.style.transform=`translate3d(${item.cx.toFixed(2)}px,${item.cy.toFixed(2)}px,0)`;
       });
-
       velocityX*=.76;
       velocityY*=.76;
       const unsettled=cells.some(item=>Math.abs(item.tx-item.cx)>.07||Math.abs(item.ty-item.cy)>.07);
       if(inside||unsettled)raf=requestAnimationFrame(animate);
     };
     const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
-
-    host.addEventListener('pointerenter',event=>{
-      if(!effectAllowed())return;
-      syncOverlayGeometry();
-      const rect=overlay.getBoundingClientRect();
-      pointerX=event.clientX-rect.left;
-      pointerY=event.clientY-rect.top;
-      lastX=pointerX;
-      lastY=pointerY;
-      inside=true;
-      overlay.style.setProperty('--mf-image-grid-x',`${pointerX}px`);
-      overlay.style.setProperty('--mf-image-grid-y',`${pointerY}px`);
-      overlay.classList.add('is-active');
+    const reset=()=>{
+      inside=false;
+      velocityX=0;
+      velocityY=0;
+      overlay.classList.remove('is-active');
       queue();
-    },{passive:true});
+    };
+    host._mfImageGridReset=reset;
 
-    host.addEventListener('pointermove',event=>{
+    /* Bind interaction to the visible image, never to empty wrapper space. */
+    source.addEventListener('pointermove',event=>{
       if(!effectAllowed()){
-        inside=false;
-        overlay.classList.remove('is-active');
+        reset();
         return;
       }
       syncOverlayGeometry();
       const rect=overlay.getBoundingClientRect();
       const nextX=event.clientX-rect.left;
       const nextY=event.clientY-rect.top;
-      velocityX=nextX-lastX;
-      velocityY=nextY-lastY;
+      if(!inside){
+        lastX=nextX;
+        lastY=nextY;
+        velocityX=0;
+        velocityY=0;
+      }else{
+        velocityX=nextX-lastX;
+        velocityY=nextY-lastY;
+      }
       pointerX=nextX;
       pointerY=nextY;
       lastX=nextX;
       lastY=nextY;
+      inside=true;
       overlay.style.setProperty('--mf-image-grid-x',`${pointerX}px`);
       overlay.style.setProperty('--mf-image-grid-y',`${pointerY}px`);
       overlay.classList.add('is-active');
       queue();
     },{passive:true});
+    source.addEventListener('pointerleave',reset,{passive:true});
+    source.addEventListener('pointercancel',reset,{passive:true});
 
-    host.addEventListener('pointerleave',()=>{
-      inside=false;
-      velocityX=0;
-      velocityY=0;
-      overlay.classList.remove('is-active');
-      queue();
-    },{passive:true});
+    /* Reset at the exact start of the Leadership scroll fade. This removes
+       load/exit blinking and lets the effect initialise cleanly on return. */
+    new MutationObserver(()=>{
+      if(host.classList.contains('is-scrolling-away'))reset();
+    }).observe(host,{attributes:true,attributeFilter:['class']});
   }
 
   const initStaticTargets=()=>{
