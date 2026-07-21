@@ -2006,10 +2006,12 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   }
 
   const markActiveReview=id=>{
-    if(!id||id===activeReviewId)return;
+    if(!id)return;
     activeReviewId=id;
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
-      const active=button.dataset.reviewTarget===id;
+      /* Mobile shows the submenu as a neutral jump index. No person is
+         visually selected while the reviews flow beneath it. */
+      const active=!mobileGuidance.matches&&button.dataset.reviewTarget===id;
       button.classList.toggle('is-active',active);
       button.setAttribute('aria-current',active?'true':'false');
     });
@@ -3546,4 +3548,148 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   },{passive:true});
   window.addEventListener('pointerleave',()=>{visible=false;cursor.classList.remove('is-visible');});
   window.addEventListener('blur',()=>{visible=false;cursor.classList.remove('is-visible');});
+})();
+
+
+/* ============================================================
+   V96 — shared RGB grid deformation for photographic assets
+   ============================================================ */
+(function(){
+  const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion:reduce)');
+  if(!finePointer.matches||reducedMotion.matches)return;
+
+  function initImageGridDistortion(host,sourceSelector){
+    if(!host||host.dataset.mfImageGridReady==='true')return;
+    const source=host.querySelector(sourceSelector);
+    if(!source)return;
+    host.dataset.mfImageGridReady='true';
+    host.classList.add('mf-image-grid-host');
+
+    const overlay=document.createElement('span');
+    overlay.className='mf-image-grid-distortion';
+    overlay.setAttribute('aria-hidden','true');
+    host.appendChild(overlay);
+
+    const columns=8;
+    const rows=5;
+    const cells=[];
+
+    const buildLayer=(channel)=>{
+      const image=source.cloneNode(false);
+      image.removeAttribute('id');
+      image.removeAttribute('alt');
+      image.removeAttribute('loading');
+      image.removeAttribute('onerror');
+      image.setAttribute('aria-hidden','true');
+      image.className=`mf-image-grid-layer is-${channel}`;
+      const computed=getComputedStyle(source);
+      image.style.objectFit=computed.objectFit||'cover';
+      image.style.objectPosition=computed.objectPosition||'50% 50%';
+      return image;
+    };
+
+    for(let row=0;row<rows;row++){
+      for(let column=0;column<columns;column++){
+        const cell=document.createElement('span');
+        cell.className='mf-image-grid-cell';
+        cell.style.clipPath=`inset(${row/rows*100}% ${(columns-column-1)/columns*100}% ${(rows-row-1)/rows*100}% ${column/columns*100}%)`;
+        cell.append(buildLayer('base'),buildLayer('red'),buildLayer('cyan'));
+        overlay.appendChild(cell);
+        cells.push({
+          cell,
+          x:(column+.5)/columns,
+          y:(row+.5)/rows,
+          column,
+          row,
+          tx:0,
+          ty:0,
+          cx:0,
+          cy:0
+        });
+      }
+    }
+
+    let pointerX=-9999;
+    let pointerY=-9999;
+    let lastX=pointerX;
+    let lastY=pointerY;
+    let velocityX=0;
+    let velocityY=0;
+    let inside=false;
+    let raf=0;
+
+    const animate=()=>{
+      raf=0;
+      const rect=host.getBoundingClientRect();
+      const radius=Math.max(130,Math.min(Math.min(rect.width,rect.height)*.58,330));
+      overlay.style.setProperty('--mf-image-grid-radius',`${radius}px`);
+
+      cells.forEach(item=>{
+        const centerX=item.x*rect.width;
+        const centerY=item.y*rect.height;
+        const dx=centerX-pointerX;
+        const dy=centerY-pointerY;
+        const distance=Math.hypot(dx,dy)||1;
+        const influence=inside?Math.pow(Math.max(0,1-distance/radius),1.55):0;
+        const push=Math.min(28,Math.max(16,rect.width*.022))*influence;
+        item.tx=(dx/distance)*push+velocityX*.15*influence+(item.row%2?1:-1)*2.3*influence;
+        item.ty=(dy/distance)*push*.68+velocityY*.11*influence+(item.column%2?1:-1)*1.6*influence;
+        item.cx+=(item.tx-item.cx)*.22;
+        item.cy+=(item.ty-item.cy)*.22;
+        item.cell.style.transform=`translate3d(${item.cx.toFixed(2)}px,${item.cy.toFixed(2)}px,0)`;
+      });
+
+      velocityX*=.76;
+      velocityY*=.76;
+      const unsettled=cells.some(item=>Math.abs(item.tx-item.cx)>.07||Math.abs(item.ty-item.cy)>.07);
+      if(inside||unsettled)raf=requestAnimationFrame(animate);
+    };
+    const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
+
+    host.addEventListener('pointerenter',event=>{
+      const rect=host.getBoundingClientRect();
+      pointerX=event.clientX-rect.left;
+      pointerY=event.clientY-rect.top;
+      lastX=pointerX;
+      lastY=pointerY;
+      inside=true;
+      overlay.style.setProperty('--mf-image-grid-x',`${pointerX}px`);
+      overlay.style.setProperty('--mf-image-grid-y',`${pointerY}px`);
+      overlay.classList.add('is-active');
+      queue();
+    },{passive:true});
+
+    host.addEventListener('pointermove',event=>{
+      const rect=host.getBoundingClientRect();
+      const nextX=event.clientX-rect.left;
+      const nextY=event.clientY-rect.top;
+      velocityX=nextX-lastX;
+      velocityY=nextY-lastY;
+      pointerX=nextX;
+      pointerY=nextY;
+      lastX=nextX;
+      lastY=nextY;
+      overlay.style.setProperty('--mf-image-grid-x',`${pointerX}px`);
+      overlay.style.setProperty('--mf-image-grid-y',`${pointerY}px`);
+      overlay.classList.add('is-active');
+      queue();
+    },{passive:true});
+
+    host.addEventListener('pointerleave',()=>{
+      inside=false;
+      velocityX=0;
+      velocityY=0;
+      overlay.classList.remove('is-active');
+      queue();
+    },{passive:true});
+  }
+
+  const initStaticTargets=()=>{
+    initImageGridDistortion(document.querySelector('.mf-photo-wrap'),'.mf-photo-card');
+    document.querySelectorAll('.mf-leadership-hero-photo').forEach(host=>initImageGridDistortion(host,'img'));
+  };
+
+  initStaticTargets();
+  new MutationObserver(initStaticTargets).observe(document.body,{childList:true,subtree:true});
 })();

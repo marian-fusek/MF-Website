@@ -12034,3 +12034,102 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     line-height:.88 !important;
   }
 }
+
+/* ============================================================
+   V96 — mobile neutral Mindset index + image RGB grid deformation
+   ============================================================ */
+
+/* On mobile the Mindset submenu is a neutral jump list, never a selected state. */
+@media (max-width:1024px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active {
+    color:rgba(255,255,255,.58) !important;
+    background:transparent !important;
+    padding-left:0 !important;
+    transform:none !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button::before,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover::before,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active::before {
+    opacity:0 !important;
+    transform:none !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button > span,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover > span,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active > span {
+    color:inherit !important;
+    transform:none !important;
+    opacity:1 !important;
+  }
+}
+
+/* The hero-name RGB grid language, adapted to photographic surfaces. */
+.mf-image-grid-host {
+  position:relative !important;
+  isolation:isolate;
+}
+.mf-image-grid-distortion {
+  --mf-image-grid-radius:clamp(130px,25vw,330px);
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:0;
+  -webkit-mask-image:radial-gradient(circle var(--mf-image-grid-radius) at var(--mf-image-grid-x,-999px) var(--mf-image-grid-y,-999px),#000 0%,rgba(0,0,0,.98) 28%,rgba(0,0,0,.76) 57%,rgba(0,0,0,.30) 82%,transparent 100%);
+  mask-image:radial-gradient(circle var(--mf-image-grid-radius) at var(--mf-image-grid-x,-999px) var(--mf-image-grid-y,-999px),#000 0%,rgba(0,0,0,.98) 28%,rgba(0,0,0,.76) 57%,rgba(0,0,0,.30) 82%,transparent 100%);
+  transition:opacity .28s cubic-bezier(.16,1,.3,1);
+  will-change:opacity,-webkit-mask-image,mask-image;
+}
+.mf-image-grid-distortion.is-active { opacity:1; }
+.mf-image-grid-cell {
+  position:absolute;
+  inset:0;
+  display:block;
+  will-change:transform;
+}
+.mf-image-grid-layer {
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  object-fit:cover;
+  pointer-events:none;
+  transform:none !important;
+}
+.mf-image-grid-layer.is-base {
+  z-index:1;
+  filter:contrast(1.035) saturate(1.04);
+}
+.mf-image-grid-layer.is-red,
+.mf-image-grid-layer.is-cyan {
+  z-index:2;
+  opacity:.38;
+  mix-blend-mode:screen;
+}
+.mf-image-grid-layer.is-red {
+  transform:translate3d(-2.4px,0,0) !important;
+  filter:grayscale(1) contrast(1.25) brightness(.82) sepia(1) saturate(12) hue-rotate(302deg);
+}
+.mf-image-grid-layer.is-cyan {
+  transform:translate3d(2.4px,0,0) !important;
+  filter:grayscale(1) contrast(1.25) brightness(.82) sepia(1) saturate(12) hue-rotate(142deg);
+}
+
+/* Match the existing BIO image crop exactly. */
+.mf-photo-wrap .mf-image-grid-layer {
+  clip-path:inset(0 10% 0 10%) !important;
+}
+
+/* Keep the Leadership image's 10% veil above the distortion as well. */
+.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo::after {
+  z-index:2 !important;
+}
+
+@media (hover:none),(pointer:coarse),(prefers-reduced-motion:reduce) {
+  .mf-image-grid-distortion { display:none !important; }
+}
