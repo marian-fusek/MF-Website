@@ -12438,3 +12438,25 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     margin-bottom:64px !important;
   }
 }
+
+
+/* ============================================================
+   V#106 — mobile section rhythm + optical 404 centering
+   ============================================================ */
+@media (max-width:1024px) {
+  /* Let INDEX grow to its real content height. A legacy 100svh height forced
+     the following section to begin before the final strip had finished. */
+  .mf-work {
+    height:auto !important;
+    min-height:100svh !important;
+    padding-bottom:12svh !important;
+  }
+
+  /* Match the established hero → INDEX rhythm between INDEX → GUIDANCE,
+     without stacking arbitrary margins that vary across phone heights. */
+  .mf-guidance {
+    margin-top:0 !important;
+    margin-bottom:0 !important;
+    padding-top:10svh !important;
+  }
+}
