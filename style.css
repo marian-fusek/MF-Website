@@ -11528,3 +11528,144 @@ html body .mf-carousel-runtime-loader-percent {
   }
 }
 
+
+/* ============================================================
+   V93 — Side Quests alignment, cursor precision, Guidance flow
+   ============================================================ */
+
+/* Side Quests: keep collapsed and expanded header geometry independent. */
+.mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-number {
+  top:-15px !important;
+}
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-heading {
+  transform:translateY(8px) !important;
+}
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+  top:8px !important;
+}
+@media (max-width:620px) {
+  .mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-number {
+    top:-12px !important;
+  }
+  .mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-heading {
+    transform:translateY(7px) !important;
+  }
+  .mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+    top:7px !important;
+  }
+}
+
+/* The dot remains the only cursor on the requested homepage/detail interactions. */
+#heroName,
+#heroName *,
+.mf-strip,
+.mf-strip *,
+.mf-xp-card,
+.mf-xp-card *,
+.mf-project-shell.is-sidequests-project,
+.mf-project-shell.is-sidequests-project *,
+.mf-project-shell.is-sidequests-project .mf-sidequest-trigger,
+.mf-project-shell.is-sidequests-project .mf-sidequest-trigger * {
+  cursor:none !important;
+}
+body.mf-custom-cursor.project-open .mf-project-shell.is-sidequests-project,
+body.mf-custom-cursor.project-open .mf-project-shell.is-sidequests-project a,
+body.mf-custom-cursor.project-open .mf-project-shell.is-sidequests-project button {
+  cursor:none !important;
+}
+
+/* Thin click pulse: expansion and disappearance finish on the same frame. */
+.mf-global-cursor-pulse {
+  border-width:.5px !important;
+  opacity:0 !important;
+}
+.mf-global-cursor.is-clicking .mf-global-cursor-pulse {
+  animation:mfCursorClickPulseV93 .66s cubic-bezier(.2,.72,.12,1) both !important;
+}
+@keyframes mfCursorClickPulseV93 {
+  0% {
+    transform:translate(-50%,-50%) scale(.28);
+    opacity:.52;
+  }
+  100% {
+    transform:translate(-50%,-50%) scale(3.5);
+    opacity:0;
+  }
+}
+
+/* The first Mindset review fades in without visually dropping below its final position. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-initial-review {
+  transform:none !important;
+}
+
+/* Both final Guidance links use one exact viewport/baseline system. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next,
+.mf-guidance-overlay.is-leadership .mf-leadership-guidance-next {
+  width:100vw !important;
+  min-height:100vh !important;
+  min-height:100dvh !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:flex-start !important;
+  margin:0 !important;
+  padding:8vh 4vw 8vh 50vw !important;
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next .mf-guidance-next-link,
+.mf-guidance-overlay.is-leadership .mf-leadership-guidance-next .mf-guidance-next-link {
+  width:100% !important;
+  margin:0 !important;
+}
+
+/* Leadership hero fades continuously as it leaves, while the image itself stays untouched. */
+.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+  will-change:opacity,transform,filter;
+}
+
+/* More compact Highlights, with Eleken aligned to the same copy start. */
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block ul {
+  gap:19px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li,
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link,
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link .mf-weight-link {
+  font-size:clamp(15px,1.02vw,18px) !important;
+  line-height:1.42 !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li {
+  padding-left:50px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li::before {
+  top:.68em !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link {
+  padding-left:50px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link::before {
+  left:0 !important;
+  top:.08em !important;
+}
+
+/* A little more air between the portrait carousel and the active review. */
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+  margin-bottom:clamp(52px,6.5vh,78px) !important;
+}
+
+/* Team Leadership uses the same target-and-drift model as the homepage. */
+.mf-guidance-overlay.is-leadership .mf-guidance-reviews {
+  scroll-behavior:auto !important;
+  overscroll-behavior-y:contain !important;
+}
+
+@media (max-width:1024px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next,
+  .mf-guidance-overlay.is-leadership .mf-leadership-guidance-next {
+    width:100% !important;
+    padding:8vh 18px !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+    transform:none !important;
+    filter:none !important;
+    opacity:1 !important;
+  }
+}

@@ -460,7 +460,7 @@ if(indexExtra){
             ]
           },
           {
-            title:"Tonmas Bata University",
+            title:"Tomas Bata University",
             subtitle:"Member of Dissertation Committee",
             image:"/media/projects/side-quests/utb.jpg",
             descriptionHtml:`<p>I was twice invited to serve on a panel of industry professionals evaluating final bachelor's and master's thesis presentations at university.</p><p>On top of this, while leading a design team, we held full-day design talks for students on the Multimedia &amp; Design programme twice over two years. The sessions continued even after I got promoted out of the Design Team Leadership role.</p><p>I made friends with the faculty lead. Had students applying to STRV years later. Lovely stuff.</p>`,
@@ -1820,10 +1820,34 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
     leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll));
     const distance=leadershipTargetScroll-reviewsHost.scrollTop;
-    reviewsHost.scrollTop+=distance*.18;
+    reviewsHost.scrollTop+=distance*.065;
+    updateLeadershipVisuals();
     if(Math.abs(distance)>.35){leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);return;}
     reviewsHost.scrollTop=leadershipTargetScroll;
+    updateLeadershipVisuals();
     leadershipScrollFrame=0;
+  }
+
+  function updateLeadershipVisuals(){
+    if(currentMode!=='leadership')return;
+    const hero=reviewsHost.querySelector('.mf-leadership-hero-photo');
+    if(hero){
+      const height=Math.max(1,hero.offsetHeight);
+      const start=hero.offsetTop+height*.06;
+      const end=hero.offsetTop+height*.82;
+      const progress=mobileGuidance.matches?0:Math.max(0,Math.min(1,(reviewsHost.scrollTop-start)/Math.max(1,end-start)));
+      hero.style.setProperty('opacity',(1-progress).toFixed(4),'important');
+      hero.style.setProperty('transform',`translate3d(0,${(-28*progress).toFixed(2)}px,0)`,'important');
+      hero.style.setProperty('filter',`brightness(${(1-.72*progress).toFixed(3)}) blur(${(5*progress).toFixed(2)}px)`,'important');
+    }
+    const next=reviewsHost.querySelector('.mf-leadership-guidance-next');
+    if(next){
+      const top=next.getBoundingClientRect().top;
+      const hostTop=reviewsHost.getBoundingClientRect().top;
+      const visible=top<=hostTop+reviewsHost.clientHeight*.5&&next.getBoundingClientRect().bottom>hostTop;
+      next.classList.toggle('is-in-view',visible);
+      next.querySelector('.mf-guidance-next-link')?.classList.toggle('is-in-view',visible);
+    }
   }
 
 
@@ -1840,6 +1864,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
           ?entry.isIntersecting&&entry.boundingClientRect.top<=rootBounds.top+rootBounds.height*.52&&entry.boundingClientRect.bottom>rootBounds.top
           :entry.isIntersecting&&entry.intersectionRatio>=.12;
         entry.target.classList.toggle('is-in-view',visible);
+        if(!visible&&entry.target.classList.contains('is-initial-review'))entry.target.classList.remove('is-initial-review');
       });
     },{root,rootMargin:'-4% 0px -7% 0px',threshold:[0,.12,.32,.58]});
     targets.forEach((target,index)=>{
@@ -1961,11 +1986,24 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
+    if(currentMode==='leadership'){
+      if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
+      updateLeadershipVisuals();
+    }
     if(!supportsScrollEnd)queueMindsetSettle();
   },{passive:true});
   if(supportsScrollEnd)reviewsHost.addEventListener('scrollend',settleMindsetReview,{passive:true});
   reviewsHost.addEventListener('wheel',event=>{
-    if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
+    if(mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
+    if(currentMode==='leadership'){
+      event.preventDefault();
+      const unit=event.deltaMode===1?16:event.deltaMode===2?reviewsHost.clientHeight:1;
+      if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
+      leadershipTargetScroll+=event.deltaY*unit*1.4;
+      if(!leadershipScrollFrame)leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
+      return;
+    }
+    if(currentMode!=='mindset')return;
     event.preventDefault();
     if(snapInFlight)return;
     mindsetWheelTotal+=event.deltaY;
@@ -2108,6 +2146,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
         ?`<button class="is-guidance-next-nav" type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>NEXT: Team Leadership →</span><span></span></button>`
         :`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${flagMarkup(entry.flag)}</span></button>`).join('');
       reviewsHost.innerHTML=ordered.map(reviewMarkup).join('');
+      const initialReview=reviewsHost.querySelector('[data-review-id]');
+      initialReview?.classList.add('is-initial-review');
+      if(initialReview)reviewsHost.scrollTop=initialReview.offsetTop;
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
@@ -2121,7 +2162,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     bindLeadership();
     requestAnimationFrame(()=>{
       setupGuidanceReveals();
-      
+      updateLeadershipVisuals();
       startGuidanceAscii();
     });
   }
@@ -3398,7 +3439,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
   window.addEventListener('pointermove',event=>{
     x=event.clientX;y=event.clientY;place();
-    const shouldHide=hiddenZone(event.target)||document.body.classList.contains('project-open')||document.body.classList.contains('art-open');
+    const sideQuestsOpen=document.body.classList.contains('project-open')&&!!document.querySelector('.mf-project-shell.is-sidequests-project');
+    const shouldHide=hiddenZone(event.target)||(document.body.classList.contains('project-open')&&!sideQuestsOpen)||document.body.classList.contains('art-open');
     const wasVisible=visible;
     visible=!shouldHide;
     cursor.classList.toggle('is-visible',visible);
@@ -3421,7 +3463,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     cursor.classList.remove('is-clicking');
     void cursor.offsetWidth;
     cursor.classList.add('is-clicking');
-    setTimeout(()=>cursor.classList.remove('is-clicking'),560);
+    const pulse=cursor.querySelector('.mf-global-cursor-pulse');
+    pulse?.addEventListener('animationend',()=>cursor.classList.remove('is-clicking'),{once:true});
   },{passive:true});
   window.addEventListener('pointerleave',()=>{visible=false;cursor.classList.remove('is-visible');});
   window.addEventListener('blur',()=>{visible=false;cursor.classList.remove('is-visible');});
