@@ -11876,3 +11876,161 @@ body.mf-custom-cursor.project-open .mf-project-shell.is-sidequests-project butto
     margin-right:18px !important;
   }
 }
+
+/* ============================================================
+   V95 — cursor, Side Quests and Guidance finishing corrections
+   ============================================================ */
+
+/* Loader percentage uses proportional Geist, including the final 100%. */
+html body .mf-loader > .mf-loader-progress,
+html body .mf-loader > .mf-loader-progress::before,
+html body .mf-loader > .mf-loader-progress::after,
+html body .mf-art-runtime-loader .mf-loader-progress,
+html body .mf-art-runtime-loader .mf-loader-progress::before,
+html body .mf-art-runtime-loader .mf-loader-progress::after {
+  font-family:"Geist",Arial,sans-serif !important;
+  font-variant-numeric:normal !important;
+  font-feature-settings:"tnum" 0,"lnum" 1 !important;
+}
+
+/* Click ripple: a visible hairline ring whose expansion and fade end together. */
+.mf-global-cursor-pulse {
+  display:block !important;
+  left:50% !important;
+  top:50% !important;
+  width:10px !important;
+  height:10px !important;
+  margin:0 !important;
+  border:.45px solid rgba(255,255,255,.72) !important;
+  border-radius:50% !important;
+  opacity:0 !important;
+  animation:none !important;
+  transform:translate(-50%,-50%) scale(.34) !important;
+  transform-origin:center center !important;
+  box-sizing:border-box !important;
+}
+.mf-global-cursor.is-clicking .mf-global-cursor-pulse {
+  animation:mfCursorClickPulseV95 .58s cubic-bezier(.2,.72,.12,1) both !important;
+}
+@keyframes mfCursorClickPulseV95 {
+  0% { transform:translate(-50%,-50%) scale(.34); opacity:.62; }
+  100% { transform:translate(-50%,-50%) scale(3.7); opacity:0; }
+}
+
+/* Preserve only the global dot on the requested interactions. */
+@media (pointer:fine) {
+  body.mf-custom-cursor #heroName,
+  body.mf-custom-cursor #heroName *,
+  body.mf-custom-cursor .mf-strip,
+  body.mf-custom-cursor .mf-strip *,
+  body.mf-custom-cursor .mf-xp-card,
+  body.mf-custom-cursor .mf-xp-card *,
+  body.mf-custom-cursor .mf-project-shell.is-sidequests-project,
+  body.mf-custom-cursor .mf-project-shell.is-sidequests-project * {
+    cursor:none !important;
+  }
+}
+
+/* Side Quests: change only the expanded number's vertical position. */
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+  top:18px !important;
+}
+
+/* Guidance cross-links fit their available width at every viewport size. */
+.mf-guidance-next-link {
+  font-size:var(--guidance-next-size,clamp(38px,7.25vw,128px)) !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+.mf-guidance-next-label {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+
+/* The Mindset end card lives inside the 32vw right-hand viewport. Its 18vw
+   inner offset puts the type at the true 50vw screen axis. */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next {
+    width:100% !important;
+    padding-left:18vw !important;
+    padding-right:4vw !important;
+  }
+}
+
+/* Leadership hero: retain source image, add only a 10% black veil. */
+.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+  position:relative !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo::after {
+  content:"";
+  position:absolute;
+  z-index:2;
+  inset:0;
+  background:rgba(0,0,0,.10);
+  pointer-events:none;
+}
+
+/* Eleken arrow and line read as one vertically centred row. */
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link::before {
+  top:calc(.08em + 3px) !important;
+}
+
+/* Reviews: 20px after the intro, then a slightly clearer handoff to the copy. */
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+  margin-top:20px !important;
+  margin-bottom:clamp(58px,7vh,84px) !important;
+}
+
+/* Highlights stay compact; Eleken keeps the same size and copy axis. */
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block ul {
+  gap:15px !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li,
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link,
+.mf-guidance-overlay.is-leadership .mf-leadership-eleken-link .mf-weight-link {
+  font-size:clamp(14px,.94vw,16px) !important;
+  line-height:1.42 !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li::before {
+  top:.67em !important;
+}
+
+/* Replace the former full-viewport gap after the CTA with a 30vh handoff.
+   The bottom inset mirrors the title's top rhythm below the menu. */
+.mf-guidance-overlay.is-leadership .mf-leadership-page {
+  padding-bottom:0 !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-guidance-next {
+  width:100vw !important;
+  min-height:30vh !important;
+  height:auto !important;
+  margin:0 !important;
+  padding:0 4vw clamp(50px,7vh,90px) 50vw !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  box-sizing:border-box !important;
+}
+
+@media (max-width:1024px) {
+  /* Both section links remain inside the mobile viewport at all weights. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next,
+  .mf-guidance-overlay.is-leadership .mf-leadership-guidance-next {
+    width:100% !important;
+    max-width:100% !important;
+    padding-left:18px !important;
+    padding-right:18px !important;
+    overflow:hidden !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next {
+    min-height:100svh !important;
+    padding-bottom:max(22px,env(safe-area-inset-bottom)) !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-guidance-next {
+    min-height:30svh !important;
+    padding-bottom:max(72px,env(safe-area-inset-bottom)) !important;
+  }
+  .mf-guidance-next-link {
+    width:100% !important;
+    line-height:.88 !important;
+  }
+}

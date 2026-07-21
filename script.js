@@ -1809,42 +1809,60 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const mobileGuidance=window.matchMedia('(max-width:1024px)');
 
   let leadershipTargetScroll=0;
+  let leadershipCurrentScroll=0;
   let leadershipScrollFrame=0;
   let modeSwitching=false;
 
   function stopLeadershipScroll(){
     cancelAnimationFrame(leadershipScrollFrame);
     leadershipScrollFrame=0;
+    leadershipCurrentScroll=reviewsHost.scrollTop;
+    leadershipTargetScroll=reviewsHost.scrollTop;
   }
+  /* Exact homepage-style target scrolling: normal input distance with a long,
+     controlled drift rather than a reduced scroll amount. */
   function runLeadershipScroll(){
     const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
     leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll));
-    const distance=leadershipTargetScroll-reviewsHost.scrollTop;
-    reviewsHost.scrollTop+=distance*.065;
+    const distance=leadershipTargetScroll-leadershipCurrentScroll;
+    if(Math.abs(distance)<.35){
+      leadershipCurrentScroll=leadershipTargetScroll;
+      reviewsHost.scrollTop=leadershipCurrentScroll;
+      updateLeadershipVisuals();
+      leadershipScrollFrame=0;
+      return;
+    }
+    leadershipCurrentScroll+=distance*.065;
+    reviewsHost.scrollTop=leadershipCurrentScroll;
     updateLeadershipVisuals();
-    if(Math.abs(distance)>.35){leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);return;}
-    reviewsHost.scrollTop=leadershipTargetScroll;
-    updateLeadershipVisuals();
-    leadershipScrollFrame=0;
+    leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
   }
 
   function updateLeadershipVisuals(){
     if(currentMode!=='leadership')return;
+    const scrollRoot=mobileGuidance.matches?overlay:reviewsHost;
+    const rootRect=scrollRoot.getBoundingClientRect();
+    const viewportTop=mobileGuidance.matches?0:rootRect.top;
+    const viewportHeight=mobileGuidance.matches?window.innerHeight:reviewsHost.clientHeight;
     const hero=reviewsHost.querySelector('.mf-leadership-hero-photo');
     if(hero){
-      const height=Math.max(1,hero.offsetHeight);
-      const start=hero.offsetTop+height*.06;
-      const end=hero.offsetTop+height*.82;
-      const progress=mobileGuidance.matches?0:Math.max(0,Math.min(1,(reviewsHost.scrollTop-start)/Math.max(1,end-start)));
+      const rect=hero.getBoundingClientRect();
+      const height=Math.max(1,rect.height);
+      const travelled=viewportTop-rect.top;
+      const progress=Math.max(0,Math.min(1,(travelled-height*.06)/Math.max(1,height*.76)));
       hero.style.setProperty('opacity',(1-progress).toFixed(4),'important');
       hero.style.setProperty('transform',`translate3d(0,${(-28*progress).toFixed(2)}px,0)`,'important');
       hero.style.setProperty('filter',`brightness(${(1-.72*progress).toFixed(3)}) blur(${(5*progress).toFixed(2)}px)`,'important');
     }
     const next=reviewsHost.querySelector('.mf-leadership-guidance-next');
     if(next){
-      const top=next.getBoundingClientRect().top;
-      const hostTop=reviewsHost.getBoundingClientRect().top;
-      const visible=top<=hostTop+reviewsHost.clientHeight*.5&&next.getBoundingClientRect().bottom>hostTop;
+      const button=reviewsHost.querySelector('#mfLeadershipCopyButton');
+      const buttonRect=button?.getBoundingClientRect();
+      const nextRect=next.getBoundingClientRect();
+      const triggerLine=viewportTop+viewportHeight*.5;
+      const visible=buttonRect
+        ?buttonRect.top<=triggerLine&&nextRect.bottom>viewportTop
+        :nextRect.top<=triggerLine&&nextRect.bottom>viewportTop;
       next.classList.toggle('is-in-view',visible);
       next.querySelector('.mf-guidance-next-link')?.classList.toggle('is-in-view',visible);
     }
@@ -2007,7 +2025,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
     if(currentMode==='leadership'){
-      if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
+      if(!leadershipScrollFrame){
+        leadershipTargetScroll=reviewsHost.scrollTop;
+        leadershipCurrentScroll=reviewsHost.scrollTop;
+      }
       updateLeadershipVisuals();
     }
     if(!supportsScrollEnd)queueMindsetSettle();
@@ -2018,7 +2039,10 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     if(currentMode==='leadership'){
       event.preventDefault();
       const unit=event.deltaMode===1?16:event.deltaMode===2?reviewsHost.clientHeight:1;
-      if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
+      if(!leadershipScrollFrame){
+        leadershipTargetScroll=reviewsHost.scrollTop;
+        leadershipCurrentScroll=reviewsHost.scrollTop;
+      }
       leadershipTargetScroll+=event.deltaY*unit*1.4;
       if(!leadershipScrollFrame)leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
       return;
@@ -2038,7 +2062,30 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     mindsetWheelTotal=0;
     scrollToMindsetReview(currentIndex+direction);
   },{passive:false});
-  overlay.addEventListener('scroll',scheduleReviewTracking,{passive:true});
+  overlay.addEventListener('scroll',()=>{
+    scheduleReviewTracking();
+    if(currentMode==='leadership')updateLeadershipVisuals();
+  },{passive:true});
+
+  function fitGuidanceNextLinks(){
+    requestAnimationFrame(()=>{
+      reviewsHost.querySelectorAll('.mf-guidance-next-link').forEach(link=>{
+        const label=link.querySelector('.mf-guidance-next-label');
+        const arrow=link.querySelector('.mf-guidance-next-arrow');
+        if(!label||!arrow)return;
+        const mobile=mobileGuidance.matches;
+        const base=mobile?Math.min(78,window.innerWidth*.14):Math.min(128,window.innerWidth*.0725);
+        const minimum=mobile?28:38;
+        link.style.setProperty('font-size',`${base}px`,'important');
+        const available=Math.max(1,link.clientWidth);
+        const needed=Math.max(1,label.scrollWidth+arrow.scrollWidth+12);
+        const fitted=Math.max(minimum,Math.min(base,base*(available/needed)*.91));
+        link.style.setProperty('--guidance-next-size',`${fitted.toFixed(2)}px`);
+        link.style.removeProperty('font-size');
+      });
+    });
+  }
+  window.addEventListener('resize',fitGuidanceNextLinks,{passive:true});
 
   function bindReviewParts(){
     reviewsHost.querySelectorAll('.mf-guidance-copy-shell').forEach(shell=>{
@@ -2181,16 +2228,18 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
-      requestAnimationFrame(()=>{setupGuidanceReveals();});
+      requestAnimationFrame(()=>{setupGuidanceReveals();fitGuidanceNextLinks();});
       return;
     }
 
     reviewNav.innerHTML='';
     reviewsHost.innerHTML=leadershipContent();
     leadershipTargetScroll=0;
+    leadershipCurrentScroll=0;
     bindLeadership();
     requestAnimationFrame(()=>{
       setupGuidanceReveals();
+      fitGuidanceNextLinks();
       updateLeadershipVisuals();
       startGuidanceAscii();
     });
