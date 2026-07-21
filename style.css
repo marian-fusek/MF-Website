@@ -12233,3 +12233,56 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     top:14px !important;
   }
 }
+
+
+/* ============================================================
+   V#099 — Guidance handoff baseline + stable Leadership image FX
+   ============================================================ */
+/* Keep descenders fully visible. The earlier overflow:hidden clipped letters
+   such as g/y at the baseline while the weight animation was running. */
+.mf-guidance-next-link,
+.mf-guidance-next-label,
+.mf-guidance-review.is-guidance-next,
+.mf-leadership-guidance-next {
+  overflow:visible !important;
+}
+.mf-guidance-next-link {
+  line-height:.94 !important;
+  padding-bottom:.12em !important;
+}
+.mf-guidance-next-label,
+.mf-guidance-next-char,
+.mf-guidance-next-arrow {
+  line-height:inherit !important;
+}
+
+/* The Mindset handoff begins on the true 50vw screen axis. The desktop
+   review viewport begins after the 24vw left panel, so its internal offset
+   is 26vw. */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review.is-guidance-next {
+    width:100% !important;
+    padding-left:26vw !important;
+    padding-right:4vw !important;
+  }
+}
+
+/* Stop pointer-enter/leave oscillation once the full-screen chill image starts
+   leaving the viewport; its normal scroll fade remains continuous. */
+.mf-leadership-hero-photo.is-scrolling-away .mf-image-grid-distortion {
+  opacity:0 !important;
+  transition:none !important;
+}
+
+/* The academy image uses the same RGB grid treatment without changing its
+   approved layout or crop. */
+.mf-leadership-graduates-photo.mf-image-grid-host {
+  isolation:isolate;
+}
+.mf-leadership-graduates-photo .mf-image-grid-distortion {
+  z-index:2;
+}
+.mf-leadership-graduates-photo figcaption {
+  position:relative;
+  z-index:3;
+}

@@ -1850,6 +1850,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const height=Math.max(1,rect.height);
       const travelled=viewportTop-rect.top;
       const progress=Math.max(0,Math.min(1,(travelled-height*.06)/Math.max(1,height*.76)));
+      hero.classList.toggle('is-scrolling-away',progress>.012);
+      if(progress>.012)hero.querySelector('.mf-image-grid-distortion')?.classList.remove('is-active');
       hero.style.setProperty('opacity',(1-progress).toFixed(4),'important');
       hero.style.setProperty('transform',`translate3d(0,${(-28*progress).toFixed(2)}px,0)`,'important');
       hero.style.setProperty('filter',`brightness(${(1-.72*progress).toFixed(3)}) blur(${(5*progress).toFixed(2)}px)`,'important');
@@ -3592,6 +3594,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     let velocityY=0;
     let inside=false;
     let raf=0;
+    const effectAllowed=()=>!host.classList.contains('is-scrolling-away');
 
     const animate=()=>{
       raf=0;
@@ -3623,6 +3626,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
 
     host.addEventListener('pointerenter',event=>{
+      if(!effectAllowed())return;
       syncOverlayGeometry();
       const rect=overlay.getBoundingClientRect();
       pointerX=event.clientX-rect.left;
@@ -3637,6 +3641,11 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     },{passive:true});
 
     host.addEventListener('pointermove',event=>{
+      if(!effectAllowed()){
+        inside=false;
+        overlay.classList.remove('is-active');
+        return;
+      }
       syncOverlayGeometry();
       const rect=overlay.getBoundingClientRect();
       const nextX=event.clientX-rect.left;
@@ -3665,6 +3674,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const initStaticTargets=()=>{
     initImageGridDistortion(document.querySelector('.mf-photo-wrap'),'.mf-photo-card');
     document.querySelectorAll('.mf-leadership-hero-photo').forEach(host=>initImageGridDistortion(host,'img'));
+    document.querySelectorAll('.mf-leadership-graduates-photo').forEach(host=>initImageGridDistortion(host,'img'));
   };
 
   initStaticTargets();
