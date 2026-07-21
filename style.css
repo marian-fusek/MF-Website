@@ -2949,30 +2949,57 @@ body.project-open .mf-nav-logo { opacity:1; visibility:visible; }
   transition-duration: 90ms, 260ms !important;
 }
 
-/* ASCII fragments emitted from hero letterforms. */
-.mf-hero-ascii-fragment {
-  position: fixed;
-  z-index: 90;
+/* Hero-name hover lens: a 1px outlined treatment that fades back to solid white. */
+.mf-hero-name-lens {
+  --mf-hero-lens-radius: clamp(78px, 8.25vw, 132px);
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
   pointer-events: none;
-  color: #fff;
-  font-family: "Geist Mono", monospace;
-  font-size: clamp(8px, .7vw, 12px);
-  line-height: 1;
   opacity: 0;
-  transform: translate(-50%, -50%) scale(.65);
-  filter: blur(.15px);
-  text-shadow: 0 0 8px rgba(255,255,255,.28);
-  animation: mfHeroAsciiBreak 520ms cubic-bezier(.16,1,.3,1) forwards;
+  line-height: inherit;
+  white-space: nowrap;
+  -webkit-mask-image: radial-gradient(
+    circle var(--mf-hero-lens-radius) at var(--mf-hero-lens-x, -999px) var(--mf-hero-lens-y, -999px),
+    #000 0%,
+    #000 22%,
+    rgba(0,0,0,.96) 36%,
+    rgba(0,0,0,.72) 56%,
+    rgba(0,0,0,.36) 76%,
+    rgba(0,0,0,.10) 91%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle var(--mf-hero-lens-radius) at var(--mf-hero-lens-x, -999px) var(--mf-hero-lens-y, -999px),
+    #000 0%,
+    #000 22%,
+    rgba(0,0,0,.96) 36%,
+    rgba(0,0,0,.72) 56%,
+    rgba(0,0,0,.36) 76%,
+    rgba(0,0,0,.10) 91%,
+    transparent 100%
+  );
+  transition: opacity 220ms cubic-bezier(.22,1,.36,1);
+  will-change: opacity, -webkit-mask-image, mask-image;
 }
-@keyframes mfHeroAsciiBreak {
-  0% { opacity:0; transform:translate(-50%,-50%) scale(.55); }
-  18% { opacity:.95; }
-  100% { opacity:0; transform:translate(calc(-50% + var(--ascii-x)),calc(-50% + var(--ascii-y))) scale(1.15) rotate(var(--ascii-r)); }
+.mf-hero-name-lens.is-active { opacity: 1; }
+#heroNameLensWrap {
+  display: inline-block;
+  width: auto;
+  transform-origin: left bottom;
+  will-change: transform;
 }
-.mf-hero-name .nc.is-ascii-touched {
-  filter: blur(.45px);
-  opacity:.88;
-  text-shadow: 2px 0 0 rgba(255,255,255,.22), -2px 0 0 rgba(255,255,255,.12);
+.mf-hero-name-lens .nc {
+  color: #000 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 1px #fff;
+  paint-order: stroke fill;
+}
+@media (hover:none), (pointer:coarse) {
+  .mf-hero-name-lens { display:none !important; }
 }
 
 /* Full-width case-study invitation, spanning BIO copy through portrait. */
