@@ -3298,7 +3298,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   let pointerX=-9999,pointerY=-9999,velocityX=0,velocityY=0,lastX=pointerX,lastY=pointerY,inside=false,raf=0;
   const animate=()=>{
     raf=0;
-    const rect=hero.getBoundingClientRect();
+    const rect=overlay.getBoundingClientRect();
     const radius=Math.max(150,Math.min(rect.width*.22,310));
     cells.forEach(item=>{
       const centerX=item.x*rect.width,centerY=item.y*rect.height;
@@ -3323,18 +3323,18 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
 
   hero.addEventListener("pointerenter",event=>{
-    const rect=hero.getBoundingClientRect();
+    const rect=overlay.getBoundingClientRect();
     pointerX=event.clientX-rect.left;pointerY=event.clientY-rect.top;
     lastX=pointerX;lastY=pointerY;inside=true;
     overlay.classList.add("is-active");queue();
   },{passive:true});
   hero.addEventListener("pointermove",event=>{
-    const rect=hero.getBoundingClientRect();
+    const rect=overlay.getBoundingClientRect();
     const nextX=event.clientX-rect.left,nextY=event.clientY-rect.top;
     velocityX=nextX-lastX;velocityY=nextY-lastY;
     pointerX=nextX;pointerY=nextY;lastX=nextX;lastY=nextY;
-    hero.style.setProperty("--mf-grid-x",`${pointerX}px`);
-    hero.style.setProperty("--mf-grid-y",`${pointerY}px`);
+    overlay.style.setProperty("--mf-grid-x",`${pointerX}px`);
+    overlay.style.setProperty("--mf-grid-y",`${pointerY}px`);
     overlay.classList.add("is-active");queue();
   },{passive:true});
   hero.addEventListener("pointerleave",()=>{

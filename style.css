@@ -12386,3 +12386,29 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     text-align:left !important;
   }
 }
+
+
+/* ============================================================
+   V#103 — final SEO/performance pass + interaction repairs
+   ============================================================ */
+.mf-hero-grid-distortion {
+  top:-64px !important;
+  right:0 !important;
+  bottom:-36px !important;
+  left:0 !important;
+}
+.mf-hero-grid-clone {
+  position:absolute !important;
+  left:0 !important;
+  bottom:36px !important;
+}
+.mf-image-grid-distortion,
+.mf-image-grid-cell,
+.mf-image-grid-layer {
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.mf-leadership-hero-photo .mf-image-grid-distortion,
+.mf-leadership-graduates-photo .mf-image-grid-distortion {
+  will-change:opacity,transform,-webkit-mask-image,mask-image;
+}
