@@ -11669,3 +11669,210 @@ body.mf-custom-cursor.project-open .mf-project-shell.is-sidequests-project butto
     opacity:1 !important;
   }
 }
+
+/* ============================================================
+   V94 — mobile Guidance flow, ART spacing and desktop drag hygiene
+   ============================================================ */
+
+/* Desktop: dragging is for navigation and galleries, never browser selection. */
+@media (min-width:1025px) {
+  html,
+  body,
+  #mf,
+  #mf * {
+    -webkit-user-select:none !important;
+    user-select:none !important;
+  }
+  #mf img,
+  #mf a {
+    -webkit-user-drag:none !important;
+    user-drag:none !important;
+  }
+}
+
+@media (max-width:1024px) {
+  /* Homepage Guidance: each offer is its own full mobile viewport and all
+     information follows one simple left-hand axis. */
+  .mf-guidance {
+    display:block !important;
+    min-height:auto !important;
+    height:auto !important;
+    padding:9svh 12px 0 !important;
+    overflow:visible !important;
+  }
+  .mf-guidance-title {
+    margin:0 0 34px !important;
+  }
+  .mf-guidance-portals {
+    display:block !important;
+    min-height:0 !important;
+    height:auto !important;
+  }
+  .mf-guidance-portal,
+  .mf-guidance-portals:has(.mf-guidance-portal:hover) .mf-guidance-portal,
+  .mf-guidance-portals:has(.mf-guidance-portal:hover) .mf-guidance-portal:hover {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    justify-content:flex-start !important;
+    width:100% !important;
+    height:100svh !important;
+    min-height:100svh !important;
+    padding:18px !important;
+    box-sizing:border-box !important;
+    flex:none !important;
+  }
+  .mf-guidance-portal + .mf-guidance-portal {
+    border-top:1px solid rgba(255,255,255,.12) !important;
+  }
+  .mf-guidance-portal-index {
+    position:static !important;
+    display:block !important;
+  }
+  .mf-guidance-portal-title {
+    position:static !important;
+    display:block !important;
+    left:auto !important;
+    top:auto !important;
+    margin:clamp(72px,13svh,116px) 0 0 !important;
+    transform:none !important;
+    font-size:clamp(48px,15vw,76px) !important;
+  }
+  .mf-guidance-portal-copy {
+    position:static !important;
+    display:block !important;
+    left:auto !important;
+    top:auto !important;
+    bottom:auto !important;
+    width:min(100%,34em) !important;
+    margin:clamp(28px,5svh,46px) 0 0 !important;
+    font-size:clamp(16px,4.5vw,21px) !important;
+    line-height:1.18 !important;
+    text-align:left !important;
+  }
+  .mf-guidance-portal-tags {
+    position:static !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    left:auto !important;
+    bottom:auto !important;
+    margin:20px 0 0 !important;
+    justify-content:flex-start !important;
+  }
+  .mf-guidance-portal-tags i {
+    font-size:8px !important;
+    padding:5px 7px !important;
+  }
+  .mf-guidance-open-label {
+    left:18px !important;
+    right:18px !important;
+    bottom:max(18px,env(safe-area-inset-bottom)) !important;
+    text-align:left !important;
+  }
+
+  /* Bring the ART tags and copy visibly above the preview without changing
+     the preview block itself. */
+  .mf-art-showcase-bottom {
+    position:relative !important;
+    top:-22px !important;
+  }
+
+  /* Mindset mobile detail: the first screen is a complete introduction with
+     the full review index anchored to its bottom. Reviews then form one
+     natural vertical document beneath it. */
+  .mf-guidance-overlay.is-mindset {
+    display:block !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    scroll-behavior:smooth !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-top {
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside {
+    position:relative !important;
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:100svh !important;
+    min-height:100svh !important;
+    padding:72px 18px max(16px,env(safe-area-inset-bottom)) !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside h2 {
+    flex:0 0 auto !important;
+    margin:0 !important;
+    font-size:clamp(46px,14vw,68px) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+    flex:0 0 auto !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:24px 0 0 !important;
+    font-size:clamp(12px,3.35vw,14px) !important;
+    line-height:1.28 !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav {
+    position:static !important;
+    display:flex !important;
+    flex-direction:column !important;
+    flex-wrap:nowrap !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    margin:auto 0 0 !important;
+    gap:0 !important;
+    overflow:visible !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button {
+    flex:0 0 auto !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    grid-template-columns:24px minmax(0,1fr) 22px !important;
+    gap:8px !important;
+    padding:4px 0 !important;
+    border:0 !important;
+    border-left:1px solid transparent !important;
+    font-size:clamp(7px,1.95vw,8.5px) !important;
+    line-height:1.15 !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button:hover,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-nav button.is-active {
+    padding-left:8px !important;
+    border-left-color:#fff !important;
+    background:transparent !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-reviews {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    overflow:visible !important;
+    padding:0 !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    min-height:100svh !important;
+    height:auto !important;
+    box-sizing:border-box !important;
+    padding:64px 18px 54px !important;
+  }
+
+  /* Team Leadership action fills its content column, preserving equal gutters. */
+  .mf-guidance-overlay.is-leadership .mf-leadership-cta {
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    box-sizing:border-box !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-copy-block:has(.mf-leadership-cta) {
+    width:calc(100% - 36px) !important;
+    max-width:none !important;
+    margin-left:18px !important;
+    margin-right:18px !important;
+  }
+}

@@ -1882,6 +1882,26 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const getDominantMindsetReview=()=>{
     const articles=[...reviewsHost.querySelectorAll('[data-review-id]')];
     if(!articles.length)return null;
+
+    /* On mobile the overlay itself is the scrolling document and the reviews
+       host expands naturally beneath the full-screen introduction. Measure
+       articles against the visible overlay viewport rather than scrollTop. */
+    if(mobileGuidance.matches){
+      const topBar=overlay.querySelector('.mf-guidance-overlay-top');
+      const viewportTop=topBar?.getBoundingClientRect().bottom||0;
+      const viewportBottom=window.innerHeight;
+      let best=articles[0],bestVisible=-1,bestCenter=Infinity;
+      articles.forEach(article=>{
+        const rect=article.getBoundingClientRect();
+        const visible=Math.max(0,Math.min(rect.bottom,viewportBottom)-Math.max(rect.top,viewportTop));
+        const centerDistance=Math.abs((rect.top+rect.bottom)/2-(viewportTop+viewportBottom)/2);
+        if(visible>bestVisible+1||(Math.abs(visible-bestVisible)<=1&&centerDistance<bestCenter)){
+          best=article;bestVisible=visible;bestCenter=centerDistance;
+        }
+      });
+      return best;
+    }
+
     const viewportTop=reviewsHost.scrollTop;
     const viewportBottom=viewportTop+reviewsHost.clientHeight;
     let best=articles[0],bestVisible=-1,bestCenter=Infinity;
@@ -2051,6 +2071,15 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const target=document.getElementById(`guidance-review-${button.dataset.reviewTarget}`);
       if(!target)return;
       markActiveReview(button.dataset.reviewTarget);
+
+      if(mobileGuidance.matches){
+        const topBar=overlay.querySelector('.mf-guidance-overlay-top');
+        const topOffset=topBar?.offsetHeight||0;
+        const destination=overlay.scrollTop+target.getBoundingClientRect().top-overlay.getBoundingClientRect().top-topOffset;
+        overlay.scrollTo({top:Math.max(0,destination),behavior:'smooth'});
+        return;
+      }
+
       animateGuidanceScroll(target.offsetTop,760);
     }));
   }
