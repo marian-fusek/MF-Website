@@ -2219,7 +2219,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       }
       copyBtn.textContent=copyClicks===1
         ?'EMAIL COPIED TO YOUR CLIPBOARD...'
-        :"1 MORE & I'm GONE!";
+        :"ONCE MORE & I'M GONE!";
     });
   }
 
@@ -3281,6 +3281,10 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       const push=20*influence;
       item.tx=(dx/distance)*push+velocityX*.12*influence+(item.row%2?1:-1)*2.5*influence;
       item.ty=(dy/distance)*push*.62+velocityY*.09*influence+(item.column%2?1:-1)*1.7*influence;
+      /* Keep the outer rows inside the original letter bounds so the RGB
+         deformation never appears clipped at the top or bottom edge. */
+      if(item.row===0)item.ty=Math.max(0,item.ty);
+      if(item.row===rows-1)item.ty=Math.min(0,item.ty);
       item.cx+=(item.tx-item.cx)*.24;
       item.cy+=(item.ty-item.cy)*.24;
       item.cell.style.transform=`translate3d(${item.cx.toFixed(2)}px,${item.cy.toFixed(2)}px,0)`;

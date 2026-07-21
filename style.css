@@ -12286,3 +12286,27 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
   position:relative;
   z-index:3;
 }
+
+
+/* ============================================================
+   V#100 — final RGB overlay stacking + hero edge containment
+   ============================================================ */
+/* The BIO distortion is a visual overlay, not a second image beneath the
+   portrait. Keep the approved portrait geometry untouched and only establish
+   an explicit stacking order. */
+.mf-photo-wrap.mf-image-grid-host {
+  isolation:isolate !important;
+}
+.mf-photo-wrap .mf-photo-card {
+  position:relative !important;
+  z-index:1 !important;
+}
+.mf-photo-wrap .mf-image-grid-distortion {
+  z-index:3 !important;
+}
+
+/* Preserve the hero grid outside individual translated slices. */
+.mf-hero-grid-distortion,
+.mf-hero-grid-cell {
+  overflow:visible !important;
+}
