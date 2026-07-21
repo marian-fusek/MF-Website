@@ -1860,9 +1860,8 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const buttonRect=button?.getBoundingClientRect();
       const nextRect=next.getBoundingClientRect();
       const triggerLine=viewportTop+viewportHeight*.5;
-      const visible=buttonRect
-        ?buttonRect.top<=triggerLine&&nextRect.bottom>viewportTop
-        :nextRect.top<=triggerLine&&nextRect.bottom>viewportTop;
+      const visible=(buttonRect?.top<=triggerLine||nextRect.top<=viewportTop+viewportHeight*.88)
+        &&nextRect.bottom>viewportTop;
       next.classList.toggle('is-in-view',visible);
       next.querySelector('.mf-guidance-next-link')?.classList.toggle('is-in-view',visible);
     }
@@ -2068,6 +2067,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     scheduleReviewTracking();
     if(currentMode==='leadership')updateLeadershipVisuals();
   },{passive:true});
+  reviewsHost.addEventListener('scroll',()=>{
+    if(currentMode==='leadership')updateLeadershipVisuals();
+  },{passive:true});
 
   function fitGuidanceNextLinks(){
     requestAnimationFrame(()=>{
@@ -2183,7 +2185,15 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     if(first)paint(first.dataset.leadershipPerson,false);
 
     const copyBtn=reviewsHost.querySelector('#mfLeadershipCopyButton');
+    let copyClicks=0;
     copyBtn?.addEventListener('click',async()=>{
+      copyClicks+=1;
+      if(copyClicks>=3){
+        copyBtn.classList.add('is-removing');
+        setTimeout(()=>copyBtn.remove(),340);
+        return;
+      }
+
       const email='email@marianfusek.com';
       let copied=false;
       try{
@@ -2200,7 +2210,14 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
         try{ copied=document.execCommand('copy'); }catch(__){ copied=false; }
         helper.remove();
       }
-      copyBtn.textContent=copied?'Email copied to your clipboard .)':'Copy email@marianfusek.com';
+      if(!copied){
+        copyBtn.textContent='Copy email@marianfusek.com';
+        copyClicks=Math.max(0,copyClicks-1);
+        return;
+      }
+      copyBtn.textContent=copyClicks===1
+        ?'EMAIL COPIED TO YOUR CLIPBOARD...'
+        :"1 MORE & I'm GONE!";
     });
   }
 
@@ -3206,46 +3223,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 })();
 
 
-/* BIO PHOTO — smooth, demand-driven mouse parallax + periodic ASCII glitches */
-(function(){
-  const section=document.getElementById("about");
-  const photo=document.querySelector(".mf-photo-card");
-  if(!section||!photo)return;
-
-  let targetX=0,targetY=0,currentX=0,currentY=0,raf=0;
-  const animate=()=>{
-    raf=0;
-    currentX+=(targetX-currentX)*.22;
-    currentY+=(targetY-currentY)*.22;
-    photo.style.transform=`translate3d(${currentX.toFixed(2)}px,${currentY.toFixed(2)}px,0)`;
-    if(Math.abs(targetX-currentX)>.02||Math.abs(targetY-currentY)>.02){
-      raf=requestAnimationFrame(animate);
-    }
-  };
-  const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
-
-  section.addEventListener("pointermove",event=>{
-    const rect=section.getBoundingClientRect();
-    targetX=((event.clientX-rect.left)/rect.width-.5)*12;
-    targetY=((event.clientY-rect.top)/rect.height-.5)*10;
-    queue();
-  },{passive:true});
-  section.addEventListener("pointerleave",()=>{targetX=0;targetY=0;queue();},{passive:true});
-
-  const chars=["+ +","001101","// MF","[ERR]","<>_","0xFF","::: ","* * *"];
-  setInterval(()=>{
-    const host=photo.parentElement;
-    if(!host)return;
-    const glitch=document.createElement("span");
-    glitch.className="mf-photo-glitch";
-    glitch.textContent=chars[Math.floor(Math.random()*chars.length)];
-    glitch.style.left=(photo.offsetLeft+6+Math.random()*Math.max(10,photo.offsetWidth-46))+"px";
-    glitch.style.top=(photo.offsetTop+8+Math.random()*Math.max(10,photo.offsetHeight-28))+"px";
-    host.appendChild(glitch);
-    requestAnimationFrame(()=>glitch.classList.add("show"));
-    setTimeout(()=>glitch.remove(),850);
-  },5000);
-})();
+/* BIO PHOTO — intentionally static; the shared RGB grid effect is the only hover treatment. */
 
 /* HERO NAME — cursor-driven grid deformation with RGB displacement. */
 (function(){
@@ -3430,26 +3408,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 /* ART preview uses the exact same renderer and state as the full gallery.
    It remains non-interactive; clicking the frame opens the full overlay. */
 
-/* V24 — keep BIO glitches inside the portrait and add a small RGB split every 3s. */
-(function(){
-  const wrap=document.querySelector(".mf-photo-wrap");
-  const photo=wrap?.querySelector(".mf-photo-card");
-  if(!wrap||!photo)return;
-  const chars=["+ +","001101","// MF","[ERR]","<>_","0xFF","::: ","* * *"];
-  setInterval(()=>{
-    wrap.classList.add("is-rgb-glitch");
-    setTimeout(()=>wrap.classList.remove("is-rgb-glitch"),180);
-    const glitch=document.createElement("span");
-    glitch.className="mf-photo-glitch";
-    glitch.textContent=chars[Math.floor(Math.random()*chars.length)];
-    const photoRect={left:photo.offsetLeft,top:photo.offsetTop,width:photo.offsetWidth,height:photo.offsetHeight};
-    glitch.style.left=(photoRect.left+6+Math.random()*Math.max(10,photoRect.width-46))+"px";
-    glitch.style.top=(photoRect.top+8+Math.random()*Math.max(10,photoRect.height-28))+"px";
-    wrap.appendChild(glitch);
-    requestAnimationFrame(()=>glitch.classList.add("show"));
-    setTimeout(()=>glitch.remove(),850);
-  },3000);
-})();
+/* Legacy BIO ASCII/RGB timer removed — hover grid distortion only. */
 
 
 /* MF ART section title — the base title stays fixed while suffixes animate. */
@@ -3540,11 +3499,13 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
   window.addEventListener('pointerdown',event=>{
     if(event.button!==0||!visible)return;
-    cursor.classList.remove('is-clicking');
-    void cursor.offsetWidth;
-    cursor.classList.add('is-clicking');
-    const pulse=cursor.querySelector('.mf-global-cursor-pulse');
-    pulse?.addEventListener('animationend',()=>cursor.classList.remove('is-clicking'),{once:true});
+    const ring=document.createElement('span');
+    ring.className='mf-global-cursor-click-ring';
+    ring.style.left=`${event.clientX}px`;
+    ring.style.top=`${event.clientY}px`;
+    document.body.appendChild(ring);
+    ring.addEventListener('animationend',()=>ring.remove(),{once:true});
+    setTimeout(()=>ring.remove(),900);
   },{passive:true});
   window.addEventListener('pointerleave',()=>{visible=false;cursor.classList.remove('is-visible');});
   window.addEventListener('blur',()=>{visible=false;cursor.classList.remove('is-visible');});
@@ -3569,7 +3530,20 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     const overlay=document.createElement('span');
     overlay.className='mf-image-grid-distortion';
     overlay.setAttribute('aria-hidden','true');
+    overlay.style.inset='auto';
     host.appendChild(overlay);
+
+    const syncOverlayGeometry=()=>{
+      const hostRect=host.getBoundingClientRect();
+      const sourceRect=source.getBoundingClientRect();
+      overlay.style.left=`${sourceRect.left-hostRect.left}px`;
+      overlay.style.top=`${sourceRect.top-hostRect.top}px`;
+      overlay.style.width=`${sourceRect.width}px`;
+      overlay.style.height=`${sourceRect.height}px`;
+    };
+    syncOverlayGeometry();
+    source.addEventListener('load',syncOverlayGeometry,{passive:true});
+    window.addEventListener('resize',syncOverlayGeometry,{passive:true});
 
     const columns=8;
     const rows=5;
@@ -3621,7 +3595,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
     const animate=()=>{
       raf=0;
-      const rect=host.getBoundingClientRect();
+      syncOverlayGeometry();
+      const rect=overlay.getBoundingClientRect();
       const radius=Math.max(130,Math.min(Math.min(rect.width,rect.height)*.58,330));
       overlay.style.setProperty('--mf-image-grid-radius',`${radius}px`);
 
@@ -3648,7 +3623,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
 
     host.addEventListener('pointerenter',event=>{
-      const rect=host.getBoundingClientRect();
+      syncOverlayGeometry();
+      const rect=overlay.getBoundingClientRect();
       pointerX=event.clientX-rect.left;
       pointerY=event.clientY-rect.top;
       lastX=pointerX;
@@ -3661,7 +3637,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     },{passive:true});
 
     host.addEventListener('pointermove',event=>{
-      const rect=host.getBoundingClientRect();
+      syncOverlayGeometry();
+      const rect=overlay.getBoundingClientRect();
       const nextX=event.clientX-rect.left;
       const nextY=event.clientY-rect.top;
       velocityX=nextX-lastX;
