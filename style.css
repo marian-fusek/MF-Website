@@ -12343,3 +12343,46 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
   backface-visibility:hidden;
   transform:translateZ(0);
 }
+
+/* ============================================================
+   V#102 — coaching engagement labels + stable Leadership image readiness
+   ============================================================ */
+.mf-image-grid-distortion:not(.is-ready) {
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+.mf-image-grid-distortion.is-ready {
+  visibility:visible;
+}
+
+/* Coaching engagement type: aligned with the review-copy axis and the bottom
+   rhythm of the left submenu on desktop. */
+.mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+  position:absolute;
+  left:calc(26vw + clamp(190px,14vw,260px) + clamp(62px,5.6vw,104px));
+  right:2.5vw;
+  bottom:32px;
+  color:rgba(255,255,255,.42) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.42) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:clamp(8px,.56vw,10px) !important;
+  font-weight:400 !important;
+  line-height:1.2 !important;
+  letter-spacing:.075em !important;
+  text-transform:uppercase !important;
+  opacity:1 !important;
+  pointer-events:none;
+}
+
+@media (max-width:1024px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+    position:static !important;
+    display:block !important;
+    margin:34px 0 0 !important;
+    color:rgba(255,255,255,.46) !important;
+    -webkit-text-fill-color:rgba(255,255,255,.46) !important;
+    font-size:9px !important;
+    line-height:1.35 !important;
+    text-align:left !important;
+  }
+}

@@ -1716,6 +1716,22 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     {id:'maros-novak',length:'big-single',name:'Maroš Novák',role:'Head of Design & Engineering',company:'GoodRequest',country:'Slovakia',flag:'SK',photo:'/media/guidance/coaching/maros-novak.jpg',tags:['Leadership Coaching'],copy:marosNovakReview}
   ];
 
+  const coachingEngagementById={
+    'michal-bohac':'Ongoing Coaching Partnership (weekly, 1yr+)',
+    'roman-bartos':'Focused Coaching Cycle (~7 sessions)',
+    'darja-arefjeva':'Kickstart Coaching Session (1–3 sessions)',
+    'anastasiia-kozina':'Kickstart Coaching Session (1–3 sessions)',
+    'mako-ueda':'Focused Coaching Cycle (~7 sessions)',
+    'ilja-panic':'Focused Coaching Cycle (~7 sessions)',
+    'marie-lauren':'Focused Coaching Cycle (~7 sessions)',
+    'tomas-lodnan':'Kickstart Coaching Session (1–3 sessions)',
+    'kristyna-peckova':'Kickstart Coaching Session (1–3 sessions)',
+    'jakub-nespor':'Focused Coaching Cycle (~7 sessions)',
+    'tomas-bruzda':'Focused Coaching Cycle (~7 sessions)',
+    'maros-novak':'Focused Coaching Cycle (~7 sessions)'
+  };
+  mindsetEntries.forEach(entry=>{entry.engagement=coachingEngagementById[entry.id]||'';});
+
   const mindsetNextEntry={id:'next-leadership',type:'next',name:'NEXT: Team Leadership →'};
 
 
@@ -1742,7 +1758,8 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
   const reviewMarkup=entry=>{
     if(entry.type==='next')return `<article class="mf-guidance-review is-guidance-next" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${guidanceNextMarkup('Team Leadership →','leadership')}</article>`;
     const copy=entry.parts?partMarkup(entry):`<div class="mf-guidance-copy-shell"><div class="mf-guidance-single-copy">${nl(entry.copy)}</div></div>`;
-    return `<article class="mf-guidance-review mf-guidance-review-universal${entry.parts?' has-parts':''}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}</div><div class="mf-guidance-review-content">${tagsMarkup(entry)}${copy}</div></article>`;
+    const engagement=entry.engagement?`<div class="mf-guidance-engagement">${escapeHtml(entry.engagement)}</div>`:'';
+    return `<article class="mf-guidance-review mf-guidance-review-universal${entry.parts?' has-parts':''}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}</div><div class="mf-guidance-review-content">${tagsMarkup(entry)}${copy}${engagement}</div></article>`;
   };
 
 
@@ -1854,8 +1871,12 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
       const height=Math.max(1,rect.height);
       const travelled=viewportTop-rect.top;
       const progress=Math.max(0,Math.min(1,(travelled-height*.06)/Math.max(1,height*.76)));
-      hero.classList.toggle('is-scrolling-away',progress>.012);
-      if(progress>.012)hero.querySelector('.mf-image-grid-distortion')?.classList.remove('is-active');
+      /* Hysteresis prevents tiny scroll/rounding changes around the threshold
+         from rapidly enabling and disabling the RGB hover overlay. */
+      const wasScrollingAway=hero.classList.contains('is-scrolling-away');
+      const isScrollingAway=wasScrollingAway?progress>.004:progress>.035;
+      hero.classList.toggle('is-scrolling-away',isScrollingAway);
+      if(isScrollingAway)hero.querySelector('.mf-image-grid-distortion')?.classList.remove('is-active');
       hero.style.setProperty('opacity',(1-progress).toFixed(4),'important');
       hero.style.setProperty('transform',`translate3d(0,${(-28*progress).toFixed(2)}px,0)`,'important');
       hero.style.setProperty('filter',`brightness(${(1-.72*progress).toFixed(3)}) blur(${(5*progress).toFixed(2)}px)`,'important');
@@ -3525,7 +3546,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 
 
 /* ============================================================
-   V#101 — stable RGB grid deformation for photographic assets
+   V#102 — stable RGB grid deformation for photographic assets
    ============================================================ */
 (function(){
   const finePointer=window.matchMedia('(hover:hover) and (pointer:fine)');
@@ -3603,6 +3624,19 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
       }
     }
 
+    /* Do not reveal partially decoded clone layers. That was the source of the
+       occasional first-hover flash on the full-screen Leadership image. */
+    let visualsReady=false;
+    const clonedImages=[...overlay.querySelectorAll('img')];
+    Promise.all(clonedImages.map(image=>{
+      if(image.decode)return image.decode().catch(()=>{});
+      if(image.complete)return Promise.resolve();
+      return new Promise(resolve=>image.addEventListener('load',resolve,{once:true}));
+    })).then(()=>{
+      visualsReady=true;
+      overlay.classList.add('is-ready');
+    });
+
     let pointerX=-9999;
     let pointerY=-9999;
     let lastX=pointerX;
@@ -3611,7 +3645,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     let velocityY=0;
     let inside=false;
     let raf=0;
-    const effectAllowed=()=>!host.classList.contains('is-scrolling-away');
+    const effectAllowed=()=>visualsReady&&!host.classList.contains('is-scrolling-away');
 
     const animate=()=>{
       raf=0;
