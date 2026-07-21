@@ -10884,30 +10884,6 @@ body.project-open .mf-nav-guidance { display:none !important; }
   transition-delay:.34s;
 }
 .mf-guidance-next-arrow { position:relative;letter-spacing:0; }
-.mf-guidance-next-arrow::before,
-.mf-guidance-next-arrow::after {
-  content:"→";
-  position:absolute;
-  inset:0;
-  opacity:0;
-  pointer-events:none;
-}
-.mf-guidance-next-link:hover .mf-guidance-next-arrow { animation:mfGuidanceArrowBase .42s steps(2,end) infinite; }
-.mf-guidance-next-link:hover .mf-guidance-next-arrow::before {
-  color:#ff4e4e;
-  -webkit-text-fill-color:#ff4e4e;
-  opacity:.58;
-  animation:mfGuidanceArrowGlitchA .42s steps(2,end) infinite;
-}
-.mf-guidance-next-link:hover .mf-guidance-next-arrow::after {
-  color:#70c9ff;
-  -webkit-text-fill-color:#70c9ff;
-  opacity:.58;
-  animation:mfGuidanceArrowGlitchB .42s steps(2,end) infinite;
-}
-@keyframes mfGuidanceArrowBase { 0%,100%{transform:translate(0,0)} 45%{transform:translate(2px,-1px)} 65%{transform:translate(-1px,1px)} }
-@keyframes mfGuidanceArrowGlitchA { 0%,100%{transform:translate(-2px,0);clip-path:inset(0 0 55% 0)} 50%{transform:translate(3px,-1px);clip-path:inset(42% 0 0 0)} }
-@keyframes mfGuidanceArrowGlitchB { 0%,100%{transform:translate(2px,1px);clip-path:inset(55% 0 0 0)} 50%{transform:translate(-3px,0);clip-path:inset(0 0 48% 0)} }
 
 /* Leadership copy hierarchy and additions. */
 .mf-guidance-overlay.is-leadership .mf-leadership-projects {
@@ -11397,3 +11373,158 @@ body.mf-guidance-open .mf-nav-guidance { display:none !important; }
     top:-8px !important;
   }
 }
+
+/* ============================================================
+   V92 — focused interaction, Guidance and INDEX refinements
+   ============================================================ */
+
+/* Cursor trail lingers longer; click pulse is geometrically centred on the dot. */
+.mf-global-cursor-pulse {
+  left:50% !important;
+  top:50% !important;
+  width:12px !important;
+  height:12px !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  transform-origin:center center !important;
+  transform:translate(-50%,-50%) scale(.28);
+}
+.mf-global-cursor.is-clicking .mf-global-cursor-pulse {
+  animation:mfCursorClickPulseV92 .62s cubic-bezier(.16,1,.3,1) both !important;
+}
+@keyframes mfCursorClickPulseV92 {
+  0% { transform:translate(-50%,-50%) scale(.28);opacity:.58; }
+  72% { opacity:.14; }
+  100% { transform:translate(-50%,-50%) scale(3.5);opacity:0; }
+}
+.mf-global-cursor-trail {
+  animation:mfCursorTrailV92 1.28s cubic-bezier(.16,1,.3,1) forwards !important;
+}
+@keyframes mfCursorTrailV92 {
+  0% { opacity:.72;transform:scale(var(--trail-scale,1)); }
+  72% { opacity:.2; }
+  100% { opacity:0;transform:scale(.08); }
+}
+
+/* Loader counters always use Geist rather than Geist Mono. */
+html body .mf-loader .mf-loader-progress,
+html body .mf-art-runtime-loader .mf-loader-progress,
+html body .mf-project-video-loader-percent,
+html body .mf-carousel-runtime-loader-percent {
+  font-family:"Geist",Arial,sans-serif !important;
+  font-variation-settings:"wght" 500 !important;
+}
+
+/* Every project description and the Mindset introduction use the full usable left-panel width. */
+.mf-project-info-inner .mf-project-intro,
+.mf-project-shell.is-sidequests-project .mf-project-intro,
+.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
+  width:100% !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+
+/* Side Quests keeps the repaired geometry, with a lighter expanded title. */
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-title {
+  font-weight:400 !important;
+  font-variation-settings:"wght" 400 !important;
+}
+
+/* Mindset tags are intentionally subdued. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review-tags span,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-content > .mf-guidance-review-tags span {
+  color:rgba(255,255,255,.42) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.42) !important;
+  border-color:rgba(255,255,255,.18) !important;
+  opacity:1 !important;
+}
+
+/* Give Michal's PART controls a clean 20px lift away from the review copy. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review-parts {
+  position:relative !important;
+  top:-20px !important;
+  margin-bottom:clamp(24px,3.2vh,38px) !important;
+}
+
+/* Both Guidance cross-links occupy the same full final viewport and baseline. */
+.mf-guidance-review.is-guidance-next,
+.mf-leadership-guidance-next {
+  box-sizing:border-box !important;
+  width:100vw !important;
+  min-height:100vh !important;
+  min-height:100dvh !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  margin:0 !important;
+  padding:8vh 4vw 8vh 50vw !important;
+}
+.mf-guidance-next-link {
+  position:relative !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  gap:0 !important;
+  width:100% !important;
+  text-decoration:none !important;
+}
+.mf-guidance-next-label {
+  flex:0 0 auto;
+  text-decoration:none !important;
+}
+.mf-guidance-next-char {
+  font-weight:500 !important;
+  font-variation-settings:"wght" 500 !important;
+  transition:
+    opacity .48s ease,
+    transform .9s var(--ease),
+    filter .7s var(--ease),
+    font-variation-settings .32s cubic-bezier(.16,1,.3,1),
+    font-weight .32s cubic-bezier(.16,1,.3,1) !important;
+  transition-delay:calc(var(--r) * 14ms) !important;
+}
+.mf-guidance-next-link:hover .mf-guidance-next-char,
+.mf-guidance-next-link:focus-visible .mf-guidance-next-char {
+  font-weight:650 !important;
+  font-variation-settings:"wght" 650 !important;
+  transition-delay:calc(var(--i) * 14ms) !important;
+}
+.mf-guidance-next-runway {
+  flex:0 1 0%;
+  min-width:.16em;
+  transition:flex-grow .88s cubic-bezier(.16,1,.3,1) !important;
+}
+.mf-guidance-next-link:hover .mf-guidance-next-runway,
+.mf-guidance-next-link:focus-visible .mf-guidance-next-runway {
+  flex-grow:1;
+}
+.mf-guidance-next-arrow {
+  position:relative !important;
+  flex:0 0 auto;
+  margin-left:0 !important;
+  animation:none !important;
+  transition:transform .88s cubic-bezier(.16,1,.3,1) !important;
+}
+.mf-guidance-next-arrow::before,
+.mf-guidance-next-arrow::after {
+  display:none !important;
+  content:none !important;
+  animation:none !important;
+}
+.mf-guidance-next-link:hover .mf-guidance-next-arrow,
+.mf-guidance-next-link:focus-visible .mf-guidance-next-arrow {
+  animation:none !important;
+}
+
+/* Leadership now follows the browser's normal wheel/trackpad speed. */
+.mf-guidance-overlay.is-leadership .mf-guidance-reviews {
+  scroll-behavior:auto !important;
+  overscroll-behavior-y:auto !important;
+}
+
+@media (max-width:1024px) {
+  .mf-guidance-review.is-guidance-next,
+  .mf-leadership-guidance-next {
+    width:100% !important;
+    padding:8vh 18px !important;
+  }
+}
+

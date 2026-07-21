@@ -301,10 +301,12 @@ if(indexExtra){
       "/media/projects/aims/merch/04-aims-merch-1.jpg"
     ],
     "04":[
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=80&sat=-100"
+      "/media/projects/vault/01-nofakie-1.jpg",
+      "/media/projects/vault/02-nofakie-2.jpg",
+      "/media/projects/vault/03-one3.jpg",
+      "/media/projects/vault/04-ennui.jpg",
+      "/media/projects/vault/05-cultureboard.jpg",
+      "/media/projects/vault/06-apod.jpg"
     ],
     "05":[
       "/media/projects/side-quests/undersurface.jpg",
@@ -1627,8 +1629,11 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     return `<a class="mf-weight-link ${className}" href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${letters}</a>`;
   };
 
-  const revealTextMarkup=label=>[...label].map((char,index)=>`<span class="mf-guidance-next-char" style="--char:${index}">${char===' '?'&nbsp;':escapeHtml(char)}</span>`).join('');
-  const guidanceNextMarkup=(label,target)=>`<button class="mf-guidance-next-link" type="button" data-guidance-next="${escapeHtml(target)}" aria-label="Open ${escapeHtml(label.replace('→','').trim())}"><span class="mf-guidance-next-label">${revealTextMarkup(label.replace('→','').trim())}</span><span class="mf-guidance-next-arrow" aria-hidden="true">→</span></button>`;
+  const revealTextMarkup=label=>{
+    const chars=[...label];
+    return chars.map((char,index)=>`<span class="mf-guidance-next-char" style="--char:${index};--i:${index};--r:${chars.length-index-1}">${char===' '?'&nbsp;':escapeHtml(char)}</span>`).join('');
+  };
+  const guidanceNextMarkup=(label,target)=>`<button class="mf-guidance-next-link" type="button" data-guidance-next="${escapeHtml(target)}" aria-label="Open ${escapeHtml(label.replace('→','').trim())}"><span class="mf-guidance-next-label">${revealTextMarkup(label.replace('→','').trim())}</span><span class="mf-guidance-next-runway" aria-hidden="true"></span><span class="mf-guidance-next-arrow" aria-hidden="true">→</span></button>`;
 
   const romanReview=[
     `I started seeing Marián because I wanted to do something about my work ethic and discipline. I had left the company to work independently. Work began piling up, and very quickly I no longer knew what to tackle first.`,
@@ -2158,15 +2163,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     const next=event.target.closest('[data-guidance-next]');
     if(next)transitionGuidanceMode(next.dataset.guidanceNext);
   });
-  reviewsHost.addEventListener('wheel',event=>{
-    if(currentMode!=='leadership'||mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
-    event.preventDefault();
-    const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
-    const normalized=event.deltaMode===1?event.deltaY*16:event.deltaMode===2?event.deltaY*reviewsHost.clientHeight:event.deltaY;
-    if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
-    leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll+normalized));
-    if(!leadershipScrollFrame)leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
-  },{passive:false});
 
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
   closeButton.addEventListener('click',close);
@@ -3397,7 +3393,7 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
     trail.style.top=`${trailY}px`;
     trail.style.setProperty('--trail-scale',String(scale));
     document.body.appendChild(trail);
-    setTimeout(()=>trail.remove(),620);
+    setTimeout(()=>trail.remove(),1450);
   };
 
   window.addEventListener('pointermove',event=>{
