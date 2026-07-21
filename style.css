@@ -12208,3 +12208,28 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
   pointer-events:none !important;
   transition:opacity .3s ease,transform .34s cubic-bezier(.16,1,.3,1) !important;
 }
+
+
+/* ============================================================
+   V098 — loader marker timing + exact expanded Side Quests alignment
+   ============================================================ */
+/* The version marker belongs to the black loader surface. Hide it on the
+   exact state change that begins revealing the page, rather than waiting for
+   the loader wrapper's delayed display:none cleanup. */
+.mf-loader.is-revealing .mf-loader-version,
+.mf-loader.done .mf-loader-version {
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
+/* Preserve the expanded heading's approved position. Only lower the small
+   number by the measured 7px font-metric difference so its visible glyph top
+   aligns with the visible top of the large title. Collapsed rows are untouched. */
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+  top:15px !important;
+}
+@media (max-width:620px) {
+  .mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+    top:14px !important;
+  }
+}
