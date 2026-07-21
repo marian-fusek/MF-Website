@@ -1,4 +1,3 @@
-/* MF UPDATE 85 */
 const originalTitle = document.title || "MF";
 document.addEventListener("visibilitychange",()=>{document.title=document.hidden?"💭 MF — Still here":originalTitle;});
 
@@ -437,7 +436,7 @@ if(indexExtra){
       ]
     },
     "05":{
-      title:"Side Quests",
+      title:"Side Quests.",
       intro:"Every now and then luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
       scope:"",
       context:"",
@@ -701,11 +700,6 @@ if(indexExtra){
       panel.querySelector('.mf-sidequest-trigger')?.addEventListener('click',event=>{
         event.preventDefault();
         event.stopPropagation();
-        activate(panel);
-      });
-      panel.addEventListener('click',event=>{
-        if(panel.classList.contains('is-active'))return;
-        if(event.target.closest('a,button'))return;
         activate(panel);
       });
     });
@@ -1602,7 +1596,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const overlayAside=overlay?.querySelector('.mf-guidance-overlay-aside');
   const guidanceSection=document.getElementById('guidance');
   const closeButton=overlay?.querySelector('.mf-guidance-close');
-  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
+  const themeToggle=document.getElementById('mfGuidanceThemeToggle');
+  const themeCopy=document.getElementById('mfGuidanceThemeCopy');
+  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton||!themeToggle||!themeCopy)return;
 
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
@@ -1630,6 +1626,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     const letters=chars.map((char,index)=>`<span style="--i:${index};--r:${chars.length-index-1}">${char===' '?'&nbsp;':escapeHtml(char)}</span>`).join('');
     return `<a class="mf-weight-link ${className}" href="${escapeHtml(href)}" target="_blank" rel="noopener" aria-label="${escapeHtml(label)}">${letters}</a>`;
   };
+
+  const revealTextMarkup=label=>[...label].map((char,index)=>`<span class="mf-guidance-next-char" style="--char:${index}">${char===' '?'&nbsp;':escapeHtml(char)}</span>`).join('');
+  const guidanceNextMarkup=(label,target)=>`<button class="mf-guidance-next-link" type="button" data-guidance-next="${escapeHtml(target)}" aria-label="Open ${escapeHtml(label.replace('→','').trim())}"><span class="mf-guidance-next-label">${revealTextMarkup(label.replace('→','').trim())}</span><span class="mf-guidance-next-arrow" aria-hidden="true">→</span></button>`;
 
   const romanReview=[
     `I started seeing Marián because I wanted to do something about my work ethic and discipline. I had left the company to work independently. Work began piling up, and very quickly I no longer knew what to tackle first.`,
@@ -1662,6 +1661,18 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     `I leave my work with Marián a free, self-aware person, able to interpret my life in my own favor, whatever happens in it. You cannot always control which cards land on the table or whether you run into snakes in the sand along the way (Marián will never promise otherwise). But you can always play as well as you possibly can, despite everything and everyone. You can always enjoy your game, your journey, so that one day you can calmly say, from a good place: I followed my own path, and it was a ride no one else experienced. And perhaps, through that, inspire others never to stop searching for their own path for a very good reason, and never to settle for anything less. That is what this is all about. Thank you, my friend, for teaching me to play as if my life depended on it!`
   ];
 
+  const splitReviewAt=(text,marker)=>{
+    const index=text.indexOf(marker);
+    return index<0?[text,'']:[text.slice(0,index).trim(),text.slice(index).trim()];
+  };
+  const [michalDiscoveryLead,michalDiscoveryTail]=splitReviewAt(longReview[2],'It was only with Marián that we discovered me:');
+  const [michalPathLead,michalPathTail]=splitReviewAt(longReview[3],'I am immensely grateful that I was able to pack mine with Marián.');
+  const michalParts=[
+    [longReview[0],longReview[1],michalDiscoveryLead],
+    [michalDiscoveryTail,michalPathLead],
+    [michalPathTail,longReview[4]]
+  ];
+
   const tomasLodnanReview=[
     `I have to say, we had many mentors and consultants. Many of them helped us move forward, gave us feedback and created a space where we could talk about our challenges despite the daily routine.`,
     `Marián was on another level for us. To be honest, I was extremely surprised by how quickly and precisely he was able to understand who we are, what our challenges are and identify the problems without any unnecessary fluff. His presentation was so valuable that I went through it several times. :) Based on his suggestions and his ability to identify potential issues in the future, we made important changes to our organisational structure and prioritised our focus on areas where we had pain points.`,
@@ -1686,7 +1697,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const marieLaurenReview=`Coaching with Marián recharges your batteries and gives you so much energy to move forward that you feel like a Duracell. We’ve had sessions in both lighter and more difficult moments, but the result was always the same—a smile on my face and the strength to take action, choose what matters and throw the rest overboard. Every hour with him saved me so many others that I would otherwise have lost, had it not been for his perceptive questions to reflect on.`;
 
   const mindsetEntries=[
-    {id:'michal-bohac',length:'big-parts',name:'Michal Boháč',role:'CEO',company:'Wonder Makers',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/michal-bohac.jpg',tags:['Transformational Coaching'],copy:longReview,parts:[longReview.slice(0,3),longReview.slice(3)]},
+    {id:'michal-bohac',length:'big-parts',name:'Michal Boháč',role:'CEO',company:'Wonder Makers',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/michal-bohac.jpg',tags:['Transformational Coaching'],copy:longReview,parts:michalParts},
     {id:'roman-bartos',length:'medium',name:'Roman Bartoš',role:'Designer',company:'Freelance',country:'Czechia',flag:'CZ',photo:'/media/guidance/coaching/roman-bartos.jpg',tags:['Transformational Coaching'],copy:romanReview},
     {id:'darja-arefjeva',length:'medium',name:'Darja Arefjeva',role:'Product Designer',company:'Pipedrive',country:'Russia',flag:'RU',photo:'/media/guidance/coaching/darja-arefjeva.jpg',tags:['Design Coaching'],copy:darjaReview},
     {id:'anastasiia-kozina',length:'short',name:'Anastasiia Kozina',role:'Founding Designer',company:'Illusian',country:'Finland',flag:'FI',photo:'/media/guidance/coaching/anastasiia-kozina.jpg',tags:['Life Coaching'],copy:anastasiiaReview},
@@ -1700,6 +1711,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     {id:'maros-novak',length:'big-single',name:'Maroš Novák',role:'Head of Design & Engineering',company:'GoodRequest',country:'Slovakia',flag:'SK',photo:'/media/guidance/coaching/maros-novak.jpg',tags:['Leadership Coaching'],copy:marosNovakReview}
   ];
 
+  const mindsetNextEntry={id:'next-leadership',type:'next',name:'NEXT: Team Leadership →'};
+
+
   const leadershipEntries=[
     {id:'jan-pacek',name:'Jan Pacek',role:'Product Architect',company:'STRV',country:'Czechia',flag:'CZ',photo:'/media/guidance/leadership/jan-pacek.jpg',review:`When I think of leadership, two people immediately pop into my mind — Jocko Willink and Marian. Yes, Jocko is more badass and would probably kick both our asses, but I’ve had a chance to be part of Marian’s team for about two years, and his approach to leadership was always very inspiring. It’s the combination of absolute calmness in the face of everyday disasters together with strong values that bring new perspectives. After a conversation with Marian, every hopeless crisis has a light at the end of a tunnel, and you are left wondering why it was a disaster in the first place. Those two years made me a better person for sure.`},
     {id:'jan-kaltoun',name:'Jan Kaltoun',role:'Chief Operating Officer',company:'STRV',country:'Czechia',flag:'CZ',photo:'/media/guidance/leadership/jan-kaltoun.jpg',review:`Marian is one in a million kind of person, and working with him is simply a privilege. While Marian is not really a deeply technical person, he was able to successfully lead a team of leads who in turn led over a hundred designers and engineers. Working as a direct report to Marian, I was constantly amazed by how effortlessly he was able to tackle all the important tasks that needed to get done by empowering every single one of us in ways that are tough to put into words but endlessly effective. Marian listens, he brings the best out of you, he advises and, when needed, he pushes.`},
@@ -1711,12 +1725,13 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   ];
 
   const modes={
-    mindset:{title:'Mindset<br>Coaching',kicker:'',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No “do it like this.” Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic','marie-lauren','tomas-lodnan','kristyna-peckova','jakub-nespor','tomas-bruzda','maros-novak']},
+    mindset:{title:'Mindset<br>Coaching',kicker:'',intro:`I work with teams and individuals to find the version of you that isn't performing for anyone — the noise gone, just what's actually there. No immediate advice. No “do it like this.” Your style all the way — nothing forced.\n\nCertified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac','roman-bartos','darja-arefjeva','anastasiia-kozina','mako-ueda','ilja-panic','marie-lauren','tomas-lodnan','kristyna-peckova','jakub-nespor','tomas-bruzda','maros-novak','next-leadership']},
     leadership:{title:'Team<br>Leadership',kicker:'',intro:'',order:leadershipEntries.map(entry=>entry.id)}
   };
 
-  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts"><button class="mf-guidance-part-button is-active" type="button" data-review-part="0">PART 01</button><button class="mf-guidance-part-button" type="button" data-review-part="1">PART 02</button></nav><div class="mf-guidance-part-panels"><div class="mf-guidance-part-panel is-active" data-review-part-panel="0">${nl(entry.parts[0])}</div><div class="mf-guidance-part-panel" data-review-part-panel="1" aria-hidden="true">${nl(entry.parts[1])}</div></div></div>`;
+  const partMarkup=entry=>`<div class="mf-guidance-copy-shell"><nav class="mf-guidance-review-parts" aria-label="Review parts">${entry.parts.map((_,index)=>`<button class="mf-guidance-part-button${index===0?' is-active':''}" type="button" data-review-part="${index}">PART ${String(index+1).padStart(2,'0')}</button>`).join('')}</nav><div class="mf-guidance-part-panels">${entry.parts.map((part,index)=>`<div class="mf-guidance-part-panel${index===0?' is-active':''}" data-review-part-panel="${index}"${index===0?'':' aria-hidden="true"'}>${nl(part)}</div>`).join('')}</div></div>`;
   const reviewMarkup=entry=>{
+    if(entry.type==='next')return `<article class="mf-guidance-review is-guidance-next" id="guidance-review-${entry.id}" data-review-id="${entry.id}">${guidanceNextMarkup('Team Leadership →','leadership')}</article>`;
     const copy=entry.parts?partMarkup(entry):`<div class="mf-guidance-copy-shell"><div class="mf-guidance-single-copy">${nl(entry.copy)}</div></div>`;
     return `<article class="mf-guidance-review mf-guidance-review-universal${entry.parts?' has-parts':''}" id="guidance-review-${entry.id}" data-review-id="${entry.id}"><div class="mf-guidance-person-wrap">${personMarkup(entry)}</div><div class="mf-guidance-review-content">${tagsMarkup(entry)}${copy}</div></article>`;
   };
@@ -1725,59 +1740,57 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const leadershipPeopleMarkup=()=>leadershipEntries.map((entry,index)=>`<button class="mf-leadership-person-card${index===0?' is-active':''}" type="button" data-leadership-person="${entry.id}" aria-label="Show review from ${escapeHtml(entry.name)}" aria-pressed="${index===0?'true':'false'}"><span class="mf-leadership-person-photo-wrap"><img src="${escapeHtml(entry.photo)}" alt="${escapeHtml(entry.name)}" loading="lazy" decoding="async"></span></button>`).join('');
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
-    <section class="mf-leadership-intro" id="mfLeadershipIntro" aria-label="Team Leadership introduction">
-      <figure class="mf-leadership-hero-photo">
-        <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="eager" decoding="async">
-        <button class="mf-leadership-scroll-cue" id="mfLeadershipScrollCue" type="button" aria-label="Scroll to Team Leadership content"><span>↓</span><small>SCROLL</small></button>
+    <figure class="mf-leadership-hero-photo mf-guidance-scroll-reveal">
+      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy">
+    </figure>
+    <section class="mf-leadership-section" id="leadership-xp">
+      <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">
+        <h3>XP – CHIEF DESIGN &amp; ENGINEERING OFFICER</h3>
+        <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
+        <div class="mf-leadership-stats"><div><small>LED</small><strong><span>11</span> <span>managers</span></strong></div><div><small>OVERSEEING</small><strong><span>130</span> <span>people</span></strong></div></div>
+        <div class="mf-leadership-projects"><small>PROJECTS</small><p>Microsoft, Epic Games, The Athletic, Tinder, Autodesk, Barnes &amp; Noble, The Pump by Arnold Schwarzenegger, Barry's, and many more.</p></div>
+        <h3 class="mf-leadership-secondary-xp">XP – DESIGN TEAM LEAD*</h3>
+        <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
+        <p class="mf-leadership-eleken-link">${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
+      </div>
+      <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">
+        <h3>UPTIME</h3>
+        <p>I’m at my best when things are still being established — early-stage, lots of heavy lifting, real progress. That’s also where my coaching background kicks in — I’m good at navigating chaos and clearing the air. Once everything’s clicking, stagnation creeps in, and everyone’s obsessing over optimizing 91% into 92%, I’m ready for a shift.</p>
+      </div>
+      <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">
+        <h3>HIGHLIGHTS</h3>
+        <ul>
+          <li>Started the company’s first regular performance reviews — later adopted company-wide</li>
+          <li>Built the first career ladder for designers — later adopted by other D&amp;E departments</li>
+          <li>Co-ran the first company academy for new talent in D&amp;E</li>
+          <li>Mentored the first company academy track for designers</li>
+          <li>Listen, stuff was happening and I was around, so…</li>
+        </ul>
+      </div>
+      <figure class="mf-leadership-graduates-photo mf-guidance-scroll-reveal">
+        <img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy">
+        <figcaption>MY FIRST DESIGN GRADUATES</figcaption>
       </figure>
+      <div class="mf-leadership-copy-block mf-leadership-reviews-intro mf-guidance-scroll-reveal">
+        <h3>REVIEWS</h3>
+        <p>Kind words (no cash transaction involved) from some of my former team members.</p>
+      </div>
     </section>
-    <div class="mf-leadership-content">
-      <section class="mf-leadership-section" id="leadership-xp">
-        <div class="mf-leadership-copy-block">
-          <h3>XP</h3>
-          <p>My leadership experience comes mostly from my time at ${weightLinkMarkup('STRV','is-strv','https://www.strv.com')}. I led team leads and platform experts across iOS, Android, Backend, Frontend, Data Science, Design &amp; QA.</p>
-          <div class="mf-leadership-stats"><div><small>LED</small><strong>11 managers</strong></div><div><small>OVERSEEING</small><strong>120 people</strong></div></div>
-          <p>Before that, I ran STRV’s Design Team — and for a bit, when QA had no lead, ran both teams at once. Good times.</p>
-          <p class="mf-leadership-eleken-link">${weightLinkMarkup('My take on leadership in Eleken interview','is-eleken','https://www.eleken.co/blog-posts/managing-a-design-team-interview-with-seasoned-design-leaders')}</p>
-        </div>
-        <div class="mf-leadership-copy-block">
-          <h3>UPTIME</h3>
-          <p>I’m at my best when things are still being established — early-stage, lots of heavy lifting, real progress. That’s also where my coaching background kicks in — I’m good at navigating chaos and clearing the air. Once everything’s clicking, stagnation creeps in, and everyone’s obsessing over optimizing 91% into 92%, I’m ready for a shift.</p>
-        </div>
-        <div class="mf-leadership-copy-block">
-          <h3>HIGHLIGHTS</h3>
-          <ul>
-            <li>Started the company’s first regular performance reviews — later adopted company-wide</li>
-            <li>Built the first career ladder for designers — later adopted by other D&amp;E departments</li>
-            <li>Co-ran the first company academy for new talent in D&amp;E</li>
-            <li>Mentored the first company academy track for designers</li>
-            <li>Listen, stuff was happening and I was around, so…</li>
-          </ul>
-        </div>
-        <figure class="mf-leadership-graduates-photo">
-          <img src="/media/guidance/leadership/academy-designers.jpg" alt="Academy designers" loading="lazy">
-          <figcaption>MY FIRST DESIGN GRADUATES</figcaption>
-        </figure>
-        <div class="mf-leadership-copy-block mf-leadership-reviews-intro">
-          <h3>REVIEWS</h3>
-          <p>Kind (no monetary transaction included) words from my ex-team members.</p>
-        </div>
-      </section>
-      <section class="mf-leadership-section" id="leadership-reviews">
-        <div class="mf-leadership-people-strip" aria-label="Team review carousel">${leadershipPeopleMarkup()}</div>
-        <div class="mf-leadership-review-detail" id="mfLeadershipReviewDetail"></div>
-      </section>
-      <section class="mf-leadership-section" id="leadership-next">
-        <div class="mf-leadership-copy-block">
-          <h3>NEXT?</h3>
-          <p>If you’ve got a team out there and need support — hit me up. I treat leadership with the utmost respect. It’s sensitive territory, so job descriptions go aside here. Just tell me what’s going on, and we’ll figure it out from there.</p>
-          <p>Design, coaching, leadership — whatever the label, if something I do feels relevant to what you need, that’s enough reason to reach out. We’ll cook up the collab that actually fits, together. [hits the table]</p>
-          <button class="mf-art-cta mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
-        </div>
-      </section>
-    </div>
-    <div class="mf-leadership-viewport-blur" aria-hidden="true"></div>
+    <section class="mf-leadership-section" id="leadership-reviews">
+      <div class="mf-leadership-people-strip mf-guidance-scroll-reveal" aria-label="Team review carousel">${leadershipPeopleMarkup()}</div>
+      <div class="mf-leadership-review-detail mf-guidance-scroll-reveal" id="mfLeadershipReviewDetail"></div>
+    </section>
+    <section class="mf-leadership-section" id="leadership-next">
+      <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">
+        <h3>NEXT?</h3>
+        <p>If you’ve got a team out there and need support — hit me up. I treat leadership with the utmost respect. It’s sensitive territory, so job descriptions go aside here. Just tell me what’s going on, and we’ll figure it out from there.</p>
+        <p>Design, coaching, leadership — whatever the label, if something I do feels relevant to what you need, that’s enough reason to reach out. We’ll cook up the collab that actually fits, together. [hits the table]</p>
+        <button class="mf-art-cta mf-leadership-cta" type="button" id="mfLeadershipCopyButton">Well said MF!</button>
+      </div>
+      <div class="mf-leadership-guidance-next mf-guidance-scroll-reveal">${guidanceNextMarkup('Mindset Coaching →','mindset')}</div>
+    </section>
   </div>`;
+
 
   const leadershipDetailMarkup=entry=>`<article class="mf-leadership-review-expanded"><header class="mf-leadership-review-head"><h4>${escapeHtml(entry.name)}</h4><div class="mf-leadership-review-meta"><span>${escapeHtml(entry.role)}</span><span>${escapeHtml(entry.company)}</span></div></header><div class="mf-leadership-review-body"><p>${escapeHtml(entry.review)}</p></div></article>`;
 
@@ -1789,42 +1802,84 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   let snapTimer=0;
   let asciiTimer=0;
   const mobileGuidance=window.matchMedia('(max-width:1024px)');
-  let leadershipIntroFrame=0;
-  function updateLeadershipIntro(){
-    leadershipIntroFrame=0;
-    if(currentMode!=='leadership')return;
-    const page=reviewsHost.querySelector('.mf-leadership-page');
-    if(!page)return;
-    const travel=Math.max(1,reviewsHost.clientHeight*.82);
-    const progress=Math.max(0,Math.min(1,reviewsHost.scrollTop/travel));
-    page.style.setProperty('--leadership-progress',progress.toFixed(4));
-    page.style.setProperty('--leadership-image-opacity',Math.max(.04,1-progress*.96).toFixed(4));
-    page.style.setProperty('--leadership-image-scale',(1+progress*.035).toFixed(4));
-    page.style.setProperty('--leadership-cue-opacity',Math.max(0,1-progress*3.1).toFixed(4));
-    page.style.setProperty('--leadership-content-y',`${Math.max(0,(1-progress)*34).toFixed(2)}px`);
+
+  const themeStorageKey='mfGuidanceTheme';
+  const readGuidanceTheme=()=>{try{return localStorage.getItem(themeStorageKey)==='light'?'light':'dark';}catch(_){return 'dark';}};
+  const writeGuidanceTheme=value=>{try{localStorage.setItem(themeStorageKey,value);}catch(_){}};
+  let guidanceTheme=readGuidanceTheme();
+  let leadershipTargetScroll=0;
+  let leadershipScrollFrame=0;
+  let modeSwitching=false;
+
+  function applyGuidanceTheme(theme,{persist=true}={}){
+    guidanceTheme=theme==='light'?'light':'dark';
+    overlay.classList.toggle('is-light',guidanceTheme==='light');
+    overlay.classList.toggle('is-dark',guidanceTheme!=='light');
+    themeCopy.textContent=guidanceTheme==='light'?'Back to black':'Read this on white';
+    themeToggle.setAttribute('aria-label',themeCopy.textContent);
+    themeToggle.setAttribute('aria-pressed',guidanceTheme==='light'?'true':'false');
+    if(persist)writeGuidanceTheme(guidanceTheme);
   }
-  const scheduleLeadershipIntro=()=>{
-    if(!leadershipIntroFrame)leadershipIntroFrame=requestAnimationFrame(updateLeadershipIntro);
-  };
+
+  function refreshThemeNodes(){
+    const nodes=[...overlay.querySelectorAll('h2,h3,h4,p,li,small,strong,button,a,figcaption,.mf-guidance-person-name,.mf-guidance-person-role,.mf-guidance-person-company,.mf-guidance-person-country,.mf-guidance-review-tags span,.mf-guidance-part-button,.mf-guidance-review-nav span')]
+      .filter(node=>!node.closest('svg')&&!node.classList.contains('mf-guidance-theme-icon'));
+    const max=Math.max(1,overlay.clientHeight||innerHeight);
+    nodes.forEach(node=>{
+      node.dataset.themeNode='';
+      const top=Math.max(0,node.getBoundingClientRect().top);
+      node.style.setProperty('--theme-delay',`${Math.min(210,Math.round(top/max*190))}ms`);
+    });
+  }
+
+  async function toggleGuidanceTheme(){
+    if(overlay.classList.contains('is-theme-switching'))return;
+    refreshThemeNodes();
+    overlay.classList.add('is-theme-switching');
+    await wait(170);
+    applyGuidanceTheme(guidanceTheme==='light'?'dark':'light');
+    await wait(210);
+    overlay.classList.remove('is-theme-switching');
+    setTimeout(refreshThemeNodes,30);
+  }
+
+  function stopLeadershipScroll(){
+    cancelAnimationFrame(leadershipScrollFrame);
+    leadershipScrollFrame=0;
+  }
+  function runLeadershipScroll(){
+    const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
+    leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll));
+    const distance=leadershipTargetScroll-reviewsHost.scrollTop;
+    reviewsHost.scrollTop+=distance*.085;
+    if(Math.abs(distance)>.35){leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);return;}
+    reviewsHost.scrollTop=leadershipTargetScroll;
+    leadershipScrollFrame=0;
+  }
+
+  applyGuidanceTheme(guidanceTheme,{persist:false});
 
   function setupGuidanceReveals(){
     guidanceObserver?.disconnect();
-    const root=currentMode==='leadership'?reviewsHost:(mobileGuidance.matches?overlay:reviewsHost);
-    const targets=[...reviewsHost.querySelectorAll('.mf-guidance-review, .mf-leadership-section, .mf-leadership-copy-block, .mf-leadership-graduates-photo, .mf-leadership-photo-card, .mf-leadership-person-card')];
+    const root=mobileGuidance.matches?overlay:reviewsHost;
+    const targets=[...reviewsHost.querySelectorAll('.mf-guidance-review, .mf-guidance-scroll-reveal, .mf-guidance-next-link')];
     if(!targets.length)return;
     guidanceObserver=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
-        if(entry.isIntersecting){
-          entry.target.classList.add('is-in-view');
-          guidanceObserver?.unobserve(entry.target);
-        }
+        const rootBounds=entry.rootBounds||{top:0,height:innerHeight};
+        const isNext=entry.target.classList.contains('mf-guidance-next-link');
+        const visible=isNext
+          ?entry.isIntersecting&&entry.boundingClientRect.top<=rootBounds.top+rootBounds.height*.52&&entry.boundingClientRect.bottom>rootBounds.top
+          :entry.isIntersecting&&entry.intersectionRatio>=.12;
+        entry.target.classList.toggle('is-in-view',visible);
       });
-    },{root,rootMargin:'0px 0px -8% 0px',threshold:.08});
+    },{root,rootMargin:'-4% 0px -7% 0px',threshold:[0,.12,.32,.58]});
     targets.forEach((target,index)=>{
-      target.style.setProperty('--guide-delay',`${Math.min(index,7)*45}ms`);
+      target.style.setProperty('--guide-delay',`${Math.min(index,6)*34}ms`);
       guidanceObserver.observe(target);
     });
   }
+
 
   let snapInFlight=false;
   let snapAnimationFrame=0;
@@ -1938,7 +1993,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
-    if(currentMode==='leadership')scheduleLeadershipIntro();
     if(!supportsScrollEnd)queueMindsetSettle();
   },{passive:true});
   if(supportsScrollEnd)reviewsHost.addEventListener('scrollend',settleMindsetReview,{passive:true});
@@ -1970,22 +2024,17 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
         const next=Number(button.dataset.reviewPart);
         if(switching||next===active||!panels[next])return;
         switching=true;
-        const current=panels[active];
-        const incoming=panels[next];
-
-        incoming.classList.add('is-active','is-entering');
-        incoming.setAttribute('aria-hidden','false');
-        current.classList.add('is-leaving');
-        buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
-
-        requestAnimationFrame(()=>requestAnimationFrame(()=>incoming.classList.remove('is-entering')));
-        const previous=active;
-        active=next;
+        panels[active].classList.add('is-leaving');
         setTimeout(()=>{
-          panels[previous].classList.remove('is-active','is-leaving');
-          panels[previous].setAttribute('aria-hidden','true');
-          switching=false;
-        },860);
+          panels[active].classList.remove('is-active','is-leaving');
+          panels[active].setAttribute('aria-hidden','true');
+          panels[next].classList.add('is-active','is-entering');
+          panels[next].setAttribute('aria-hidden','false');
+          buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
+          requestAnimationFrame(()=>requestAnimationFrame(()=>panels[next].classList.remove('is-entering')));
+          active=next;
+          setTimeout(()=>{switching=false;},220);
+        },130);
       }));
     });
   }
@@ -2024,7 +2073,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       });
       strip.offsetHeight;
       reordered.forEach(card=>{
-        card.style.transition='transform .78s cubic-bezier(.16,1,.3,1), opacity .48s cubic-bezier(.16,1,.3,1)';
+        card.style.transition='transform .78s cubic-bezier(.16,1,.3,1), opacity .48s cubic-bezier(.16,1,.3,1), flex-basis .72s cubic-bezier(.16,1,.3,1), width .72s cubic-bezier(.16,1,.3,1)';
         card.style.transform='translate3d(0,0,0)';
         const active=card===clicked;
         card.classList.toggle('is-active',active);
@@ -2035,7 +2084,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const swap=()=>{
         detail.innerHTML=leadershipDetailMarkup(entry);
         const panel=detail.querySelector('.mf-leadership-review-expanded');
-        requestAnimationFrame(()=>requestAnimationFrame(()=>panel?.classList.add('is-visible')));
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{panel?.classList.add('is-visible');refreshThemeNodes();}));
       };
       if(!animate){swap();return;}
       detail.classList.add('is-switching');
@@ -2048,17 +2097,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     });
     const first=strip.querySelector('[data-leadership-person]');
     if(first)paint(first.dataset.leadershipPerson,false);
-
-    const scrollCue=reviewsHost.querySelector('#mfLeadershipScrollCue');
-    const firstContent=reviewsHost.querySelector('#leadership-xp');
-    scrollCue?.addEventListener('click',()=>{
-      if(!firstContent)return;
-      const hostRect=reviewsHost.getBoundingClientRect();
-      const contentRect=firstContent.getBoundingClientRect();
-      const destination=Math.max(0,reviewsHost.scrollTop+(contentRect.top-hostRect.top)-Math.min(120,reviewsHost.clientHeight*.12));
-      reviewsHost.scrollTo({top:destination,behavior:'smooth'});
-    });
-    scheduleLeadershipIntro();
 
     const copyBtn=reviewsHost.querySelector('#mfLeadershipCopyButton');
     copyBtn?.addEventListener('click',async()=>{
@@ -2097,28 +2135,45 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     clearTimeout(mindsetWheelReset);
 
     if(currentMode==='mindset'){
-      const ordered=config.order.map(id=>mindsetEntries.find(entry=>entry.id===id)).filter(Boolean);
-      reviewNav.innerHTML=ordered.map((entry,index)=>`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${flagMarkup(entry.flag)}</span></button>`).join('');
+      const ordered=config.order.map(id=>id===mindsetNextEntry.id?mindsetNextEntry:mindsetEntries.find(entry=>entry.id===id)).filter(Boolean);
+      reviewNav.innerHTML=ordered.map((entry,index)=>entry.type==='next'
+        ?`<button class="is-guidance-next-nav" type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>NEXT: Team Leadership →</span><span></span></button>`
+        :`<button type="button" data-review-target="${entry.id}"><span>${String(index+1).padStart(2,'0')}</span><span>${escapeHtml(entry.name)}</span><span>${flagMarkup(entry.flag)}</span></button>`).join('');
       reviewsHost.innerHTML=ordered.map(reviewMarkup).join('');
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
-      requestAnimationFrame(setupGuidanceReveals);
+      requestAnimationFrame(()=>{setupGuidanceReveals();refreshThemeNodes();});
       return;
     }
 
     reviewNav.innerHTML='';
     reviewsHost.innerHTML=leadershipContent();
+    leadershipTargetScroll=0;
     bindLeadership();
     requestAnimationFrame(()=>{
       setupGuidanceReveals();
-      updateLeadershipIntro();
+      refreshThemeNodes();
       startGuidanceAscii();
     });
   }
 
+  async function transitionGuidanceMode(mode){
+    if(modeSwitching||mode===currentMode)return;
+    modeSwitching=true;
+    stopLeadershipScroll();
+    overlay.classList.add('is-mode-switching');
+    await wait(330);
+    render(mode);
+    overlay.classList.remove('is-mode-switching');
+    overlay.classList.add('is-mode-entering');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.remove('is-mode-entering')));
+    setTimeout(()=>{modeSwitching=false;},620);
+  }
+
   function open(mode){
     guidanceReturnY=window.scrollY+guidanceSection.getBoundingClientRect().top;
+    applyGuidanceTheme(readGuidanceTheme(),{persist:false});
     render(mode);
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
@@ -2129,12 +2184,27 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   }
   function close(){
     stopGuidanceAscii();
+    stopLeadershipScroll();
     guidanceObserver?.disconnect();
     overlay.classList.remove('is-open','is-entering');
     overlay.setAttribute('aria-hidden','true');
     document.body.classList.remove('mf-guidance-open');
     requestAnimationFrame(()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'}));
   }
+
+  themeToggle.addEventListener('click',toggleGuidanceTheme);
+  reviewsHost.addEventListener('click',event=>{
+    const next=event.target.closest('[data-guidance-next]');
+    if(next)transitionGuidanceMode(next.dataset.guidanceNext);
+  });
+  reviewsHost.addEventListener('wheel',event=>{
+    if(currentMode!=='leadership'||mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
+    event.preventDefault();
+    const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
+    if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
+    leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll+event.deltaY*.88));
+    if(!leadershipScrollFrame)leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
+  },{passive:false});
 
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
   closeButton.addEventListener('click',close);
@@ -3290,44 +3360,32 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 })();
 
 
-/* GLOBAL CUSTOM CURSOR — direct pointer tracking, no smoothing delay */
+/* V83 — fine-pointer global cursor with a 1px pulse and restrained trail. */
 (function(){
-  const cursor=document.getElementById('mfSiteCursor');
-  if(!cursor)return;
-  const finePointer=window.matchMedia('(pointer:fine)');
-  if(!finePointer.matches)return;
+  if(!window.matchMedia('(pointer:fine)').matches||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const cursor=document.createElement('div');
+  cursor.className='mf-global-cursor';
+  cursor.innerHTML='<span class="mf-global-cursor-pulse"></span><span class="mf-global-cursor-dot"></span>';
+  document.body.appendChild(cursor);
+  document.body.classList.add('mf-custom-cursor');
 
-  document.documentElement.classList.add('mf-custom-cursor');
-  let visible=false;
-  const show=()=>{
-    if(visible)return;
-    visible=true;
-    cursor.classList.add('is-visible');
-  };
-  const hide=()=>{
-    visible=false;
-    cursor.classList.remove('is-visible');
-  };
-  const move=event=>{
-    const points=typeof event.getCoalescedEvents==='function'?event.getCoalescedEvents():null;
-    const point=points&&points.length?points[points.length-1]:event;
-    cursor.style.transform=`translate3d(${point.clientX}px,${point.clientY}px,0) translate3d(-50%,-50%,0)`;
-    if(!(event.target instanceof HTMLIFrameElement))show();
-  };
-  const moveEvent='onpointerrawupdate' in window?'pointerrawupdate':'pointermove';
-  window.addEventListener(moveEvent,move,{passive:true});
-  window.addEventListener('pointerout',event=>{if(!event.relatedTarget)hide();},{passive:true});
-  window.addEventListener('blur',hide);
-  document.addEventListener('pointerover',event=>{
-    if(event.target instanceof HTMLIFrameElement)hide();
+  let x=-100,y=-100,lastTrail=0,lastX=-100,lastY=-100,visible=false;
+  const hiddenZone=target=>!!target?.closest?.('.mf-carousel-zone,.mf-art-overlay,.mf-art-preview,.mf-wip-gate');
+  const place=()=>{cursor.style.transform=`translate3d(${x}px,${y}px,0)`;};
+  window.addEventListener('pointermove',event=>{
+    x=event.clientX;y=event.clientY;place();
+    const shouldHide=hiddenZone(event.target)||document.body.classList.contains('project-open')||document.body.classList.contains('art-open');
+    visible=!shouldHide;
+    cursor.classList.toggle('is-visible',visible);
+    const now=performance.now();
+    if(!visible||now-lastTrail<34||Math.hypot(x-lastX,y-lastY)<5)return;
+    lastTrail=now;lastX=x;lastY=y;
+    const trail=document.createElement('span');
+    trail.className='mf-global-cursor-trail';
+    trail.style.left=`${x}px`;trail.style.top=`${y}px`;
+    document.body.appendChild(trail);
+    setTimeout(()=>trail.remove(),460);
   },{passive:true});
-  document.addEventListener('pointerdown',event=>{
-    if(event.pointerType==='touch'||event.button!==0)return;
-    const ripple=document.createElement('span');
-    ripple.className='mf-cursor-ripple';
-    ripple.style.left=`${event.clientX}px`;
-    ripple.style.top=`${event.clientY}px`;
-    document.body.appendChild(ripple);
-    ripple.addEventListener('animationend',()=>ripple.remove(),{once:true});
-  },{passive:true});
+  window.addEventListener('pointerleave',()=>cursor.classList.remove('is-visible'));
+  window.addEventListener('blur',()=>cursor.classList.remove('is-visible'));
 })();

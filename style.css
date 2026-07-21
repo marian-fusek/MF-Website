@@ -10609,268 +10609,346 @@ body.mf-name-revealed .mf-hero-name {
   }
 }
 
-
 /* ============================================================
-   V83 — requested interaction and Guidance refinements
+   V83 — Guidance theme, repeated reveals, leadership refinements
    ============================================================ */
 
-/* No accidental blue text selection anywhere in the portfolio UI. */
-#mf,
-#mf * {
-  -webkit-user-select:none !important;
-  user-select:none !important;
-  -webkit-touch-callout:none;
-}
-#mf input,
-#mf textarea,
-#mf [contenteditable="true"] {
-  -webkit-user-select:text !important;
-  user-select:text !important;
-}
-#mf ::selection { background:transparent; color:inherit; }
-#mf ::-moz-selection { background:transparent; color:inherit; }
+/* Hide the homepage Guidance item while a project case study is open. */
+body.project-open .mf-nav-guidance { display:none !important; }
 
-/* Hide Guidance in the underlying main menu while its dedicated browser is open. */
-body.mf-guidance-open .mf-nav-guidance {
+/* Shared Guidance reading-mode toggle. */
+.mf-guidance-theme-toggle {
+  position:fixed;
+  z-index:520;
+  left:18px;
+  top:30vh;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:min(20vw,250px);
+  padding:0;
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.5);
+  -webkit-text-fill-color:rgba(255,255,255,.5);
+  font:9px/1.2 "Geist Mono",monospace;
+  letter-spacing:.075em;
+  text-align:left;
+  text-transform:uppercase;
+  cursor:pointer;
+  opacity:0;
+  pointer-events:none;
+  transform:translate3d(0,8px,0);
+  transition:opacity .48s var(--ease),transform .7s var(--ease),color .35s ease,-webkit-text-fill-color .35s ease;
+}
+.mf-guidance-overlay.is-open .mf-guidance-theme-toggle {
+  opacity:1;
+  pointer-events:auto;
+  transform:none;
+  transition-delay:.34s, .34s, 0s, 0s;
+}
+.mf-guidance-theme-toggle:hover {
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+}
+.mf-guidance-theme-icon {
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  color:currentColor;
+  -webkit-text-fill-color:currentColor;
+}
+.mf-guidance-theme-icon svg { display:block;width:100%;height:100%;overflow:visible; }
+.mf-guidance-theme-icon-moon { display:none; }
+.mf-guidance-overlay.is-light .mf-guidance-theme-icon-sun { display:none; }
+.mf-guidance-overlay.is-light .mf-guidance-theme-icon-moon { display:block; }
+.mf-guidance-theme-copy { display:block; }
+
+/* The background changes first; text nodes then disappear/re-enter from top to bottom. */
+.mf-guidance-overlay,
+.mf-guidance-overlay .mf-guidance-overlay-aside,
+.mf-guidance-overlay .mf-guidance-reviews,
+.mf-guidance-overlay .mf-leadership-page {
+  transition:background-color .62s cubic-bezier(.16,1,.3,1),color .42s ease !important;
+}
+.mf-guidance-overlay [data-theme-node] {
+  transition-property:opacity,color,-webkit-text-fill-color,background-color,border-color !important;
+  transition-duration:.22s,.34s,.34s,.34s,.34s !important;
+  transition-timing-function:ease,cubic-bezier(.16,1,.3,1),cubic-bezier(.16,1,.3,1),ease,ease !important;
+  transition-delay:var(--theme-delay,0ms) !important;
+}
+.mf-guidance-overlay.is-theme-switching [data-theme-node] { opacity:0 !important; }
+.mf-guidance-overlay.is-mode-switching .mf-guidance-overlay-aside,
+.mf-guidance-overlay.is-mode-switching .mf-guidance-reviews {
   opacity:0 !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
+  transform:translate3d(0,12px,0) !important;
+  filter:blur(4px) !important;
+  transition:opacity .25s ease,transform .35s var(--ease),filter .3s ease !important;
+}
+.mf-guidance-overlay.is-mode-entering .mf-guidance-overlay-aside,
+.mf-guidance-overlay.is-mode-entering .mf-guidance-reviews {
+  animation:mfGuidanceModeIn .72s var(--ease) both;
+}
+@keyframes mfGuidanceModeIn {
+  from { opacity:0;transform:translate3d(0,22px,0);filter:blur(6px); }
+  to { opacity:1;transform:none;filter:none; }
 }
 
-/* Side Quests: keep number at the top and keep title, subtitle, body and mentions
-   together beneath the same top edge instead of stretching toward the panel edges. */
-.mf-sidequest-panel.is-active .mf-sidequest-trigger {
-  align-items:start !important;
-  padding-top:clamp(16px,2.2vh,26px) !important;
-  padding-bottom:clamp(12px,1.7vh,20px) !important;
+/* Light reading mode. Images remain untouched. */
+.mf-guidance-overlay.is-light,
+.mf-guidance-overlay.is-light .mf-guidance-overlay-aside,
+.mf-guidance-overlay.is-light .mf-guidance-reviews,
+.mf-guidance-overlay.is-light .mf-leadership-page {
+  background:#e8e8e8 !important;
+  color:#171717 !important;
 }
-.mf-sidequest-panel.is-active .mf-sidequest-number,
-.mf-sidequest-panel.is-active .mf-sidequest-heading,
-.mf-sidequest-panel.is-active .mf-sidequest-mark {
-  align-self:start !important;
+.mf-guidance-overlay.is-light :where(h2,h3,h4,p,li,strong,a,button,figcaption,.mf-guidance-person-name,.mf-guidance-person-role,.mf-guidance-person-company,.mf-guidance-person-country,.mf-guidance-review-tags span,.mf-guidance-part-button,.mf-guidance-review-nav span) {
+  color:#171717 !important;
+  -webkit-text-fill-color:#171717 !important;
+  text-shadow:none !important;
+  mix-blend-mode:normal !important;
 }
-.mf-sidequest-content {
-  align-items:start !important;
+.mf-guidance-overlay.is-light .mf-guidance-overlay-top,
+.mf-guidance-overlay.is-light .mf-guidance-overlay-aside { border-color:rgba(23,23,23,.14) !important; }
+.mf-guidance-overlay.is-light .mf-guidance-theme-toggle {
+  color:rgba(23,23,23,.52) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.52) !important;
 }
-.mf-sidequest-copy-wrap {
-  height:auto !important;
-  align-self:start !important;
-  justify-content:flex-start !important;
-  overflow:hidden !important;
+.mf-guidance-overlay.is-light .mf-guidance-theme-toggle:hover,
+.mf-guidance-overlay.is-light .mf-guidance-review-nav button.is-active,
+.mf-guidance-overlay.is-light .mf-guidance-review-nav button:hover {
+  color:#171717 !important;
+  -webkit-text-fill-color:#171717 !important;
 }
-.mf-sidequest-copy {
-  flex:0 1 auto !important;
+.mf-guidance-overlay.is-light .mf-guidance-review-nav button:not(.is-active),
+.mf-guidance-overlay.is-light .mf-guidance-person-country,
+.mf-guidance-overlay.is-light .mf-guidance-person-company,
+.mf-guidance-overlay.is-light .mf-guidance-review-tags span,
+.mf-guidance-overlay.is-light .mf-guidance-part-button:not(.is-active),
+.mf-guidance-overlay.is-light .mf-leadership-copy-block h3,
+.mf-guidance-overlay.is-light .mf-leadership-stats small,
+.mf-guidance-overlay.is-light .mf-leadership-projects small,
+.mf-guidance-overlay.is-light .mf-leadership-graduates-photo figcaption {
+  color:rgba(23,23,23,.46) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.46) !important;
 }
-.mf-sidequest-mentions {
-  margin-top:clamp(20px,3vh,34px) !important;
-  padding-top:0 !important;
+.mf-guidance-overlay.is-light .mf-guidance-review-nav button::before,
+.mf-guidance-overlay.is-light .mf-leadership-copy-block li::before { background:rgba(23,23,23,.56) !important; }
+.mf-guidance-overlay.is-light .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-light .mf-guidance-review-universal .mf-guidance-single-copy *,
+.mf-guidance-overlay.is-light .mf-guidance-review-universal .mf-guidance-part-panel,
+.mf-guidance-overlay.is-light .mf-guidance-review-universal .mf-guidance-part-panel * {
+  color:rgba(23,23,23,.67) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.67) !important;
 }
-.mf-sidequest-image {
-  align-self:end !important;
+.mf-guidance-overlay.is-light .mf-guidance-close span { background:#171717 !important; }
+.mf-guidance-overlay.is-light .mf-weight-link { border-color:rgba(23,23,23,.64) !important; }
+.mf-guidance-overlay.is-light .mf-leadership-eleken-link::before {
+  color:rgba(23,23,23,.42) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.42) !important;
 }
 
-/* Mindset Coaching: larger muted review copy in the same container. */
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy *,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel *,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell p,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-copy-shell p * {
-  color:rgba(255,255,255,.62) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.62) !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
-  font-size:clamp(15px,1.08vw,19px) !important;
-  line-height:1.34 !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-parts {
-  order:-1 !important;
-  margin:0 0 24px !important;
-}
-
-/* Make every Mindset review visibly fade in even though the article itself must
-   remain layout-stable for the custom snapping logic. */
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-wrap,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content {
+/* Re-run the reveal every time a review or Leadership element enters view. */
+.mf-guidance-overlay.is-mindset .mf-guidance-review,
+.mf-guidance-overlay.is-leadership .mf-guidance-scroll-reveal {
   opacity:0 !important;
-  transform:translate3d(0,24px,0) !important;
-  filter:blur(3px) !important;
+  transform:translate3d(0,26px,0) !important;
+  filter:brightness(.28) blur(4px) !important;
   transition:
-    opacity .72s cubic-bezier(.16,1,.3,1),
-    transform .88s cubic-bezier(.16,1,.3,1),
-    filter .82s cubic-bezier(.16,1,.3,1) !important;
+    opacity .68s cubic-bezier(.16,1,.3,1) var(--guide-delay,0ms),
+    transform .92s cubic-bezier(.16,1,.3,1) var(--guide-delay,0ms),
+    filter .84s cubic-bezier(.16,1,.3,1) var(--guide-delay,0ms) !important;
 }
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content {
-  transition-delay:.1s !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-person-wrap,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-review-content {
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-in-view,
+.mf-guidance-overlay.is-leadership .mf-guidance-scroll-reveal.is-in-view {
   opacity:1 !important;
   transform:none !important;
   filter:none !important;
 }
+.mf-guidance-overlay.is-mindset .mf-guidance-review .mf-guidance-person-wrap,
+.mf-guidance-overlay.is-mindset .mf-guidance-review .mf-guidance-review-content {
+  opacity:0;
+  transform:translate3d(0,18px,0);
+  transition:opacity .55s ease,transform .8s var(--ease);
+}
+.mf-guidance-overlay.is-mindset .mf-guidance-review .mf-guidance-review-content { transition-delay:.07s; }
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-in-view .mf-guidance-person-wrap,
+.mf-guidance-overlay.is-mindset .mf-guidance-review.is-in-view .mf-guidance-review-content {
+  opacity:1;
+  transform:none;
+}
 
-/* Team Leadership begins as a true full-screen image. The existing fixed title
-   stays in place and uses difference blending over both image and copy. */
-.mf-guidance-overlay.is-leadership .mf-guidance-reviews {
-  padding:0 !important;
-  background:#050505 !important;
+/* Mindset review text is larger, softly gray, and retains the same container. */
+.mf-guidance-overlay.is-dark .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-dark .mf-guidance-review-universal .mf-guidance-single-copy *,
+.mf-guidance-overlay.is-dark .mf-guidance-review-universal .mf-guidance-part-panel,
+.mf-guidance-overlay.is-dark .mf-guidance-review-universal .mf-guidance-part-panel * {
+  color:rgba(255,255,255,.66) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.66) !important;
 }
-.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside {
-  top:0 !important;
-  padding-top:clamp(92px,13vh,142px) !important;
-  z-index:5 !important;
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel {
+  font-size:clamp(18px,1.42vw,25px) !important;
+  line-height:1.29 !important;
+  letter-spacing:-.022em !important;
 }
-.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2,
-.mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 * {
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
-  mix-blend-mode:difference !important;
-  isolation:auto !important;
+.mf-guidance-overlay.is-mindset .mf-guidance-review-parts {
+  order:-1 !important;
+  margin:0 0 clamp(24px,3.2vh,38px) !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-page {
-  --leadership-image-opacity:1;
-  --leadership-image-scale:1;
-  --leadership-cue-opacity:1;
-  --leadership-content-y:34px;
+.mf-guidance-overlay.is-mindset .mf-guidance-part-panels { order:0 !important; }
+.mf-guidance-overlay.is-mindset .mf-guidance-copy-shell { display:flex !important;flex-direction:column !important; }
+.mf-guidance-overlay.is-mindset .is-guidance-next-nav span:nth-child(2) { white-space:nowrap; }
+
+/* Full-slide links between the two Guidance sections. */
+.mf-guidance-review.is-guidance-next {
+  min-height:100vh !important;
+  min-height:100dvh !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  padding:8vh 4vw 8vh 50vw !important;
+  scroll-snap-align:start !important;
+  scroll-snap-stop:always !important;
+}
+.mf-leadership-guidance-next {
   width:100vw !important;
-  max-width:none !important;
-  margin:0 !important;
-  padding:0 0 clamp(110px,14vh,190px) !important;
-  overflow:visible !important;
-  background:#050505 !important;
+  margin:clamp(90px,14vh,180px) 0 0 !important;
+  padding:0 4vw 5vh 50vw !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-intro {
-  position:relative;
-  z-index:1;
-  width:100vw;
-  height:124vh;
-  height:124dvh;
-  margin:0;
-  padding:0;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
-  position:sticky !important;
-  top:0 !important;
-  left:0 !important;
-  z-index:1 !important;
-  display:block !important;
-  width:100vw !important;
-  max-width:none !important;
-  height:100vh !important;
-  height:100dvh !important;
-  margin:0 !important;
-  padding:0 !important;
-  overflow:hidden !important;
-  background:#050505 !important;
-  opacity:var(--leadership-image-opacity) !important;
-  transform:translateZ(0) !important;
-  will-change:opacity;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:1;
-  pointer-events:none;
-  background:linear-gradient(to bottom,rgba(0,0,0,.08),rgba(0,0,0,.2));
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
-  display:block !important;
-  width:100% !important;
-  height:100% !important;
-  max-height:none !important;
-  aspect-ratio:auto !important;
-  object-fit:cover !important;
-  object-position:center !important;
-  filter:none !important;
-  opacity:1 !important;
-  transform:scale(var(--leadership-image-scale)) !important;
-  transition:none !important;
-  will-change:transform;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-hero-photo:hover img {
-  transform:scale(var(--leadership-image-scale)) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-scroll-cue {
-  position:absolute;
-  z-index:2;
-  left:50%;
-  bottom:clamp(24px,4vh,54px);
+.mf-guidance-next-link {
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  padding:14px 18px;
+  align-items:flex-end;
+  justify-content:flex-start;
+  gap:.16em;
+  width:100%;
+  padding:0;
   border:0;
   background:transparent;
   color:#fff;
-  opacity:var(--leadership-cue-opacity);
-  transform:translateX(-50%);
-  pointer-events:auto;
-  will-change:opacity;
+  -webkit-text-fill-color:#fff;
+  font-family:"Geist",Arial,sans-serif;
+  font-size:clamp(48px,7.25vw,128px);
+  line-height:.84;
+  letter-spacing:-.072em;
+  font-weight:650;
+  text-align:left;
+  cursor:pointer;
+  overflow:visible;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-scroll-cue span {
-  display:block;
-  font:400 28px/1 "Geist",Arial,sans-serif;
-  animation:mfLeadershipCue 1.55s cubic-bezier(.16,1,.3,1) infinite;
+.mf-guidance-next-label { display:inline-flex;flex-wrap:nowrap;white-space:nowrap; }
+.mf-guidance-next-char,
+.mf-guidance-next-arrow {
+  display:inline-block;
+  opacity:0;
+  transform:translate3d(0,1.05em,0);
+  filter:blur(7px);
+  transition:opacity .48s ease,transform .9s var(--ease),filter .7s var(--ease);
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-scroll-cue small {
-  font:400 8px/1 "Geist Mono",monospace;
-  letter-spacing:.14em;
+.mf-guidance-next-link.is-in-view .mf-guidance-next-char {
+  opacity:1;
+  transform:none;
+  filter:none;
+  transition-delay:calc(var(--char) * 19ms);
 }
-@keyframes mfLeadershipCue {
-  0%,100% { transform:translateY(0); opacity:.58; }
-  48% { transform:translateY(8px); opacity:1; }
+.mf-guidance-next-link.is-in-view .mf-guidance-next-arrow {
+  opacity:1;
+  transform:none;
+  filter:none;
+  transition-delay:.34s;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-content {
-  position:relative;
-  z-index:2;
-  margin-top:-18vh;
-  padding-top:18vh;
-  background:linear-gradient(to bottom,transparent 0,#050505 18vh,#050505 100%);
-  transform:translate3d(0,var(--leadership-content-y),0);
-  will-change:transform;
+.mf-guidance-next-arrow { position:relative;letter-spacing:0; }
+.mf-guidance-next-arrow::before,
+.mf-guidance-next-arrow::after {
+  content:"→";
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
 }
+.mf-guidance-next-link:hover .mf-guidance-next-arrow { animation:mfGuidanceArrowBase .42s steps(2,end) infinite; }
+.mf-guidance-next-link:hover .mf-guidance-next-arrow::before {
+  color:#ff4e4e;
+  -webkit-text-fill-color:#ff4e4e;
+  opacity:.58;
+  animation:mfGuidanceArrowGlitchA .42s steps(2,end) infinite;
+}
+.mf-guidance-next-link:hover .mf-guidance-next-arrow::after {
+  color:#70c9ff;
+  -webkit-text-fill-color:#70c9ff;
+  opacity:.58;
+  animation:mfGuidanceArrowGlitchB .42s steps(2,end) infinite;
+}
+@keyframes mfGuidanceArrowBase { 0%,100%{transform:translate(0,0)} 45%{transform:translate(2px,-1px)} 65%{transform:translate(-1px,1px)} }
+@keyframes mfGuidanceArrowGlitchA { 0%,100%{transform:translate(-2px,0);clip-path:inset(0 0 55% 0)} 50%{transform:translate(3px,-1px);clip-path:inset(42% 0 0 0)} }
+@keyframes mfGuidanceArrowGlitchB { 0%,100%{transform:translate(2px,1px);clip-path:inset(55% 0 0 0)} 50%{transform:translate(-3px,0);clip-path:inset(0 0 48% 0)} }
 
-/* Leadership copy starts dark and reveals to full value as each block enters. */
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block,
-.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo {
-  opacity:0 !important;
-  transform:translate3d(0,26px,0) !important;
-  transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .95s cubic-bezier(.16,1,.3,1) !important;
+/* Leadership copy hierarchy and additions. */
+.mf-guidance-overlay.is-leadership .mf-leadership-projects {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  margin:clamp(38px,5vh,62px) 0 clamp(62px,8vh,98px) !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view,
-.mf-guidance-overlay.is-leadership .mf-leadership-graduates-photo.is-in-view {
-  opacity:1 !important;
-  transform:none !important;
+.mf-guidance-overlay.is-leadership .mf-leadership-projects small {
+  color:rgba(255,255,255,.46) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.46) !important;
+  font:600 11px/1 "Geist",Arial,sans-serif !important;
+  letter-spacing:.11em !important;
+  text-transform:uppercase !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block p,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block li,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block strong,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block .mf-weight-link,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block .mf-weight-link span,
-.mf-guidance-overlay.is-leadership .mf-leadership-review-body p {
-  color:rgba(255,255,255,.16) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.16) !important;
-  transition:
-    color 1.35s cubic-bezier(.16,1,.3,1),
-    -webkit-text-fill-color 1.35s cubic-bezier(.16,1,.3,1) !important;
+.mf-guidance-overlay.is-leadership .mf-leadership-projects p { margin:0 !important; }
+.mf-guidance-overlay.is-leadership .mf-leadership-secondary-xp {
+  margin-top:0 !important;
+  margin-bottom:30px !important;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view p,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view li,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view strong,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link span,
-.mf-guidance-overlay.is-leadership .mf-leadership-review-expanded.is-visible .mf-leadership-review-body p {
+.mf-guidance-overlay.is-leadership .mf-leadership-stats strong {
+  display:flex !important;
+  align-items:baseline !important;
+  gap:.18em !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-stats strong span { display:inline-block; }
+
+/* Active reviewer enlarges by 50% while every portrait remains top-aligned. */
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+  align-items:flex-start !important;
+  margin-bottom:clamp(15px,2vh,24px) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-person-card {
+  flex-basis:clamp(72px,6vw,94px) !important;
+  width:clamp(72px,6vw,94px) !important;
+  transform-origin:top left !important;
+  transition:flex-basis .72s var(--ease),width .72s var(--ease),opacity .48s var(--ease),transform .72s var(--ease) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-person-card.is-active {
+  flex-basis:clamp(108px,9vw,141px) !important;
+  width:clamp(108px,9vw,141px) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-head { margin-bottom:20px !important; }
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta { margin-top:14px !important; }
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta span:first-child {
   color:#fff !important;
   -webkit-text-fill-color:#fff !important;
 }
+.mf-guidance-overlay.is-leadership .mf-leadership-review-meta span:last-child {
+  color:rgba(255,255,255,.48) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.48) !important;
+}
+.mf-guidance-overlay.is-light .mf-leadership-review-meta span:first-child {
+  color:#171717 !important;
+  -webkit-text-fill-color:#171717 !important;
+}
+.mf-guidance-overlay.is-light .mf-leadership-review-meta span:last-child {
+  color:rgba(23,23,23,.48) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.48) !important;
+}
+.mf-guidance-overlay.is-leadership .mf-leadership-review-body { margin-top:0 !important; }
 
-/* Same bottom viewport blur as the homepage, but mounted only in Leadership. */
-.mf-guidance-overlay.is-leadership .mf-leadership-viewport-blur {
+/* Leadership-only lower viewport blur. Homepage blur remains unchanged. */
+.mf-guidance-overlay.is-leadership::after {
+  content:"";
   position:fixed;
-  z-index:3;
+  z-index:450;
   left:0;
   right:0;
   bottom:0;
@@ -10880,404 +10958,156 @@ body.mf-guidance-open .mf-nav-guidance {
   -webkit-backdrop-filter:blur(8px);
   -webkit-mask-image:linear-gradient(to top,#000 0%,transparent 100%);
   mask-image:linear-gradient(to top,#000 0%,transparent 100%);
+  opacity:1;
 }
 
-/* Low-latency custom cursor: no easing or interpolation on the dot itself. */
-.mf-site-cursor {
+/* Side Quests: active title group starts with its number instead of climbing above it. */
+.mf-sidequest-panel.is-active .mf-sidequest-trigger {
+  align-items:start !important;
+  padding-top:clamp(16px,2vh,24px) !important;
+  padding-bottom:10px !important;
+}
+.mf-sidequest-panel.is-active .mf-sidequest-number { padding-top:.42em; }
+.mf-sidequest-panel.is-active .mf-sidequest-heading { transform:none !important; }
+
+/* Refined desktop pointer: 1px pulse, true zero-opacity finish and a tiny trail. */
+.mf-global-cursor {
   position:fixed;
-  z-index:2147483646;
+  z-index:20000;
   left:0;
   top:0;
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:#fff;
-  mix-blend-mode:difference;
+  width:4px;
+  height:4px;
+  margin:-2px 0 0 -2px;
   pointer-events:none;
   opacity:0;
-  transform:translate3d(-100px,-100px,0) translate3d(-50%,-50%,0);
+  transform:translate3d(-100px,-100px,0);
+  transition:opacity .18s linear;
   will-change:transform;
-  contain:layout style paint;
-  transition:opacity .1s linear;
 }
-.mf-site-cursor.is-visible { opacity:1; }
-.mf-cursor-ripple {
-  position:fixed;
-  z-index:2147483645;
-  width:6px;
-  height:6px;
-  margin:-3px 0 0 -3px;
-  border:.5px solid #fff;
-  border-radius:50%;
-  background:transparent;
-  mix-blend-mode:difference;
-  pointer-events:none;
-  animation:mfCursorRipple 1.9s cubic-bezier(.22,.78,.26,1) forwards;
-}
-@keyframes mfCursorRipple {
-  0% { transform:scale(1); opacity:.9; }
-  68% { opacity:.42; }
-  100% { transform:scale(6); opacity:0; }
-}
-@media (pointer:fine) {
-  html.mf-custom-cursor,
-  html.mf-custom-cursor body,
-  html.mf-custom-cursor #mf,
-  html.mf-custom-cursor #mf *:not(iframe) {
-    cursor:none !important;
-  }
-  html.mf-custom-cursor iframe { cursor:auto !important; }
-}
-@media (pointer:coarse) {
-  .mf-site-cursor,
-  .mf-cursor-ripple { display:none !important; }
-}
-
-@media (max-width:1024px) {
-  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
-    font-size:16px !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside {
-    position:fixed !important;
-    top:0 !important;
-    width:100% !important;
-    min-height:0 !important;
-    padding:82px 18px 0 !important;
-    pointer-events:none !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-guidance-overlay-aside h2 {
-    font-size:clamp(44px,15vw,76px) !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-guidance-reviews {
-    position:absolute !important;
-    inset:0 !important;
-    height:100dvh !important;
-    overflow-y:auto !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-leadership-intro {
-    height:116dvh;
-  }
-  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
-    width:100vw !important;
-    height:100dvh !important;
-    margin:0 !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
-    width:100% !important;
-    height:100% !important;
-    aspect-ratio:auto !important;
-  }
-  .mf-guidance-overlay.is-leadership .mf-leadership-content {
-    margin-top:-13vh;
-    padding-top:13vh;
-    background:linear-gradient(to bottom,transparent 0,#050505 13vh,#050505 100%);
-  }
-  .mf-sidequest-panel.is-active .mf-sidequest-trigger {
-    padding-top:14px !important;
-  }
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .mf-guidance-overlay.is-leadership .mf-leadership-scroll-cue span { animation:none !important; }
-  .mf-cursor-ripple { animation-duration:.01ms !important; }
-}
-
-
-/* ============================================================
-   UPDATE 85 — review pacing, Leadership rhythm and Side Quests
-   ============================================================ */
-
-/* Mindset intro now uses the full width of the left column, matching its people menu. */
-.mf-guidance-overlay.is-mindset .mf-guidance-overlay-aside > p {
-  width:100% !important;
-  max-width:none !important;
-}
-
-/* Coaching tags remain descriptive metadata rather than competing with the review. */
-.mf-guidance-overlay.is-mindset .mf-guidance-review-tags span {
-  color:rgba(255,255,255,.44) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.44) !important;
-}
-
-/* All Mindset reviews are one clear step larger without changing their containers. */
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
-  font-size:clamp(17px,1.18vw,21px) !important;
-  line-height:1.36 !important;
-}
-
-/* Slower, layered entrance: photo, identity and review arrive independently. */
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-wrap,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content {
-  opacity:1 !important;
-  transform:none !important;
-  filter:none !important;
-  transition:none !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-photo,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-info,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content {
-  opacity:0 !important;
-  transform:translate3d(0,32px,0) !important;
-  filter:blur(6px) !important;
-  will-change:opacity,transform,filter;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-photo {
-  transition:
-    opacity 1.55s cubic-bezier(.22,1,.36,1),
-    transform 1.85s cubic-bezier(.22,1,.36,1),
-    filter 1.7s cubic-bezier(.22,1,.36,1) !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-info {
-  transition:
-    opacity 1.65s cubic-bezier(.22,1,.36,1) .14s,
-    transform 1.95s cubic-bezier(.22,1,.36,1) .14s,
-    filter 1.8s cubic-bezier(.22,1,.36,1) .14s !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-review-content {
-  transition:
-    opacity 1.8s cubic-bezier(.22,1,.36,1) .28s,
-    transform 2.05s cubic-bezier(.22,1,.36,1) .28s,
-    filter 1.9s cubic-bezier(.22,1,.36,1) .28s !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-person-photo,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-person-info,
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-review-content {
-  opacity:1 !important;
-  transform:none !important;
-  filter:none !important;
-}
-
-/* Michal PART 01 / PART 02 crossfade. Both panels overlap during the transition,
-   preventing the content from blinking out between states. */
-.mf-guidance-overlay.is-mindset .mf-guidance-part-panels {
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) !important;
-  align-items:start !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel {
-  grid-area:1 / 1 !important;
-  display:block !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
-  opacity:0 !important;
-  transform:translate3d(0,14px,0) !important;
-  filter:blur(6px) !important;
-  transition:
-    opacity .72s cubic-bezier(.22,1,.36,1),
-    transform .9s cubic-bezier(.22,1,.36,1),
-    filter .82s cubic-bezier(.22,1,.36,1),
-    visibility 0s linear .86s !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel.is-active {
-  visibility:visible !important;
-  pointer-events:auto !important;
-  opacity:1 !important;
-  transform:none !important;
-  filter:none !important;
-  transition-delay:.12s,.12s,.12s,0s !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel.is-active.is-entering {
-  opacity:0 !important;
-  transform:translate3d(0,14px,0) !important;
-  filter:blur(6px) !important;
-}
-.mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel.is-active.is-leaving {
-  visibility:visible !important;
-  opacity:0 !important;
-  transform:translate3d(0,-10px,0) !important;
-  filter:blur(5px) !important;
-  transition-delay:0s !important;
-}
-
-/* Team Leadership scroll cue sits in the lower-right corner with viewport padding. */
-.mf-guidance-overlay.is-leadership .mf-leadership-scroll-cue {
-  left:auto !important;
-  right:clamp(20px,3vw,52px) !important;
-  bottom:clamp(20px,3.5vh,48px) !important;
-  align-items:flex-end !important;
-  padding:12px 0 12px 12px !important;
-  transform:none !important;
-}
-
-/* Three-times-airier review handoff: intro → faces → name/review. */
-.mf-guidance-overlay.is-leadership .mf-leadership-reviews-intro {
-  margin-bottom:clamp(62px,9vh,112px) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
-  gap:clamp(16px,1.5vw,26px) !important;
-  margin-bottom:clamp(72px,10vh,124px) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-review-detail {
-  padding-top:clamp(12px,2vh,28px) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-review-head {
-  margin-bottom:clamp(46px,6vh,72px) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-review-meta,
-.mf-guidance-overlay.is-leadership .mf-leadership-review-meta span {
-  color:rgba(255,255,255,.46) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.46) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-review-body p {
-  font-size:clamp(19px,1.42vw,24px) !important;
-  line-height:1.45 !important;
-}
-
-/* Restore the variable-weight link choreography after the dark-to-light reveal. */
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block .mf-weight-link {
-  position:relative !important;
-  border-bottom:0 !important;
-  padding-bottom:0 !important;
-  text-decoration:none !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block .mf-weight-link::after {
-  content:"";
+.mf-global-cursor.is-visible { opacity:1; }
+.mf-global-cursor-dot {
   position:absolute;
-  left:0;
-  right:0;
-  bottom:.035em;
-  height:1px;
-  background:currentColor;
-  opacity:.72;
+  inset:0;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 5px rgba(255,255,255,.22);
+}
+.mf-global-cursor-pulse {
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:10px;
+  height:10px;
+  margin:-5px;
+  border:1px solid rgba(255,255,255,.48);
+  border-radius:50%;
+  animation:mfCursorPulse 1.25s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes mfCursorPulse {
+  0% { transform:scale(.25);opacity:.48; }
+  82% { opacity:.08; }
+  100% { transform:scale(3.4);opacity:0; }
+}
+.mf-global-cursor-trail {
+  position:fixed;
+  z-index:19999;
+  width:2px;
+  height:2px;
+  margin:-1px 0 0 -1px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
   pointer-events:none;
-  transition:background-color .28s ease,opacity .28s ease !important;
+  animation:mfCursorTrail .42s ease-out forwards;
 }
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link > span {
-  font-weight:400 !important;
-  font-variation-settings:"wght" 400 !important;
-  transition:
-    font-variation-settings .34s cubic-bezier(.16,1,.3,1),
-    font-weight .34s cubic-bezier(.16,1,.3,1),
-    color .26s ease,
-    -webkit-text-fill-color .26s ease !important;
-  transition-delay:calc(var(--r) * 18ms) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link:hover > span,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link:focus-visible > span {
-  font-weight:650 !important;
-  font-variation-settings:"wght" 650 !important;
-  transition-delay:calc(var(--i) * 18ms) !important;
-}
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link.is-strv:hover,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link.is-strv:focus-visible,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link.is-strv:hover > span,
-.mf-guidance-overlay.is-leadership .mf-leadership-copy-block.is-in-view .mf-weight-link.is-strv:focus-visible > span {
-  color:#f04444 !important;
-  -webkit-text-fill-color:#f04444 !important;
+@keyframes mfCursorTrail { to { opacity:0;transform:scale(.2); } }
+@media (pointer:fine) {
+  body.mf-custom-cursor:not(.project-open):not(.art-open),
+  body.mf-custom-cursor:not(.project-open):not(.art-open) a,
+  body.mf-custom-cursor:not(.project-open):not(.art-open) button { cursor:none !important; }
 }
 
-/* Side Quests project intro now uses the exact case-study description treatment. */
-.mf-project-shell.is-sidequests-project .mf-project-intro {
-  margin:22px 0 0 !important;
-  max-width:34em !important;
-  color:rgba(255,255,255,.58) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.58) !important;
-  font-family:"Geist Mono",monospace !important;
-  font-size:10px !important;
-  line-height:1.5 !important;
-  letter-spacing:.025em !important;
-}
-
-/* Every collapsed Side Quest panel is clickable, not only its header. */
-.mf-sidequest-panel:not(.is-active) {
-  cursor:pointer !important;
-}
-.mf-sidequest-panel.is-active {
-  cursor:default !important;
-}
-
-/* Lighter titles, persistent gray mono subtitles and clean vertical alignment. */
-.mf-sidequest-trigger {
-  align-items:start !important;
-  padding-top:clamp(13px,1.7vh,19px) !important;
-  padding-bottom:clamp(11px,1.4vh,17px) !important;
-}
-.mf-sidequest-title {
-  font-weight:420 !important;
-}
-.mf-sidequest-panel.is-active .mf-sidequest-title {
-  font-weight:600 !important;
-}
-.mf-sidequest-subtitle,
-.mf-sidequest-panel.is-active .mf-sidequest-subtitle {
-  color:rgba(255,255,255,.43) !important;
-  -webkit-text-fill-color:rgba(255,255,255,.43) !important;
-  opacity:1 !important;
-}
-.mf-sidequest-number {
-  align-self:start !important;
-  margin-top:3px !important;
-}
-.mf-sidequest-panel.is-active .mf-sidequest-number {
-  margin-top:clamp(11px,1vw,17px) !important;
-}
-.mf-sidequest-mark {
-  align-self:start !important;
-  margin-top:2px !important;
-}
-
-/* More air before the copy. Mentions stay anchored to the image bottom and grow upward. */
-.mf-sidequest-panel.is-active .mf-sidequest-content {
-  padding-top:clamp(24px,3.5vh,46px) !important;
-  align-items:stretch !important;
-}
-.mf-sidequest-copy-wrap {
-  height:100% !important;
-  min-height:0 !important;
-  align-self:stretch !important;
-  justify-content:flex-start !important;
-  overflow:hidden !important;
-}
-.mf-sidequest-mentions {
-  margin-top:auto !important;
-  padding-top:clamp(22px,3vh,36px) !important;
-}
-.mf-sidequest-image {
-  align-self:end !important;
+@media (max-width:1250px) {
+  .mf-guidance-overlay.is-leadership .mf-leadership-stats strong {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:0 !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-stats strong span { display:block !important; }
 }
 
 @media (max-width:1024px) {
-  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
-    font-size:17px !important;
+  .mf-guidance-theme-toggle {
+    position:absolute;
+    top:27vh;
+    left:18px;
+    width:calc(100% - 36px);
   }
-  .mf-guidance-overlay.is-leadership .mf-leadership-reviews-intro {
-    margin-bottom:56px !important;
+  .mf-guidance-review.is-guidance-next,
+  .mf-leadership-guidance-next {
+    padding-left:18px !important;
+    padding-right:18px !important;
   }
-  .mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
-    gap:16px !important;
-    margin-bottom:68px !important;
+  .mf-guidance-next-link { font-size:clamp(42px,14vw,78px); }
+  .mf-guidance-overlay.is-leadership .mf-leadership-person-card.is-active {
+    flex-basis:108px !important;
+    width:108px !important;
   }
-  .mf-guidance-overlay.is-leadership .mf-leadership-review-body p {
-    font-size:19px !important;
-  }
-  .mf-project-shell.is-sidequests-project .mf-project-intro {
-    font-size:10px !important;
-  }
-  .mf-sidequest-panel.is-active .mf-sidequest-content {
-    padding-top:24px !important;
-  }
-}
-
-@media (max-width:620px) {
-  .mf-sidequest-trigger {
-    padding-top:11px !important;
-    padding-bottom:10px !important;
-  }
-  .mf-sidequest-panel.is-active .mf-sidequest-number {
-    margin-top:8px !important;
-  }
-  .mf-sidequest-panel.is-active .mf-sidequest-content {
-    padding-top:18px !important;
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel {
+    font-size:clamp(18px,5.1vw,26px) !important;
   }
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .mf-guidance-overlay.is-mindset .mf-guidance-person-photo,
-  .mf-guidance-overlay.is-mindset .mf-guidance-person-info,
-  .mf-guidance-overlay.is-mindset .mf-guidance-review-content,
-  .mf-guidance-overlay.is-mindset .mf-guidance-part-panel,
-  .mf-guidance-overlay.is-leadership .mf-weight-link > span {
-    transition-duration:.01ms !important;
-    transition-delay:0ms !important;
-  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review,
+  .mf-guidance-overlay.is-leadership .mf-guidance-scroll-reveal,
+  .mf-guidance-next-char,
+  .mf-guidance-next-arrow,
+  .mf-guidance-overlay [data-theme-node] { transition-duration:.01ms !important;transition-delay:0ms !important; }
+  .mf-global-cursor-pulse { animation:none !important; }
+}
+
+/* V83 light-mode specificity guard against older Guidance white locks. */
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-overlay-aside h2 *,
+.mf-guidance-overlay.is-light.is-leadership .mf-guidance-overlay-aside h2,
+.mf-guidance-overlay.is-light.is-leadership .mf-guidance-overlay-aside h2 *,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-person-name,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-person-name *,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-person-role,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-page h3,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-page h4,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-page p,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-page li,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-review-meta span:first-child,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-stats strong,
+.mf-guidance-overlay.is-light.is-leadership .mf-weight-link,
+.mf-guidance-overlay.is-light.is-leadership .mf-weight-link span,
+.mf-guidance-overlay.is-light .mf-guidance-next-link,
+.mf-guidance-overlay.is-light .mf-guidance-next-link * {
+  color:#171717 !important;
+  -webkit-text-fill-color:#171717 !important;
+}
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy *,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel * {
+  color:rgba(23,23,23,.67) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.67) !important;
+}
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-person-company,
+.mf-guidance-overlay.is-light.is-mindset .mf-guidance-person-country,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-review-meta span:last-child,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-copy-block h3,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-stats small,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-projects small,
+.mf-guidance-overlay.is-light.is-leadership .mf-leadership-graduates-photo figcaption {
+  color:rgba(23,23,23,.46) !important;
+  -webkit-text-fill-color:rgba(23,23,23,.46) !important;
+}
+.mf-guidance-theme-toggle { text-transform:none !important; }
+@media (max-width:1024px) {
+  .mf-guidance-theme-toggle { top:clamp(235px,32vh,310px) !important; }
 }
