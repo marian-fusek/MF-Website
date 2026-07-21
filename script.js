@@ -307,10 +307,10 @@ if(indexExtra){
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=80&sat=-100"
     ],
     "05":[
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=1400&q=80&sat=-100",
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80&sat=-100"
+      "/media/projects/side-quests/undersurface.jpg",
+      "/media/projects/side-quests/utb.jpg",
+      "/media/projects/side-quests/nollie.jpg",
+      "/media/projects/side-quests/next-workout.jpg"
     ]
   };
   const strips=[...document.querySelectorAll('.mf-strip')];

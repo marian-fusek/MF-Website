@@ -11354,3 +11354,46 @@ body.project-open .mf-nav-guidance { display:none !important; }
 
 /* The navigation item is not useful while either Guidance detail is open. */
 body.mf-guidance-open .mf-nav-guidance { display:none !important; }
+
+
+/* ============================================================
+   V91 — Side Quests header alignment + image colour previews
+   ============================================================ */
+
+/* Expanded state: move only the number down and only the title left. */
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-number {
+  position:relative !important;
+  top:3px !important;
+}
+.mf-project-slide-sidequests .mf-sidequest-panel.is-active .mf-sidequest-title {
+  position:relative !important;
+  left:-3px !important;
+}
+
+/* Collapsed state: the number keys off the top of the two-line heading,
+   while the heading remains vertically centred as one unit. */
+.mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-heading {
+  gap:10px !important;
+}
+.mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-number {
+  position:relative !important;
+  top:-11px !important;
+}
+
+/* Side Quest images remain monochrome until directly explored. */
+.mf-project-slide-sidequests .mf-sidequest-image img {
+  filter:grayscale(1) contrast(1.12) brightness(.76) !important;
+}
+.mf-project-slide-sidequests .mf-sidequest-image:hover img,
+.mf-project-slide-sidequests .mf-sidequest-image:focus-within img {
+  filter:none !important;
+}
+
+@media (max-width:620px) {
+  .mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-heading {
+    gap:7px !important;
+  }
+  .mf-project-slide-sidequests .mf-sidequest-panel:not(.is-active) .mf-sidequest-number {
+    top:-8px !important;
+  }
+}
