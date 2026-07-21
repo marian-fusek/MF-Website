@@ -11138,3 +11138,219 @@ body.project-open .mf-nav-guidance { display:none !important; }
 @media (max-width:1024px) {
   .mf-guidance-theme-toggle { top:clamp(235px,32vh,310px) !important; }
 }
+
+
+/* ============================================================
+   V88 — focused restoration and repairs
+   ============================================================ */
+
+/* Loader percentages use Geist, never the mono face. */
+.mf-loader > .mf-loader-progress,
+.mf-art-runtime-loader .mf-loader-progress,
+.mf-project-video-loader-percent,
+.mf-carousel-runtime-loader-percent {
+  font-family:"Geist",Arial,sans-serif !important;
+}
+
+/* The removed reading-mode UI and all old lens markup stay inert. */
+.mf-guidance-theme-toggle,
+.mf-hero-name-lens { display:none !important; }
+.mf-guidance-overlay,
+.mf-guidance-overlay .mf-guidance-overlay-aside,
+.mf-guidance-overlay .mf-guidance-reviews,
+.mf-guidance-overlay .mf-leadership-page {
+  background-color:#050505 !important;
+  color:#fff !important;
+}
+
+/* Hero-name grid deformation: RGB edges and a soft radial boundary. */
+.mf-hero-name { isolation:isolate; }
+.mf-hero-grid-distortion {
+  --mf-grid-radius:clamp(150px,20vw,310px);
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  opacity:0;
+  overflow:visible;
+  -webkit-mask-image:radial-gradient(circle var(--mf-grid-radius) at var(--mf-grid-x,-999px) var(--mf-grid-y,-999px),#000 0%,rgba(0,0,0,.98) 30%,rgba(0,0,0,.72) 58%,rgba(0,0,0,.28) 82%,transparent 100%);
+  mask-image:radial-gradient(circle var(--mf-grid-radius) at var(--mf-grid-x,-999px) var(--mf-grid-y,-999px),#000 0%,rgba(0,0,0,.98) 30%,rgba(0,0,0,.72) 58%,rgba(0,0,0,.28) 82%,transparent 100%);
+  transition:opacity .28s cubic-bezier(.16,1,.3,1);
+  will-change:opacity,-webkit-mask-image,mask-image;
+}
+.mf-hero-grid-distortion.is-active { opacity:1; }
+.mf-hero-grid-cell {
+  position:absolute;
+  inset:0;
+  display:block;
+  will-change:transform;
+}
+.mf-hero-grid-clone {
+  display:inline-block;
+  width:auto;
+  transform-origin:left bottom;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  text-shadow:-2.4px 0 0 rgba(255,51,75,.82),2.4px 0 0 rgba(38,198,255,.8) !important;
+  filter:saturate(1.14);
+}
+.mf-hero-grid-clone .nc {
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  opacity:1 !important;
+  filter:none !important;
+  text-shadow:inherit !important;
+}
+@media (hover:none),(pointer:coarse),(prefers-reduced-motion:reduce) {
+  .mf-hero-grid-distortion { display:none !important; }
+}
+
+/* Desktop cursor: fixed dot, pulse only on press, and a genuinely visible micro trail. */
+.mf-global-cursor-pulse {
+  opacity:0;
+  animation:none !important;
+  border-width:1px !important;
+}
+.mf-global-cursor.is-clicking .mf-global-cursor-pulse {
+  animation:mfCursorClickPulse .55s cubic-bezier(.16,1,.3,1) both !important;
+}
+@keyframes mfCursorClickPulse {
+  0% { transform:scale(.28);opacity:.58; }
+  72% { opacity:.14; }
+  100% { transform:scale(3.5);opacity:0; }
+}
+.mf-global-cursor-trail {
+  width:2.5px !important;
+  height:2.5px !important;
+  margin:-1.25px 0 0 -1.25px !important;
+  background:rgba(255,255,255,.42) !important;
+  box-shadow:0 0 5px rgba(255,255,255,.18);
+  transform:scale(var(--trail-scale,1));
+  animation:mfCursorTrailV88 .58s cubic-bezier(.16,1,.3,1) forwards !important;
+}
+@keyframes mfCursorTrailV88 {
+  0% { opacity:.72;transform:scale(var(--trail-scale,1)); }
+  100% { opacity:0;transform:scale(.12); }
+}
+
+/* Side Quests left copy fills the usable project-info column in the same style as project details. */
+.mf-project-shell.is-sidequests-project .mf-project-intro {
+  width:100% !important;
+  max-width:none !important;
+  margin:22px 0 0 !important;
+  color:rgba(255,255,255,.58) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.58) !important;
+  font-family:"Geist Mono",monospace !important;
+  font-size:10px !important;
+  line-height:1.5 !important;
+  letter-spacing:.025em !important;
+  box-sizing:border-box !important;
+}
+
+/* Collapsed and expanded Side Quest headers are independent states. */
+.mf-sidequest-panel:not(.is-active) {
+  grid-template-rows:minmax(0,1fr) 0fr !important;
+}
+.mf-sidequest-panel:not(.is-active) .mf-sidequest-trigger {
+  height:100% !important;
+  min-height:0 !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  align-items:center !important;
+}
+.mf-sidequest-panel:not(.is-active) .mf-sidequest-heading {
+  justify-content:center !important;
+  transform:none;
+}
+.mf-sidequest-panel:not(.is-active):hover .mf-sidequest-heading {
+  transform:translateX(9px) !important;
+}
+.mf-sidequest-panel:not(.is-active) .mf-sidequest-number { padding-top:0 !important; }
+.mf-sidequest-panel:not(.is-active) .mf-sidequest-content {
+  height:0 !important;
+  min-height:0 !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  overflow:hidden !important;
+}
+.mf-sidequest-panel.is-active {
+  grid-template-rows:auto minmax(0,1fr) !important;
+}
+.mf-sidequest-panel.is-active .mf-sidequest-trigger {
+  min-height:clamp(112px,15vh,156px) !important;
+  padding-top:clamp(15px,2vh,23px) !important;
+  padding-bottom:clamp(28px,4vh,48px) !important;
+  align-items:start !important;
+}
+.mf-sidequest-panel.is-active .mf-sidequest-heading {
+  transform:translateY(-4px) !important;
+  gap:10px !important;
+}
+.mf-sidequest-panel.is-active .mf-sidequest-number { padding-top:.1em !important; }
+.mf-sidequest-panel.is-active .mf-sidequest-subtitle {
+  color:rgba(255,255,255,.46) !important;
+  -webkit-text-fill-color:rgba(255,255,255,.46) !important;
+  opacity:1 !important;
+  transform:none !important;
+}
+
+/* Team Leadership returns to one full-width visual page. */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-leadership .mf-leadership-page {
+    padding-top:0 !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+    display:block !important;
+    width:100vw !important;
+    max-width:none !important;
+    height:calc(100dvh - 58px) !important;
+    min-height:620px !important;
+    margin:0 0 clamp(76px,10vh,132px) !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+    object-position:center !important;
+  }
+}
+@media (max-width:1024px) {
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo {
+    width:100vw !important;
+    height:78svh !important;
+    margin:0 0 72px !important;
+  }
+  .mf-guidance-overlay.is-leadership .mf-leadership-hero-photo img {
+    width:100% !important;
+    height:100% !important;
+    aspect-ratio:auto !important;
+    object-fit:cover !important;
+  }
+}
+
+/* Give the expanded review a little breathing room below the portrait carousel. */
+.mf-guidance-overlay.is-leadership .mf-leadership-people-strip {
+  margin-bottom:clamp(38px,5vh,62px) !important;
+}
+
+/* Cross-links must remain visible even if an intersection callback arrives late. */
+.mf-guidance-review.is-guidance-next.is-in-view .mf-guidance-next-char,
+.mf-guidance-review.is-guidance-next.is-in-view .mf-guidance-next-arrow,
+.mf-leadership-guidance-next.is-in-view .mf-guidance-next-char,
+.mf-leadership-guidance-next.is-in-view .mf-guidance-next-arrow,
+.mf-guidance-next-link.is-in-view .mf-guidance-next-char,
+.mf-guidance-next-link.is-in-view .mf-guidance-next-arrow {
+  opacity:1 !important;
+  transform:none !important;
+  filter:none !important;
+}
+.mf-guidance-review.is-guidance-next .mf-guidance-next-link,
+.mf-leadership-guidance-next .mf-guidance-next-link {
+  min-height:.9em;
+  visibility:visible !important;
+}
+
+/* The navigation item is not useful while either Guidance detail is open. */
+body.mf-guidance-open .mf-nav-guidance { display:none !important; }

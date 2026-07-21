@@ -436,7 +436,7 @@ if(indexExtra){
       ]
     },
     "05":{
-      title:"Side Quests.",
+      title:"Side Quests",
       intro:"Every now and then luck kicks me in the kneecap and I end up stumbling into some quality opportunity. Here are a few that, looking back, give me that nice warm feeling. Mmm.",
       scope:"",
       context:"",
@@ -449,24 +449,24 @@ if(indexExtra){
           {
             title:"Ūndersurface",
             subtitle:"Community co-founder",
-            image:"https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            image:"/media/projects/side-quests/undersurface.jpg",
             descriptionHtml:`<p>Co-founded an enclosed community of entrepreneurs, designers and tinkerers. A peer accountability community that ran for 5+ years on Slack, combining structured goal-pushing sessions, sharing circles and talks to help members grow personally and professionally. Beyond the digital space, Joe and I organized an in-person retreat — including a 3-day trip to Estonia — built around deep-sharing, introspective and task-driven exercises designed to get people sharing honestly and working through personal blocks.</p><p>It moved me so much that when I got back, I enrolled in a one-year coaching program to become a certified life coach.</p>`,
             mentions:[
               {name:"Joe Pacal",url:"https://www.pac.al/"}
             ]
           },
           {
-            title:"Tomas Bata University in Zlin",
+            title:"Tonmas Bata University",
             subtitle:"Member of Dissertation Committee",
-            image:"https://images.unsplash.com/photo-1483347756197-71ef80e95f73?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:`<p>I was twice invited to serve on a panel of industry professionals evaluating final bachelor's and master's thesis presentations at university.</p><p>On top of this, while leading a design team, we held full-day design talks for students on the Multimedia &amp; Design track twice over two years. The sessions continued even after I got promoted out of the Design Team Leadership role.</p><p>I made friends with the faculty lead. Had students applying to STRV years later. Lovely stuff.</p>`,
+            image:"/media/projects/side-quests/utb.jpg",
+            descriptionHtml:`<p>I was twice invited to serve on a panel of industry professionals evaluating final bachelor's and master's thesis presentations at university.</p><p>On top of this, while leading a design team, we held full-day design talks for students on the Multimedia &amp; Design programme twice over two years. The sessions continued even after I got promoted out of the Design Team Leadership role.</p><p>I made friends with the faculty lead. Had students applying to STRV years later. Lovely stuff.</p>`,
             mentions:[]
           },
           {
             title:"Nollie",
             subtitle:"Creative Studio",
-            image:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=88&sat=-100",
-            descriptionHtml:`<p>Co-founded this creative studio with a longtime friend and former colleague, Ales Nesetril, until we both decided to pivot into our own things — all in good heart. During this time we launched the NEXT WORKOUT iOS app, which you can check out next in line.</p><p>Sharing this to also openly admit that not everything I touch always fully “works out.” Duh! Here, the studio. The app is fine and works great! Hehe.</p>`,
+            image:"/media/projects/side-quests/nollie.jpg",
+            descriptionHtml:`<p>Co-founded this creative studio with a longtime friend and former colleague, Ales Nesetril, before we each pivoted into our own things — all in good spirit. During this time we launched the NEXT WORKOUT iOS app, which you can check out next.</p><p>Sharing this to also openly admit that not everything I touch always &quot;works out.&quot; Duh! Here, the studio — the app works great! Hehe.</p>`,
             mentions:[
               {name:"Ales Nesetril",url:"https://www.instagram.com/alesnesetril"}
             ]
@@ -474,7 +474,7 @@ if(indexExtra){
           {
             title:"NEXT WORKOUT",
             subtitle:"Fitness trainer iOS App",
-            image:"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=88&sat=-100",
+            image:"/media/projects/side-quests/next-workout.jpg",
             descriptionHtml:`<p>This was a sweet collab between Next.Move (client), Yiskra Creative Studio (brand) — and my former Creative Studio Nollie (Design &amp; Ops w/ Ales Nesetril).</p><p>I sourced and managed developers, tracked the timeline and reported progress to the client side represented by Veronika Huna.</p><p>The app launched and keeps growing. People work out. Life's good.</p>`,
             mentions:[
               {name:"Next.Move",url:"https://www.instagram.com/nextmove.cz/"},
@@ -1596,9 +1596,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const overlayAside=overlay?.querySelector('.mf-guidance-overlay-aside');
   const guidanceSection=document.getElementById('guidance');
   const closeButton=overlay?.querySelector('.mf-guidance-close');
-  const themeToggle=document.getElementById('mfGuidanceThemeToggle');
-  const themeCopy=document.getElementById('mfGuidanceThemeCopy');
-  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton||!themeToggle||!themeCopy)return;
+  if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
 
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
@@ -1803,45 +1801,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   let asciiTimer=0;
   const mobileGuidance=window.matchMedia('(max-width:1024px)');
 
-  const themeStorageKey='mfGuidanceTheme';
-  const readGuidanceTheme=()=>{try{return localStorage.getItem(themeStorageKey)==='light'?'light':'dark';}catch(_){return 'dark';}};
-  const writeGuidanceTheme=value=>{try{localStorage.setItem(themeStorageKey,value);}catch(_){}};
-  let guidanceTheme=readGuidanceTheme();
   let leadershipTargetScroll=0;
   let leadershipScrollFrame=0;
   let modeSwitching=false;
-
-  function applyGuidanceTheme(theme,{persist=true}={}){
-    guidanceTheme=theme==='light'?'light':'dark';
-    overlay.classList.toggle('is-light',guidanceTheme==='light');
-    overlay.classList.toggle('is-dark',guidanceTheme!=='light');
-    themeCopy.textContent=guidanceTheme==='light'?'Back to black':'Read this on white';
-    themeToggle.setAttribute('aria-label',themeCopy.textContent);
-    themeToggle.setAttribute('aria-pressed',guidanceTheme==='light'?'true':'false');
-    if(persist)writeGuidanceTheme(guidanceTheme);
-  }
-
-  function refreshThemeNodes(){
-    const nodes=[...overlay.querySelectorAll('h2,h3,h4,p,li,small,strong,button,a,figcaption,.mf-guidance-person-name,.mf-guidance-person-role,.mf-guidance-person-company,.mf-guidance-person-country,.mf-guidance-review-tags span,.mf-guidance-part-button,.mf-guidance-review-nav span')]
-      .filter(node=>!node.closest('svg')&&!node.classList.contains('mf-guidance-theme-icon'));
-    const max=Math.max(1,overlay.clientHeight||innerHeight);
-    nodes.forEach(node=>{
-      node.dataset.themeNode='';
-      const top=Math.max(0,node.getBoundingClientRect().top);
-      node.style.setProperty('--theme-delay',`${Math.min(210,Math.round(top/max*190))}ms`);
-    });
-  }
-
-  async function toggleGuidanceTheme(){
-    if(overlay.classList.contains('is-theme-switching'))return;
-    refreshThemeNodes();
-    overlay.classList.add('is-theme-switching');
-    await wait(170);
-    applyGuidanceTheme(guidanceTheme==='light'?'dark':'light');
-    await wait(210);
-    overlay.classList.remove('is-theme-switching');
-    setTimeout(refreshThemeNodes,30);
-  }
 
   function stopLeadershipScroll(){
     cancelAnimationFrame(leadershipScrollFrame);
@@ -1851,13 +1813,12 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
     leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll));
     const distance=leadershipTargetScroll-reviewsHost.scrollTop;
-    reviewsHost.scrollTop+=distance*.085;
+    reviewsHost.scrollTop+=distance*.18;
     if(Math.abs(distance)>.35){leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);return;}
     reviewsHost.scrollTop=leadershipTargetScroll;
     leadershipScrollFrame=0;
   }
 
-  applyGuidanceTheme(guidanceTheme,{persist:false});
 
   function setupGuidanceReveals(){
     guidanceObserver?.disconnect();
@@ -2084,7 +2045,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       const swap=()=>{
         detail.innerHTML=leadershipDetailMarkup(entry);
         const panel=detail.querySelector('.mf-leadership-review-expanded');
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{panel?.classList.add('is-visible');refreshThemeNodes();}));
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{panel?.classList.add('is-visible');}));
       };
       if(!animate){swap();return;}
       detail.classList.add('is-switching');
@@ -2143,7 +2104,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
-      requestAnimationFrame(()=>{setupGuidanceReveals();refreshThemeNodes();});
+      requestAnimationFrame(()=>{setupGuidanceReveals();});
       return;
     }
 
@@ -2153,7 +2114,7 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     bindLeadership();
     requestAnimationFrame(()=>{
       setupGuidanceReveals();
-      refreshThemeNodes();
+      
       startGuidanceAscii();
     });
   }
@@ -2173,7 +2134,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
 
   function open(mode){
     guidanceReturnY=window.scrollY+guidanceSection.getBoundingClientRect().top;
-    applyGuidanceTheme(readGuidanceTheme(),{persist:false});
     render(mode);
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
@@ -2192,7 +2152,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     requestAnimationFrame(()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'}));
   }
 
-  themeToggle.addEventListener('click',toggleGuidanceTheme);
   reviewsHost.addEventListener('click',event=>{
     const next=event.target.closest('[data-guidance-next]');
     if(next)transitionGuidanceMode(next.dataset.guidanceNext);
@@ -2201,8 +2160,9 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
     if(currentMode!=='leadership'||mobileGuidance.matches||!overlay.classList.contains('is-open'))return;
     event.preventDefault();
     const max=Math.max(0,reviewsHost.scrollHeight-reviewsHost.clientHeight);
+    const normalized=event.deltaMode===1?event.deltaY*16:event.deltaMode===2?event.deltaY*reviewsHost.clientHeight:event.deltaY;
     if(!leadershipScrollFrame)leadershipTargetScroll=reviewsHost.scrollTop;
-    leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll+event.deltaY*.88));
+    leadershipTargetScroll=Math.max(0,Math.min(max,leadershipTargetScroll+normalized));
     if(!leadershipScrollFrame)leadershipScrollFrame=requestAnimationFrame(runLeadershipScroll);
   },{passive:false});
 
@@ -3168,74 +3128,91 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   },5000);
 })();
 
-/* HERO NAME — soft outlined lens under the unchanged cursor */
+/* HERO NAME — cursor-driven grid deformation with RGB displacement. */
 (function(){
   const hero=document.getElementById("heroName");
-  const baseWrap=document.getElementById("nameWrap");
-  if(!hero||!baseWrap||!window.matchMedia("(hover:hover) and (pointer:fine)").matches)return;
+  const source=document.getElementById("nameWrap");
+  const fine=window.matchMedia("(hover:hover) and (pointer:fine)");
+  if(!hero||!source||!fine.matches)return;
 
-  const effect=document.createElement("span");
-  effect.className="mf-hero-name-lens";
-  effect.setAttribute("aria-hidden","true");
+  const overlay=document.createElement("span");
+  overlay.className="mf-hero-grid-distortion";
+  overlay.setAttribute("aria-hidden","true");
+  hero.appendChild(overlay);
 
-  const effectWrap=baseWrap.cloneNode(true);
-  effectWrap.id="heroNameLensWrap";
-  effectWrap.querySelectorAll(".nc").forEach(letter=>{
-    letter.classList.remove("is-ascii-touched");
-    letter.removeAttribute("style");
-  });
-  effect.appendChild(effectWrap);
-  hero.appendChild(effect);
+  const columns=10,rows=4,cells=[];
+  for(let row=0;row<rows;row++){
+    for(let column=0;column<columns;column++){
+      const cell=document.createElement("span");
+      cell.className="mf-hero-grid-cell";
+      const clone=source.cloneNode(true);
+      clone.removeAttribute("id");
+      clone.classList.add("mf-hero-grid-clone");
+      clone.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+      cell.style.clipPath=`inset(${row/rows*100}% ${(columns-column-1)/columns*100}% ${(rows-row-1)/rows*100}% ${column/columns*100}%)`;
+      cell.appendChild(clone);
+      overlay.appendChild(cell);
+      cells.push({cell,clone,column,row,x:(column+.5)/columns,y:(row+.5)/rows,tx:0,ty:0,cx:0,cy:0});
+    }
+  }
 
-  const syncTransform=()=>{
-    effectWrap.style.transform=baseWrap.style.transform;
-    effectWrap.style.transformOrigin=baseWrap.style.transformOrigin||"left bottom";
-  };
-  const syncGlyphs=()=>{
-    const source=[...baseWrap.children];
-    const target=[...effectWrap.children];
-    source.forEach((letter,index)=>{
-      if(target[index]&&target[index].textContent!==letter.textContent){
-        target[index].textContent=letter.textContent;
-      }
+  const sync=()=>{
+    const transform=source.style.transform;
+    const origin=source.style.transformOrigin||"left bottom";
+    cells.forEach(item=>{
+      item.clone.style.transform=transform;
+      item.clone.style.transformOrigin=origin;
+      const sourceLetters=[...source.children],cloneLetters=[...item.clone.children];
+      sourceLetters.forEach((letter,index)=>{if(cloneLetters[index])cloneLetters[index].textContent=letter.textContent;});
     });
   };
-  syncTransform();
-  syncGlyphs();
+  sync();
+  new MutationObserver(sync).observe(source,{subtree:true,childList:true,characterData:true});
 
-  const observer=new MutationObserver(syncGlyphs);
-  observer.observe(baseWrap,{subtree:true,childList:true,characterData:true});
-
-  let frame=0;
-  let latestEvent=null;
-  const render=()=>{
-    frame=0;
-    if(!latestEvent)return;
-    const event=latestEvent;
-    latestEvent=null;
-    const letter=event.target.closest?.("#nameWrap .nc:not(.n-sp)");
-    if(!letter||!hero.contains(letter)){
-      effect.classList.remove("is-active");
-      return;
-    }
+  let pointerX=-9999,pointerY=-9999,velocityX=0,velocityY=0,lastX=pointerX,lastY=pointerY,inside=false,raf=0;
+  const animate=()=>{
+    raf=0;
     const rect=hero.getBoundingClientRect();
-    hero.style.setProperty("--mf-hero-lens-x",`${event.clientX-rect.left}px`);
-    hero.style.setProperty("--mf-hero-lens-y",`${event.clientY-rect.top}px`);
-    effect.classList.add("is-active");
+    const radius=Math.max(150,Math.min(rect.width*.22,310));
+    cells.forEach(item=>{
+      const centerX=item.x*rect.width,centerY=item.y*rect.height;
+      const dx=centerX-pointerX,dy=centerY-pointerY;
+      const distance=Math.hypot(dx,dy)||1;
+      const influence=inside?Math.pow(Math.max(0,1-distance/radius),1.65):0;
+      const push=20*influence;
+      item.tx=(dx/distance)*push+velocityX*.12*influence+(item.row%2?1:-1)*2.5*influence;
+      item.ty=(dy/distance)*push*.62+velocityY*.09*influence+(item.column%2?1:-1)*1.7*influence;
+      item.cx+=(item.tx-item.cx)*.24;
+      item.cy+=(item.ty-item.cy)*.24;
+      item.cell.style.transform=`translate3d(${item.cx.toFixed(2)}px,${item.cy.toFixed(2)}px,0)`;
+    });
+    velocityX*=.78;velocityY*=.78;
+    const unsettled=cells.some(item=>Math.abs(item.tx-item.cx)>.08||Math.abs(item.ty-item.cy)>.08);
+    if(inside||unsettled)raf=requestAnimationFrame(animate);
   };
+  const queue=()=>{if(!raf)raf=requestAnimationFrame(animate);};
 
+  hero.addEventListener("pointerenter",event=>{
+    const rect=hero.getBoundingClientRect();
+    pointerX=event.clientX-rect.left;pointerY=event.clientY-rect.top;
+    lastX=pointerX;lastY=pointerY;inside=true;
+    overlay.classList.add("is-active");queue();
+  },{passive:true});
   hero.addEventListener("pointermove",event=>{
-    latestEvent=event;
-    if(!frame)frame=requestAnimationFrame(render);
+    const rect=hero.getBoundingClientRect();
+    const nextX=event.clientX-rect.left,nextY=event.clientY-rect.top;
+    velocityX=nextX-lastX;velocityY=nextY-lastY;
+    pointerX=nextX;pointerY=nextY;lastX=nextX;lastY=nextY;
+    hero.style.setProperty("--mf-grid-x",`${pointerX}px`);
+    hero.style.setProperty("--mf-grid-y",`${pointerY}px`);
+    overlay.classList.add("is-active");queue();
   },{passive:true});
   hero.addEventListener("pointerleave",()=>{
-    latestEvent=null;
-    if(frame){cancelAnimationFrame(frame);frame=0;}
-    effect.classList.remove("is-active");
+    inside=false;velocityX=0;velocityY=0;
+    overlay.classList.remove("is-active");queue();
   },{passive:true});
-
-  window.addEventListener("resize",syncTransform,{passive:true});
-  window.addEventListener("load",syncTransform,{once:true});
+  window.addEventListener("resize",()=>{sync();queue();},{passive:true});
+  window.addEventListener("load",sync,{once:true});
 })();
 
 /* FOOTER NAME — original variable expansion, RAF-throttled to remove lag */
@@ -3399,32 +3376,55 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
 })();
 
 
-/* V83 — fine-pointer global cursor with a 1px pulse and restrained trail. */
+/* Desktop cursor — restrained dot, visible micro-trail and pulse only on click. */
 (function(){
-  if(!window.matchMedia('(pointer:fine)').matches||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  if(!window.matchMedia('(pointer:fine)').matches)return;
   const cursor=document.createElement('div');
   cursor.className='mf-global-cursor';
   cursor.innerHTML='<span class="mf-global-cursor-pulse"></span><span class="mf-global-cursor-dot"></span>';
   document.body.appendChild(cursor);
   document.body.classList.add('mf-custom-cursor');
 
-  let x=-100,y=-100,lastTrail=0,lastX=-100,lastY=-100,visible=false;
+  let x=-100,y=-100,lastX=-100,lastY=-100,lastTrailAt=0,visible=false;
   const hiddenZone=target=>!!target?.closest?.('.mf-carousel-zone,.mf-art-overlay,.mf-art-preview,.mf-wip-gate');
   const place=()=>{cursor.style.transform=`translate3d(${x}px,${y}px,0)`;};
+  const addTrail=(trailX,trailY,scale=1)=>{
+    const trail=document.createElement('span');
+    trail.className='mf-global-cursor-trail';
+    trail.style.left=`${trailX}px`;
+    trail.style.top=`${trailY}px`;
+    trail.style.setProperty('--trail-scale',String(scale));
+    document.body.appendChild(trail);
+    setTimeout(()=>trail.remove(),620);
+  };
+
   window.addEventListener('pointermove',event=>{
     x=event.clientX;y=event.clientY;place();
     const shouldHide=hiddenZone(event.target)||document.body.classList.contains('project-open')||document.body.classList.contains('art-open');
+    const wasVisible=visible;
     visible=!shouldHide;
     cursor.classList.toggle('is-visible',visible);
     const now=performance.now();
-    if(!visible||now-lastTrail<34||Math.hypot(x-lastX,y-lastY)<5)return;
-    lastTrail=now;lastX=x;lastY=y;
-    const trail=document.createElement('span');
-    trail.className='mf-global-cursor-trail';
-    trail.style.left=`${x}px`;trail.style.top=`${y}px`;
-    document.body.appendChild(trail);
-    setTimeout(()=>trail.remove(),460);
+    if(!visible||!wasVisible){lastX=x;lastY=y;lastTrailAt=now;return;}
+    const distance=Math.hypot(x-lastX,y-lastY);
+    /* Keep the previous emitted position while throttled. Updating it on every
+       pointer event made fast 120 Hz pointer streams produce no visible trail. */
+    if(now-lastTrailAt<18||distance<2.5)return;
+    const steps=Math.min(5,Math.max(1,Math.floor(distance/7)));
+    for(let step=1;step<=steps;step++){
+      const t=step/(steps+1);
+      addTrail(lastX+(x-lastX)*t,lastY+(y-lastY)*t,.68+t*.24);
+    }
+    lastTrailAt=now;lastX=x;lastY=y;
   },{passive:true});
-  window.addEventListener('pointerleave',()=>cursor.classList.remove('is-visible'));
-  window.addEventListener('blur',()=>cursor.classList.remove('is-visible'));
+
+  window.addEventListener('pointerdown',event=>{
+    if(event.button!==0||!visible)return;
+    cursor.classList.remove('is-clicking');
+    void cursor.offsetWidth;
+    cursor.classList.add('is-clicking');
+    setTimeout(()=>cursor.classList.remove('is-clicking'),560);
+  },{passive:true});
+  window.addEventListener('pointerleave',()=>{visible=false;cursor.classList.remove('is-visible');});
+  window.addEventListener('blur',()=>{visible=false;cursor.classList.remove('is-visible');});
 })();
