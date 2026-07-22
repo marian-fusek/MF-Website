@@ -12460,3 +12460,210 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     padding-top:10svh !important;
   }
 }
+
+
+/* ============================================================
+   V#109 — Mindset long-review width relief, fixed duration baseline
+   ============================================================ */
+@media (min-width:1025px) {
+  /* Duration text returns to the exact bottom rhythm of the reviewer submenu. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+    bottom:28px !important;
+  }
+
+  /* Reserve a protected visual band above the duration label. This does not
+     move the label and does not introduce an inner scroll area. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-content {
+    padding-bottom:82px !important;
+    box-sizing:border-box !important;
+    transition:margin-left .5s var(--ease),width .5s var(--ease) !important;
+  }
+
+  /* All Mindset review copy is intentionally a little larger than V108. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
+    font-size:clamp(14px,.98vw,18px) !important;
+    line-height:1.31 !important;
+  }
+
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-person-wrap {
+    transition:transform .5s var(--ease) !important;
+    will-change:transform;
+  }
+
+  /* Only a review that approaches the protected duration band receives these
+     classes. Copy and portrait move left together; copy width grows by the
+     same amount, so the right edge and all bottom controls remain fixed. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-1 {
+    --mf-review-width-relief:clamp(20px,2.2vw,42px);
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-2 {
+    --mf-review-width-relief:clamp(38px,4vw,76px);
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-3 {
+    --mf-review-width-relief:clamp(58px,6vw,112px);
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3) .mf-guidance-person-wrap {
+    transform:translateX(calc(-1 * var(--mf-review-width-relief))) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3) .mf-guidance-review-content {
+    margin-left:calc(-1 * var(--mf-review-width-relief)) !important;
+    width:calc(100% + var(--mf-review-width-relief)) !important;
+  }
+}
+
+/* ============================================================
+   V#110 — restore protected short-height submenu + width-only review fit
+   ============================================================ */
+@media (min-width:1025px) {
+  /* Keep the duration line pinned to the overlay viewport baseline rather than
+     to the changing review-content height. Only the settled review shows it. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+    position:fixed !important;
+    left:calc(24vw + clamp(210px,18vw,300px) + clamp(42px,5vw,88px)) !important;
+    right:clamp(34px,4.4vw,80px) !important;
+    bottom:30px !important;
+    opacity:0 !important;
+    visibility:hidden !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-in-view .mf-guidance-engagement {
+    opacity:1 !important;
+    visibility:visible !important;
+  }
+
+  /* V109's permanent bottom padding altered the approved vertical geometry.
+     Collision protection is handled by measurement and width relief instead. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-content {
+    padding-bottom:0 !important;
+  }
+
+  /* Slightly larger baseline copy for every Mindset review. It never shrinks. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
+    font-size:clamp(14px,1vw,18px) !important;
+    line-height:1.31 !important;
+  }
+
+  /* Short-height fallback: retain the active row at the approved bottom snap.
+     Opening it reveals the full list and temporarily hides only the description. */
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button {
+    display:none !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active {
+    display:grid !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active::after {
+    content:"↓";
+    position:absolute;
+    right:9px;
+    top:50%;
+    transform:translateY(-50%);
+    color:rgba(255,255,255,.72);
+    font:400 10px/1 "Geist Mono",monospace;
+    pointer-events:none;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active > span:nth-child(3) {
+    opacity:0 !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-overlay-aside > p {
+    visibility:hidden !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button {
+    display:grid !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button.is-active::after {
+    content:"↑";
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button.is-active > span:nth-child(3) {
+    opacity:1 !important;
+  }
+}
+
+/* ============================================================
+   V#111 — stable Mindset geometry + short-screen ART containment
+   ============================================================ */
+@media (min-width:1025px) {
+  /* Restore the duration label to the review's own bottom baseline. This is
+     the same vertical rhythm as the reviewer submenu and cannot jump when the
+     viewport height changes. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    position:relative !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-engagement {
+    position:absolute !important;
+    left:calc(26vw + clamp(190px,14vw,260px) + clamp(62px,5.6vw,104px)) !important;
+    right:2.5vw !important;
+    bottom:28px !important;
+    opacity:1 !important;
+    visibility:visible !important;
+  }
+
+  /* Slightly larger copy for every Mindset review. It is never reduced by JS
+     or CSS; threatened reviews receive width instead. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal p {
+    font-size:clamp(15px,1.05vw,19px) !important;
+    line-height:1.31 !important;
+  }
+
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-content {
+    padding-bottom:0 !important;
+    box-sizing:border-box !important;
+    transition:margin-left .5s var(--ease),width .5s var(--ease) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-person-wrap {
+    transition:transform .5s var(--ease) !important;
+  }
+
+  /* Extra leftward width levels for exceptionally long reviews. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-1 { --mf-review-width-relief:clamp(24px,2.4vw,46px); }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-2 { --mf-review-width-relief:clamp(46px,4.5vw,86px); }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-3 { --mf-review-width-relief:clamp(70px,6.5vw,126px); }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-width-fit-4 { --mf-review-width-relief:clamp(92px,8vw,156px); }
+
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4) .mf-guidance-person-wrap {
+    transform:translateX(calc(-1 * var(--mf-review-width-relief))) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4) .mf-guidance-review-content {
+    margin-left:calc(-1 * var(--mf-review-width-relief)) !important;
+    width:calc(100% + var(--mf-review-width-relief)) !important;
+  }
+
+  /* Compact submenu remains bottom-snapped. Only the active row is shown when
+     the full menu would enter the description's protected area. */
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav {
+    bottom:28px !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button {
+    display:none !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active {
+    display:grid !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-overlay-aside > p {
+    visibility:hidden !important;
+  }
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button {
+    display:grid !important;
+  }
+}
+
+/* On short phone/tablet viewports, keep the MF ART preview fully below the
+   'Mid-life butterflies' copy. The frame is slightly shorter and its animated
+   contents are clipped inside it; no artwork can drift upward into the text. */
+@media (max-width:1024px) and (max-height:820px) {
+  .mf-art-showcase-inner {
+    grid-template-rows:auto minmax(18px,1fr) auto minmax(29svh,34svh) !important;
+    gap:16px !important;
+  }
+  .mf-art-showcase-bottom {
+    top:0 !important;
+    padding-bottom:8px !important;
+  }
+  .mf-art-preview-frame {
+    overflow:hidden !important;
+    contain:layout paint !important;
+  }
+  .mf-art-mini-world {
+    inset:0 !important;
+    overflow:hidden !important;
+    clip-path:inset(0) !important;
+  }
+}
