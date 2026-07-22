@@ -12506,3 +12506,14 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     opacity:1 !important;
   }
 }
+
+
+/* ============================================================
+   V#107 — collision-safe long Mindset reviews
+   ============================================================ */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-single-copy.is-auto-fitted,
+  .mf-guidance-overlay.is-mindset .mf-guidance-part-panel.is-auto-fitted {
+    transform-origin:top left !important;
+  }
+}

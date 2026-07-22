@@ -2050,9 +2050,37 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     },2300);
   }
 
+  function fitMindsetReviewCopy(id){
+    if(currentMode!=='mindset'||mobileGuidance.matches)return;
+    const review=reviewsHost.querySelector(`[data-review-id="${id}"]`);
+    if(!review||review.classList.contains('is-guidance-next'))return;
+    const copy=review.querySelector('.mf-guidance-part-panel.is-active, .mf-guidance-single-copy');
+    const engagement=review.querySelector('.mf-guidance-engagement');
+    if(!copy||!engagement)return;
+
+    /* Reset first so every calculation starts from the original design. */
+    copy.style.removeProperty('zoom');
+    copy.style.removeProperty('transform');
+    copy.style.removeProperty('transform-origin');
+    copy.classList.remove('is-auto-fitted');
+
+    requestAnimationFrame(()=>{
+      const copyRect=copy.getBoundingClientRect();
+      const engagementRect=engagement.getBoundingClientRect();
+      const safeGap=28;
+      const available=engagementRect.top-safeGap-copyRect.top;
+      if(available<=0||copyRect.height<=available+1)return;
+
+      const scale=Math.max(.84,Math.min(1,available/copyRect.height));
+      copy.style.setProperty('zoom',scale.toFixed(4));
+      copy.classList.add('is-auto-fitted');
+    });
+  }
+
   const markActiveReview=id=>{
     if(!id)return;
     activeReviewId=id;
+    requestAnimationFrame(()=>fitMindsetReviewCopy(id));
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
       /* Mobile shows the submenu as a neutral jump index. No person is
          visually selected while the reviews flow beneath it. */
@@ -2068,6 +2096,12 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     if(dominant)markActiveReview(dominant.dataset.reviewId);
   };
   const scheduleReviewTracking=()=>{ if(!reviewScrollFrame)reviewScrollFrame=requestAnimationFrame(updateActiveReview); };
+  let reviewFitResizeTimer=0;
+  window.addEventListener('resize',()=>{
+    clearTimeout(reviewFitResizeTimer);
+    reviewFitResizeTimer=setTimeout(()=>fitMindsetReviewCopy(activeReviewId),120);
+  },{passive:true});
+  document.fonts?.ready?.then(()=>fitMindsetReviewCopy(activeReviewId));
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
@@ -3759,3 +3793,8 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   initStaticTargets();
   new MutationObserver(initStaticTargets).observe(document.body,{childList:true,subtree:true});
 })();
+
+
+/* ============================================================
+   V#107 — collision-safe long Mindset reviews
+   ============================================================ */
