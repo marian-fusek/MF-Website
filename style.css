@@ -12460,3 +12460,49 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     padding-top:10svh !important;
   }
 }
+
+/* ============================================================
+   Short-height safety: compact Mindset review submenu
+   Normal layouts remain pixel-identical. This activates only when
+   JavaScript detects that the snapped menu would touch the intro copy.
+   ============================================================ */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button {
+    display:none !important;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active {
+    display:grid !important;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active::after {
+    content:"↓";
+    position:absolute;
+    right:9px;
+    top:50%;
+    transform:translateY(-50%);
+    color:rgba(255,255,255,.72);
+    font:400 10px/1 "Geist Mono",monospace;
+    pointer-events:none;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav .mf-guidance-review-nav button.is-active > span:nth-child(3) {
+    opacity:0 !important;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-overlay-aside > p {
+    visibility:hidden !important;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button {
+    display:grid !important;
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button.is-active::after {
+    content:"↑";
+  }
+
+  .mf-guidance-overlay.is-mindset.is-compact-review-nav.is-review-nav-open .mf-guidance-review-nav button.is-active > span:nth-child(3) {
+    opacity:1 !important;
+  }
+}

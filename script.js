@@ -1602,6 +1602,25 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const closeButton=overlay?.querySelector('.mf-guidance-close');
   if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
 
+  let compactNavFrame=0;
+  const closeCompactReviewNav=()=>overlay.classList.remove('is-review-nav-open');
+  const updateCompactReviewNav=()=>{
+    compactNavFrame=0;
+    if(currentMode!=='mindset'||!overlay.classList.contains('is-open')){
+      overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
+      return;
+    }
+    overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
+    const introRect=overlayIntro.getBoundingClientRect();
+    const navRect=reviewNav.getBoundingClientRect();
+    const threatened=window.innerWidth>1024&&navRect.top<introRect.bottom+24;
+    overlay.classList.toggle('is-compact-review-nav',threatened);
+  };
+  const scheduleCompactReviewNav=()=>{
+    if(compactNavFrame)cancelAnimationFrame(compactNavFrame);
+    compactNavFrame=requestAnimationFrame(()=>requestAnimationFrame(updateCompactReviewNav));
+  };
+
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
     while(title.isConnected){
@@ -2146,9 +2165,14 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
   function bindMindset(){
     bindReviewParts();
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>{
+      if(overlay.classList.contains('is-compact-review-nav')&&!overlay.classList.contains('is-review-nav-open')&&button.classList.contains('is-active')){
+        overlay.classList.add('is-review-nav-open');
+        return;
+      }
       const target=document.getElementById(`guidance-review-${button.dataset.reviewTarget}`);
       if(!target)return;
       markActiveReview(button.dataset.reviewTarget);
+      closeCompactReviewNav();
 
       if(mobileGuidance.matches){
         const topBar=overlay.querySelector('.mf-guidance-overlay-top');
@@ -2274,7 +2298,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
-      requestAnimationFrame(()=>{setupGuidanceReveals();fitGuidanceNextLinks();});
+      requestAnimationFrame(()=>{setupGuidanceReveals();fitGuidanceNextLinks();scheduleCompactReviewNav();});
       return;
     }
 
@@ -2310,7 +2334,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
     overlay.classList.add('is-entering');
-    requestAnimationFrame(()=>overlay.classList.add('is-open'));
+    requestAnimationFrame(()=>{overlay.classList.add('is-open');scheduleCompactReviewNav();});
     setTimeout(()=>overlay.classList.remove('is-entering'),1150);
     setTimeout(()=>reviewsHost.focus({preventScroll:true}),360);
   }
@@ -2318,7 +2342,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     stopGuidanceAscii();
     stopLeadershipScroll();
     guidanceObserver?.disconnect();
-    overlay.classList.remove('is-open','is-entering');
+    overlay.classList.remove('is-open','is-entering','is-compact-review-nav','is-review-nav-open');
     overlay.setAttribute('aria-hidden','true');
     document.body.classList.remove('mf-guidance-open');
     requestAnimationFrame(()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'}));
@@ -2331,7 +2355,12 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
   closeButton.addEventListener('click',close);
-  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.classList.contains('is-open'))close();});
+  window.addEventListener('resize',scheduleCompactReviewNav,{passive:true});
+  window.addEventListener('keydown',event=>{
+    if(event.key!=='Escape'||!overlay.classList.contains('is-open'))return;
+    if(overlay.classList.contains('is-review-nav-open'))closeCompactReviewNav();
+    else close();
+  });
 })();
 
 /* BIO TABS — slower sequential fade, stable on desktop and mobile */
