@@ -254,34 +254,6 @@ const ascii=Array.from(document.querySelectorAll(".mf-ascii"));let asciiIndex=0;
 
 const indexExtra=document.getElementById("indexExtra");
 if(indexExtra){
-  let compactNavFrame=0;
-  const closeCompactReviewNav=()=>overlay.classList.remove('is-review-nav-open');
-  const updateCompactReviewNav=()=>{
-    compactNavFrame=0;
-    if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open')){
-      overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
-      return;
-    }
-
-    /* Measure the full approved menu from its real scroll height. The nav is
-       bottom-anchored, so calculate its theoretical top rather than relying on
-       a transitional getBoundingClientRect() value. Collapse only when that
-       top would enter the protected gap below the description. */
-    overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
-    const asideRect=overlayAside.getBoundingClientRect();
-    const introRect=overlayIntro.getBoundingClientRect();
-    const navHeight=reviewNav.scrollHeight;
-    const navBottom=28;
-    const protectedGap=30;
-    const theoreticalTop=asideRect.bottom-navBottom-navHeight;
-    const threatened=theoreticalTop<introRect.bottom+protectedGap;
-    overlay.classList.toggle('is-compact-review-nav',threatened);
-  };
-  const scheduleCompactReviewNav=()=>{
-    if(compactNavFrame)cancelAnimationFrame(compactNavFrame);
-    compactNavFrame=requestAnimationFrame(()=>requestAnimationFrame(updateCompactReviewNav));
-  };
-
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runIndexLoop(){
     while(true){
@@ -1630,6 +1602,11 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const closeButton=overlay?.querySelector('.mf-guidance-close');
   if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
 
+  const engagementLine=document.createElement('div');
+  engagementLine.className='mf-guidance-engagement-fixed';
+  engagementLine.setAttribute('aria-hidden','true');
+  overlay.appendChild(engagementLine);
+
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
     while(title.isConnected){
@@ -1857,6 +1834,97 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
   let asciiTimer=0;
   const mobileGuidance=window.matchMedia('(max-width:1024px)');
 
+  /* V112: short-height Mindset submenu. The approved full menu remains
+     unchanged whenever it fits. When it would reach the description, only
+     the active row remains visible. Clicking that row opens the full list and
+     temporarily hides the description. */
+  let compactNavFrame=0;
+  const compactFitClasses=['is-width-fit-1','is-width-fit-2','is-width-fit-3','is-width-fit-4','is-width-fit-5','is-width-fit-6','is-width-fit-7','is-width-fit-8'];
+  const closeCompactReviewNav=()=>{
+    overlay.classList.remove('is-review-nav-open');
+    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.setAttribute('aria-expanded','false'));
+  };
+  function updateCompactReviewNav(){
+    compactNavFrame=0;
+    if(currentMode!=='mindset'||mobileGuidance.matches||!overlay.classList.contains('is-open')){
+      overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
+      return;
+    }
+
+    const keepOpen=overlay.classList.contains('is-review-nav-open');
+    overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
+
+    const asideRect=overlayAside.getBoundingClientRect();
+    const introRect=overlayIntro.getBoundingClientRect();
+    const navStyle=getComputedStyle(reviewNav);
+    const navBottom=Number.parseFloat(navStyle.bottom)||30;
+    const fullNavHeight=reviewNav.getBoundingClientRect().height;
+    const theoreticalTop=asideRect.bottom-navBottom-fullNavHeight;
+    const threatened=theoreticalTop<introRect.bottom+26;
+
+    overlay.classList.toggle('is-compact-review-nav',threatened);
+    if(threatened&&keepOpen)overlay.classList.add('is-review-nav-open');
+    reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
+      const expanded=threatened&&button.classList.contains('is-active')&&overlay.classList.contains('is-review-nav-open');
+      button.setAttribute('aria-expanded',expanded?'true':'false');
+    });
+  }
+  function scheduleCompactReviewNav(){
+    cancelAnimationFrame(compactNavFrame);
+    compactNavFrame=requestAnimationFrame(()=>requestAnimationFrame(updateCompactReviewNav));
+  }
+
+  /* V112: long Mindset reviews never shrink and never get an inner scroller.
+     Only the settled active review is measured. If it approaches the fixed
+     engagement line, the portrait and copy move left together while the copy
+     gains the same amount of width and keeps its right edge fixed. */
+  let mindsetFitFrame=0;
+  let mindsetFitTimer=0;
+  function resetMindsetReviewWidths(exceptReview=null){
+    reviewsHost.querySelectorAll('.mf-guidance-review-universal').forEach(review=>{
+      if(review===exceptReview)return;
+      review.classList.remove(...compactFitClasses);
+    });
+  }
+  function activeReviewFlowBottom(review){
+    const nodes=[
+      review.querySelector('.mf-guidance-review-content > .mf-guidance-review-tags'),
+      review.querySelector('.mf-guidance-part-panel.is-active'),
+      review.querySelector('.mf-guidance-single-copy'),
+      review.querySelector('.mf-guidance-review-parts')
+    ].filter(Boolean);
+    return nodes.reduce((bottom,node)=>Math.max(bottom,node.getBoundingClientRect().bottom),-Infinity);
+  }
+  function fitSettledMindsetReviewWidth(id=activeReviewId){
+    cancelAnimationFrame(mindsetFitFrame);
+    clearTimeout(mindsetFitTimer);
+    if(currentMode!=='mindset'||mobileGuidance.matches||snapInFlight||(!overlay.classList.contains('is-open')&&!overlay.classList.contains('is-entering')))return;
+
+    mindsetFitFrame=requestAnimationFrame(()=>{
+      mindsetFitFrame=0;
+      const review=reviewsHost.querySelector(`[data-review-id="${id}"]`);
+      if(!review||review.classList.contains('is-guidance-next')||getDominantMindsetReview()!==review)return;
+      if(!engagementLine.classList.contains('has-text'))return;
+
+      resetMindsetReviewWidths(review);
+      review.classList.add('is-measuring-review-fit');
+      review.classList.remove(...compactFitClasses);
+      const collides=()=>activeReviewFlowBottom(review)>engagementLine.getBoundingClientRect().top-34;
+      if(collides()){
+        for(const level of compactFitClasses){
+          review.classList.add(level);
+          void review.offsetWidth;
+          if(!collides())break;
+        }
+      }
+      review.classList.remove('is-measuring-review-fit');
+    });
+  }
+  function queueSettledMindsetWidthFit(delay=90){
+    clearTimeout(mindsetFitTimer);
+    mindsetFitTimer=setTimeout(()=>fitSettledMindsetReviewWidth(activeReviewId),delay);
+  }
+
   let leadershipTargetScroll=0;
   let leadershipCurrentScroll=0;
   let leadershipScrollFrame=0;
@@ -2060,57 +2128,19 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     },2300);
   }
 
-  let mindsetWidthFrame=0;
-  let mindsetWidthTimer=0;
-
-  function resetMindsetReviewWidths(exceptReview=null){
-    reviewsHost.querySelectorAll('.mf-guidance-review-universal').forEach(review=>{
-      if(review===exceptReview)return;
-      review.classList.remove('is-width-fit-1','is-width-fit-2','is-width-fit-3','is-width-fit-4');
-    });
-  }
-
-  function fitSettledMindsetReviewWidth(id=activeReviewId){
-    cancelAnimationFrame(mindsetWidthFrame);
-    clearTimeout(mindsetWidthTimer);
-    if(currentMode!=='mindset'||mobileGuidance.matches||snapInFlight||!overlay.classList.contains('is-open'))return;
-
-    mindsetWidthFrame=requestAnimationFrame(()=>{
-      mindsetWidthFrame=0;
-      const review=reviewsHost.querySelector(`[data-review-id="${id}"]`);
-      if(!review||review.classList.contains('is-guidance-next')||!review.classList.contains('is-in-view'))return;
-      if(getDominantMindsetReview()!==review)return;
-
-      const copy=review.querySelector('.mf-guidance-part-panel.is-active, .mf-guidance-single-copy');
-      const engagement=review.querySelector('.mf-guidance-engagement');
-      if(!copy||!engagement)return;
-
-      resetMindsetReviewWidths(review);
-      review.classList.remove('is-width-fit-1','is-width-fit-2','is-width-fit-3','is-width-fit-4');
-
-      const safeGap=54;
-      const collides=()=>copy.getBoundingClientRect().bottom>engagement.getBoundingClientRect().top-safeGap;
-      if(!collides())return;
-
-      /* Widen leftward in restrained steps. Text size never changes. The
-         portrait/credentials move left with the copy, while the copy grows to
-         the left and keeps its approved right edge. */
-      for(const level of ['is-width-fit-1','is-width-fit-2','is-width-fit-3','is-width-fit-4']){
-        review.classList.add(level);
-        void review.offsetWidth;
-        if(!collides())break;
-      }
-    });
-  }
-
-  function queueSettledMindsetWidthFit(delay=80){
-    clearTimeout(mindsetWidthTimer);
-    mindsetWidthTimer=setTimeout(()=>fitSettledMindsetReviewWidth(activeReviewId),delay);
-  }
-
   const markActiveReview=id=>{
     if(!id)return;
     activeReviewId=id;
+    let activeArticle=null;
+    reviewsHost.querySelectorAll('[data-review-id]').forEach(review=>{
+      const active=review.dataset.reviewId===id;
+      review.classList.toggle('is-active-review',active);
+      if(active)activeArticle=review;
+    });
+    const engagementSource=activeArticle?.querySelector('.mf-guidance-engagement');
+    const engagementText=engagementSource?.textContent?.trim()||'';
+    engagementLine.textContent=engagementText;
+    engagementLine.classList.toggle('has-text',Boolean(engagementText));
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
       /* Mobile shows the submenu as a neutral jump index. No person is
          visually selected while the reviews flow beneath it. */
@@ -2126,13 +2156,6 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     if(dominant)markActiveReview(dominant.dataset.reviewId);
   };
   const scheduleReviewTracking=()=>{ if(!reviewScrollFrame)reviewScrollFrame=requestAnimationFrame(updateActiveReview); };
-  let mindsetWidthResizeTimer=0;
-  window.addEventListener('resize',()=>{
-    resetMindsetReviewWidths();
-    clearTimeout(mindsetWidthResizeTimer);
-    mindsetWidthResizeTimer=setTimeout(()=>queueSettledMindsetWidthFit(40),160);
-  },{passive:true});
-  document.fonts?.ready?.then(()=>queueSettledMindsetWidthFit(40));
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
@@ -2233,6 +2256,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>{
       if(overlay.classList.contains('is-compact-review-nav')&&!overlay.classList.contains('is-review-nav-open')&&button.classList.contains('is-active')){
         overlay.classList.add('is-review-nav-open');
+        button.setAttribute('aria-expanded','true');
         return;
       }
       const target=document.getElementById(`guidance-review-${button.dataset.reviewTarget}`);
@@ -2349,6 +2373,9 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     reviewsHost.scrollTop=0;
     overlay.scrollTop=0;
     activeReviewId='';
+    engagementLine.textContent='';
+    engagementLine.classList.remove('has-text');
+    overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
     mindsetWheelTotal=0;
     clearTimeout(mindsetWheelReset);
 
@@ -2405,7 +2432,15 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
     overlay.classList.add('is-entering');
-    requestAnimationFrame(()=>{overlay.classList.add('is-open');scheduleCompactReviewNav();});
+    if(currentMode==='mindset'){
+      overlay.classList.add('is-fit-preparing');
+      fitSettledMindsetReviewWidth(activeReviewId);
+    }
+    requestAnimationFrame(()=>{
+      overlay.classList.add('is-open');
+      scheduleCompactReviewNav();
+      requestAnimationFrame(()=>overlay.classList.remove('is-fit-preparing'));
+    });
     setTimeout(()=>overlay.classList.remove('is-entering'),1150);
     setTimeout(()=>reviewsHost.focus({preventScroll:true}),360);
   }
@@ -2414,6 +2449,9 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     stopLeadershipScroll();
     guidanceObserver?.disconnect();
     overlay.classList.remove('is-open','is-entering','is-compact-review-nav','is-review-nav-open');
+    resetMindsetReviewWidths();
+    engagementLine.textContent='';
+    engagementLine.classList.remove('has-text');
     overlay.setAttribute('aria-hidden','true');
     document.body.classList.remove('mf-guidance-open');
     requestAnimationFrame(()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'}));
@@ -2426,12 +2464,18 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
   closeButton.addEventListener('click',close);
-  window.addEventListener('resize',scheduleCompactReviewNav,{passive:true});
-  window.addEventListener('keydown',event=>{
-    if(event.key!=='Escape'||!overlay.classList.contains('is-open'))return;
-    if(overlay.classList.contains('is-review-nav-open'))closeCompactReviewNav();
-    else close();
+  let mindsetLayoutResizeTimer=0;
+  window.addEventListener('resize',()=>{
+    scheduleCompactReviewNav();
+    resetMindsetReviewWidths();
+    clearTimeout(mindsetLayoutResizeTimer);
+    mindsetLayoutResizeTimer=setTimeout(()=>queueSettledMindsetWidthFit(40),170);
+  },{passive:true});
+  document.fonts?.ready?.then(()=>{
+    scheduleCompactReviewNav();
+    queueSettledMindsetWidthFit(40);
   });
+  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.classList.contains('is-open'))close();});
 })();
 
 /* BIO TABS — slower sequential fade, stable on desktop and mobile */
