@@ -12504,7 +12504,7 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
   .mf-guidance-overlay.is-mindset .mf-guidance-review-content {
     padding-bottom:0 !important;
     box-sizing:border-box !important;
-    transition:margin-left .48s var(--ease),width .48s var(--ease) !important;
+    transition:margin-left .48s var(--ease),width .48s var(--ease),transform .48s var(--ease) !important;
   }
   .mf-guidance-overlay.is-mindset .mf-guidance-person-wrap {
     transition:transform .48s var(--ease) !important;
@@ -12527,12 +12527,12 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
     transition:none !important;
   }
 
-  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4,.is-width-fit-5,.is-width-fit-6,.is-width-fit-7,.is-width-fit-8) .mf-guidance-person-wrap {
-    transform:translateX(calc(-1 * var(--mf-review-width-relief))) !important;
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit,.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4,.is-width-fit-5,.is-width-fit-6,.is-width-fit-7,.is-width-fit-8) .mf-guidance-person-wrap {
+    transform:translateX(calc(-1 * var(--mf-review-person-shift,var(--mf-review-width-relief)))) !important;
   }
-  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4,.is-width-fit-5,.is-width-fit-6,.is-width-fit-7,.is-width-fit-8) .mf-guidance-review-content {
-    margin-left:calc(-1 * var(--mf-review-width-relief)) !important;
-    width:calc(100% + var(--mf-review-width-relief)) !important;
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal:is(.is-width-fit,.is-width-fit-1,.is-width-fit-2,.is-width-fit-3,.is-width-fit-4,.is-width-fit-5,.is-width-fit-6,.is-width-fit-7,.is-width-fit-8) .mf-guidance-review-content {
+    margin-left:calc(-1 * var(--mf-review-copy-gain,var(--mf-review-width-relief))) !important;
+    width:calc(100% + var(--mf-review-copy-gain,var(--mf-review-width-relief))) !important;
   }
 
   /* Height fallback. The full submenu remains unchanged whenever it fits. */
@@ -12620,7 +12620,161 @@ html body .mf-art-runtime-loader .mf-loader-progress::after {
 
 @media (min-width:1025px) {
   .mf-guidance-overlay.is-mindset.is-fit-preparing .mf-guidance-person-wrap,
-  .mf-guidance-overlay.is-mindset.is-fit-preparing .mf-guidance-review-content {
+  .mf-guidance-overlay.is-mindset.is-fit-preparing .mf-guidance-review-content,
+  .mf-guidance-overlay.is-mindset.is-fit-preparing .mf-guidance-single-copy p,
+  .mf-guidance-overlay.is-mindset.is-fit-preparing .mf-guidance-part-panel p {
     transition:none !important;
+  }
+}
+
+
+/* ============================================================
+   V#113 — MC/TL V2 + staged review fit + ART boundary + Symbio optical fix
+   MC/TL V1 baseline: V112. Set data-mc-tl-version="1" on
+   .mf-guidance-portals to restore the approved V1 interaction.
+   ============================================================ */
+
+/* Mindset review copy starts slightly larger. Only the active settled review
+   receives --mf-review-fit-font-size when it genuinely approaches the fixed
+   engagement line. Tags, identity and controls are never resized. */
+@media (min-width:1025px) {
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal {
+    --mf-review-copy-base:clamp(16px,1.08vw,20px);
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-single-copy p,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal .mf-guidance-part-panel p {
+    font-size:var(--mf-review-fit-font-size,var(--mf-review-copy-base)) !important;
+    line-height:1.30 !important;
+    transition:font-size .32s cubic-bezier(.16,1,.3,1),line-height .32s cubic-bezier(.16,1,.3,1) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-measuring-review-fit .mf-guidance-single-copy p,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-measuring-review-fit .mf-guidance-part-panel p {
+    transition:none !important;
+  }
+  /* Fitting is a settled-state correction, not a visible resize animation. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-review-fitted .mf-guidance-person-wrap,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-review-fitted .mf-guidance-review-content,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-review-fitted .mf-guidance-single-copy p,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-review-fitted .mf-guidance-part-panel p {
+    transition:none !important;
+  }
+  /* Only the rare review that has exhausted both readable type reduction and
+     safe horizontal expansion receives this final compact rhythm. */
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-review-content {
+    transform:translateY(calc(-1 * var(--mf-review-vertical-lift,0px))) !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-review-content > .mf-guidance-review-tags {
+    margin-bottom:18px !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-single-copy p,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-part-panel p {
+    line-height:1.20 !important;
+    margin-bottom:1em !important;
+  }
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-single-copy p:last-child,
+  .mf-guidance-overlay.is-mindset .mf-guidance-review-universal.is-dense-review-fit .mf-guidance-part-panel p:last-child {
+    margin-bottom:0 !important;
+  }
+  .mf-guidance-engagement-fixed {
+    bottom:30px !important;
+    transition:opacity .25s ease !important;
+  }
+  .mf-guidance-overlay:has(.mf-guidance-review-universal.is-measuring-review-fit) .mf-guidance-engagement-fixed {
+    transition:none !important;
+  }
+}
+
+/* MF ART: preserve the full approved copy width. When the desktop viewport is
+   narrow, the preview gains a calculated left margin and therefore contracts
+   only from its left edge while its right edge remains anchored. */
+@media (min-width:1025px) {
+  .mf-art-showcase-inner {
+    --mf-art-grid-gap:clamp(36px,6vw,110px);
+    --mf-art-copy-column:max(260px,28vw);
+    --mf-art-copy-visual:min(max(405.6px,43.68vw),612px);
+    --mf-art-safe-gap:clamp(26px,2vw,36px);
+    gap:var(--mf-art-grid-gap) !important;
+  }
+  .mf-art-preview-frame {
+    min-width:0 !important;
+    margin-left:max(0px,calc(var(--mf-art-copy-visual) + var(--mf-art-safe-gap) - var(--mf-art-copy-column) - var(--mf-art-grid-gap))) !important;
+    transform-origin:right center !important;
+  }
+}
+@media (min-width:1025px) and (max-width:1600px) {
+  .mf-art-preview-frame:hover { transform:scale(1.008) !important; }
+}
+
+/* MC / TL V2 — V1 remains untouched and instantly recoverable through the
+   data-mc-tl-version switch in index.html. */
+@media (min-width:1025px) and (hover:hover) and (pointer:fine) {
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal {
+    transition:
+      flex-basis .76s cubic-bezier(.16,1,.3,1),
+      background-color .62s cubic-bezier(.16,1,.3,1),
+      opacity .52s cubic-bezier(.16,1,.3,1),
+      filter .62s cubic-bezier(.16,1,.3,1) !important;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal::after {
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    opacity:0;
+    transform:translate3d(-16%,0,0);
+    background:linear-gradient(108deg,transparent 18%,rgba(255,255,255,.022) 49%,transparent 74%);
+    transition:opacity .62s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal {
+    flex-basis:42% !important;
+    opacity:.82;
+    filter:brightness(.84);
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal:hover {
+    flex-basis:58% !important;
+    opacity:1;
+    filter:none;
+    background:#0c0c0c !important;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal-title,
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal-copy,
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal-tags,
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-open-label {
+    transition:
+      transform .76s cubic-bezier(.16,1,.3,1),
+      opacity .52s cubic-bezier(.16,1,.3,1),
+      letter-spacing .76s cubic-bezier(.16,1,.3,1) !important;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal:not(:hover) .mf-guidance-portal-title,
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal:not(:hover) .mf-guidance-portal-copy,
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal:not(:hover) .mf-guidance-portal-tags,
+  .mf-guidance-portals[data-mc-tl-version="2"]:has(.mf-guidance-portal:hover) .mf-guidance-portal:not(:hover) .mf-guidance-open-label {
+    transform:translate3d(-5px,2px,0);
+    opacity:.72;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal:hover::after {
+    opacity:1;
+    transform:translate3d(0,0,0);
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal:hover .mf-guidance-portal-title {
+    transform:translate3d(14px,0,0) !important;
+    letter-spacing:-.055em !important;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal:hover .mf-guidance-portal-copy,
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal:hover .mf-guidance-portal-tags {
+    transform:translate3d(8px,-4px,0);
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-open-label b {
+    display:inline-block;
+    transform-origin:center;
+  }
+  .mf-guidance-portals[data-mc-tl-version="2"] .mf-guidance-portal:hover .mf-guidance-open-label b {
+    animation:mfGuidancePortalArrowV2 .78s cubic-bezier(.16,1,.3,1) both !important;
+  }
+  @keyframes mfGuidancePortalArrowV2 {
+    0% { transform:translate3d(0,0,0) rotate(0deg); }
+    42% { transform:translate3d(2px,-2px,0) rotate(190deg); }
+    100% { transform:translate3d(7px,-7px,0) rotate(360deg); }
   }
 }
