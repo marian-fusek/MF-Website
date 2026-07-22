@@ -1602,25 +1602,6 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const closeButton=overlay?.querySelector('.mf-guidance-close');
   if(!title||!overlay||!reviewsHost||!reviewNav||!overlayTitle||!overlayIntro||!kicker||!overlayAside||!guidanceSection||!closeButton)return;
 
-  let compactNavFrame=0;
-  const closeCompactReviewNav=()=>overlay.classList.remove('is-review-nav-open');
-  const updateCompactReviewNav=()=>{
-    compactNavFrame=0;
-    if(currentMode!=='mindset'||!overlay.classList.contains('is-open')){
-      overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
-      return;
-    }
-    overlay.classList.remove('is-compact-review-nav','is-review-nav-open');
-    const introRect=overlayIntro.getBoundingClientRect();
-    const navRect=reviewNav.getBoundingClientRect();
-    const threatened=window.innerWidth>1024&&navRect.top<introRect.bottom+24;
-    overlay.classList.toggle('is-compact-review-nav',threatened);
-  };
-  const scheduleCompactReviewNav=()=>{
-    if(compactNavFrame)cancelAnimationFrame(compactNavFrame);
-    compactNavFrame=requestAnimationFrame(()=>requestAnimationFrame(updateCompactReviewNav));
-  };
-
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
   async function runTitle(){
     while(title.isConnected){
@@ -1987,10 +1968,11 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
       reviewsHost.scrollTop=destination;
       snapInFlight=false;
       const target=getDominantMindsetReview();
-      if(target)markActiveReview(target.dataset.reviewId);
+      if(target){markActiveReview(target.dataset.reviewId);queueSettledMindsetFit();}
       return;
     }
     snapInFlight=true;
+    resetMindsetReviewFits();
     const started=performance.now();
     const frame=now=>{
       const progress=Math.min(1,(now-started)/duration);
@@ -1999,7 +1981,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
       reviewsHost.scrollTop=destination;
       snapInFlight=false;
       const target=getDominantMindsetReview();
-      if(target)markActiveReview(target.dataset.reviewId);
+      if(target){markActiveReview(target.dataset.reviewId);queueSettledMindsetFit();}
     };
     snapAnimationFrame=requestAnimationFrame(frame);
   }
@@ -2050,37 +2032,79 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     },2300);
   }
 
-  function fitMindsetReviewCopy(id){
-    if(currentMode!=='mindset'||mobileGuidance.matches)return;
-    const review=reviewsHost.querySelector(`[data-review-id="${id}"]`);
-    if(!review||review.classList.contains('is-guidance-next'))return;
-    const copy=review.querySelector('.mf-guidance-part-panel.is-active, .mf-guidance-single-copy');
-    const engagement=review.querySelector('.mf-guidance-engagement');
-    if(!copy||!engagement)return;
+  let mindsetFitFrame=0;
+  let mindsetFitTimer=0;
 
-    /* Reset first so every calculation starts from the original design. */
-    copy.style.removeProperty('zoom');
-    copy.style.removeProperty('transform');
-    copy.style.removeProperty('transform-origin');
-    copy.classList.remove('is-auto-fitted');
+  function resetMindsetReviewFits(exceptReview=null){
+    reviewsHost.querySelectorAll('.mf-guidance-review-universal').forEach(review=>{
+      if(review===exceptReview)return;
+      review.querySelectorAll('.mf-guidance-single-copy, .mf-guidance-part-panel').forEach(copy=>{
+        copy.style.removeProperty('font-size');
+        copy.classList.remove('is-auto-fitted');
+      });
+    });
+  }
 
-    requestAnimationFrame(()=>{
-      const copyRect=copy.getBoundingClientRect();
-      const engagementRect=engagement.getBoundingClientRect();
+  function fitSettledMindsetReview(id=activeReviewId){
+    cancelAnimationFrame(mindsetFitFrame);
+    clearTimeout(mindsetFitTimer);
+    if(currentMode!=='mindset'||mobileGuidance.matches||snapInFlight||!overlay.classList.contains('is-open'))return;
+
+    mindsetFitFrame=requestAnimationFrame(()=>{
+      mindsetFitFrame=0;
+      const review=reviewsHost.querySelector(`[data-review-id="${id}"]`);
+      if(!review||review.classList.contains('is-guidance-next')||!review.classList.contains('is-in-view'))return;
+
+      const dominant=getDominantMindsetReview();
+      if(dominant!==review)return;
+
+      const copy=review.querySelector('.mf-guidance-part-panel.is-active, .mf-guidance-single-copy');
+      const engagement=review.querySelector('.mf-guidance-engagement');
+      if(!copy||!engagement)return;
+
+      resetMindsetReviewFits(review);
+      copy.style.removeProperty('font-size');
+      copy.classList.remove('is-auto-fitted');
+
       const safeGap=28;
-      const available=engagementRect.top-safeGap-copyRect.top;
-      if(available<=0||copyRect.height<=available+1)return;
+      const engagementTop=engagement.getBoundingClientRect().top-safeGap;
+      const copyTop=copy.getBoundingClientRect().top;
+      const originalSize=parseFloat(getComputedStyle(copy).fontSize);
+      if(!Number.isFinite(originalSize)||originalSize<=0||engagementTop<=copyTop)return;
 
-      const scale=Math.max(.84,Math.min(1,available/copyRect.height));
-      copy.style.setProperty('zoom',scale.toFixed(4));
+      const fits=()=>copy.getBoundingClientRect().bottom<=engagementTop+.5;
+      if(fits())return;
+
+      const minimumSize=Math.max(15,originalSize*.84);
+      let low=minimumSize;
+      let high=originalSize;
+      copy.style.setProperty('font-size',`${low}px`,'important');
+
+      /* If the protected space still cannot be respected at the readability
+         floor, keep that floor rather than collapsing the composition. */
+      if(!fits()){
+        copy.classList.add('is-auto-fitted');
+        return;
+      }
+
+      for(let step=0;step<10;step+=1){
+        const middle=(low+high)/2;
+        copy.style.setProperty('font-size',`${middle}px`,'important');
+        if(fits())low=middle;else high=middle;
+      }
+      copy.style.setProperty('font-size',`${low.toFixed(2)}px`,'important');
       copy.classList.add('is-auto-fitted');
     });
+  }
+
+  function queueSettledMindsetFit(delay=80){
+    clearTimeout(mindsetFitTimer);
+    mindsetFitTimer=setTimeout(()=>fitSettledMindsetReview(activeReviewId),delay);
   }
 
   const markActiveReview=id=>{
     if(!id)return;
     activeReviewId=id;
-    requestAnimationFrame(()=>fitMindsetReviewCopy(id));
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>{
       /* Mobile shows the submenu as a neutral jump index. No person is
          visually selected while the reviews flow beneath it. */
@@ -2096,12 +2120,13 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     if(dominant)markActiveReview(dominant.dataset.reviewId);
   };
   const scheduleReviewTracking=()=>{ if(!reviewScrollFrame)reviewScrollFrame=requestAnimationFrame(updateActiveReview); };
-  let reviewFitResizeTimer=0;
+  let mindsetFitResizeTimer=0;
   window.addEventListener('resize',()=>{
-    clearTimeout(reviewFitResizeTimer);
-    reviewFitResizeTimer=setTimeout(()=>fitMindsetReviewCopy(activeReviewId),120);
+    resetMindsetReviewFits();
+    clearTimeout(mindsetFitResizeTimer);
+    mindsetFitResizeTimer=setTimeout(()=>queueSettledMindsetFit(40),160);
   },{passive:true});
-  document.fonts?.ready?.then(()=>fitMindsetReviewCopy(activeReviewId));
+  document.fonts?.ready?.then(()=>queueSettledMindsetFit(40));
   const supportsScrollEnd='onscrollend' in reviewsHost;
   reviewsHost.addEventListener('scroll',()=>{
     scheduleReviewTracking();
@@ -2190,6 +2215,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
           buttons.forEach((item,index)=>item.classList.toggle('is-active',index===next));
           requestAnimationFrame(()=>requestAnimationFrame(()=>panels[next].classList.remove('is-entering')));
           active=next;
+          queueSettledMindsetFit(40);
           setTimeout(()=>{switching=false;},220);
         },130);
       }));
@@ -2199,14 +2225,9 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
   function bindMindset(){
     bindReviewParts();
     reviewNav.querySelectorAll('[data-review-target]').forEach(button=>button.addEventListener('click',()=>{
-      if(overlay.classList.contains('is-compact-review-nav')&&!overlay.classList.contains('is-review-nav-open')&&button.classList.contains('is-active')){
-        overlay.classList.add('is-review-nav-open');
-        return;
-      }
       const target=document.getElementById(`guidance-review-${button.dataset.reviewTarget}`);
       if(!target)return;
       markActiveReview(button.dataset.reviewTarget);
-      closeCompactReviewNav();
 
       if(mobileGuidance.matches){
         const topBar=overlay.querySelector('.mf-guidance-overlay-top');
@@ -2332,7 +2353,11 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
       bindMindset();
       markActiveReview(ordered[0]?.id);
       scheduleReviewTracking();
-      requestAnimationFrame(()=>{setupGuidanceReveals();fitGuidanceNextLinks();scheduleCompactReviewNav();});
+      requestAnimationFrame(()=>{
+        setupGuidanceReveals();
+        fitGuidanceNextLinks();
+        requestAnimationFrame(()=>queueSettledMindsetFit(120));
+      });
       return;
     }
 
@@ -2368,7 +2393,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('mf-guidance-open');
     overlay.classList.add('is-entering');
-    requestAnimationFrame(()=>{overlay.classList.add('is-open');scheduleCompactReviewNav();});
+    requestAnimationFrame(()=>overlay.classList.add('is-open'));
     setTimeout(()=>overlay.classList.remove('is-entering'),1150);
     setTimeout(()=>reviewsHost.focus({preventScroll:true}),360);
   }
@@ -2376,7 +2401,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     stopGuidanceAscii();
     stopLeadershipScroll();
     guidanceObserver?.disconnect();
-    overlay.classList.remove('is-open','is-entering','is-compact-review-nav','is-review-nav-open');
+    overlay.classList.remove('is-open','is-entering');
     overlay.setAttribute('aria-hidden','true');
     document.body.classList.remove('mf-guidance-open');
     requestAnimationFrame(()=>window.scrollTo({top:guidanceReturnY,behavior:'auto'}));
@@ -2389,12 +2414,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
   document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
   closeButton.addEventListener('click',close);
-  window.addEventListener('resize',scheduleCompactReviewNav,{passive:true});
-  window.addEventListener('keydown',event=>{
-    if(event.key!=='Escape'||!overlay.classList.contains('is-open'))return;
-    if(overlay.classList.contains('is-review-nav-open'))closeCompactReviewNav();
-    else close();
-  });
+  window.addEventListener('keydown',event=>{if(event.key==='Escape'&&overlay.classList.contains('is-open'))close();});
 })();
 
 /* BIO TABS — slower sequential fade, stable on desktop and mobile */
@@ -3793,8 +3813,3 @@ document.querySelectorAll(".mf-roll").forEach(row=>{["mouseenter","mouseleave"].
   initStaticTargets();
   new MutationObserver(initStaticTargets).observe(document.body,{childList:true,subtree:true});
 })();
-
-
-/* ============================================================
-   V#107 — collision-safe long Mindset reviews
-   ============================================================ */
