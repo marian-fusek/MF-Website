@@ -182,7 +182,7 @@
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
     <figure class="mf-leadership-hero-photo mf-guidance-scroll-reveal">
-      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy">
+      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="eager" decoding="async" fetchpriority="high">
     </figure>
     <section class="mf-leadership-section" id="leadership-xp">
       <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">

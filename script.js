@@ -1740,6 +1740,35 @@ const xpPlus=document.getElementById("xpPlus");if(xpPlus){function popXP(){xpPlu
   const mindsetNextEntry={id:'next-leadership',type:'next',name:'NEXT: Team Leadership →'};
 
 
+  const LEADERSHIP_HERO_SRC='/media/guidance/leadership/marian-fusek_chill.jpg';
+  let leadershipHeroPreloadPromise=null;
+  const preloadLeadershipHero=()=>{
+    if(leadershipHeroPreloadPromise)return leadershipHeroPreloadPromise;
+    leadershipHeroPreloadPromise=new Promise(resolve=>{
+      const image=new Image();
+      image.decoding='async';
+      image.fetchPriority='high';
+      image.addEventListener('load',()=>resolve(true),{once:true});
+      image.addEventListener('error',()=>{
+        leadershipHeroPreloadPromise=null;
+        resolve(false);
+      },{once:true});
+      image.src=LEADERSHIP_HERO_SRC;
+    });
+    return leadershipHeroPreloadPromise;
+  };
+  const armLeadershipHeroImage=()=>{
+    const image=reviewsHost.querySelector('.mf-leadership-hero-photo img');
+    if(!image)return;
+    const retry=()=>{
+      if(image.dataset.mfLoadRetry==='1')return;
+      image.dataset.mfLoadRetry='1';
+      image.src=`${LEADERSHIP_HERO_SRC}?v=118`;
+    };
+    image.addEventListener('error',retry,{once:true});
+    if(image.complete&&!image.naturalWidth)retry();
+  };
+
   const leadershipEntries=[
     {id:'jan-pacek',name:'Jan Pacek',role:'Product Architect',company:'STRV',country:'Czechia',flag:'CZ',photo:'/media/guidance/leadership/jan-pacek.jpg',review:`When I think of leadership, two people immediately pop into my mind — Jocko Willink and Marian. Yes, Jocko is more badass and would probably kick both our asses, but I’ve had a chance to be part of Marian’s team for about two years, and his approach to leadership was always very inspiring. It’s the combination of absolute calmness in the face of everyday disasters together with strong values that bring new perspectives. After a conversation with Marian, every hopeless crisis has a light at the end of a tunnel, and you are left wondering why it was a disaster in the first place. Those two years made me a better person for sure.`},
     {id:'jan-kaltoun',name:'Jan Kaltoun',role:'Chief Operating Officer',company:'STRV',country:'Czechia',flag:'CZ',photo:'/media/guidance/leadership/jan-kaltoun.jpg',review:`Marian is one in a million kind of person, and working with him is simply a privilege. While Marian is not really a deeply technical person, he was able to successfully lead a team of leads who in turn led over a hundred designers and engineers. Working as a direct report to Marian, I was constantly amazed by how effortlessly he was able to tackle all the important tasks that needed to get done by empowering every single one of us in ways that are tough to put into words but endlessly effective. Marian listens, he brings the best out of you, he advises and, when needed, he pushes.`},
@@ -1772,7 +1801,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
   const leadershipContent=()=>`<div class="mf-leadership-page">
     <figure class="mf-leadership-hero-photo mf-guidance-scroll-reveal">
-      <img src="/media/guidance/leadership/marian-fusek_chill.jpg" alt="Marian Fusek portrait" loading="lazy">
+      <img src="${LEADERSHIP_HERO_SRC}" alt="Marian Fusek portrait" loading="eager" decoding="async" fetchpriority="high">
     </figure>
     <section class="mf-leadership-section" id="leadership-xp">
       <div class="mf-leadership-copy-block mf-guidance-scroll-reveal">
@@ -2574,6 +2603,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
     reviewNav.innerHTML='';
     reviewsHost.innerHTML=leadershipContent();
+    armLeadershipHeroImage();
     leadershipTargetScroll=0;
     leadershipCurrentScroll=0;
     bindLeadership();
@@ -2587,6 +2617,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
 
   async function transitionGuidanceMode(mode){
     if(modeSwitching||mode===currentMode)return;
+    if(mode==='leadership')preloadLeadershipHero();
     modeSwitching=true;
     stopLeadershipScroll();
     overlay.classList.add('is-mode-switching');
@@ -2599,6 +2630,7 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
   }
 
   function open(mode){
+    if(mode==='leadership')preloadLeadershipHero();
     guidanceReturnY=window.scrollY+guidanceSection.getBoundingClientRect().top;
     render(mode);
     overlay.setAttribute('aria-hidden','false');
@@ -2635,7 +2667,13 @@ Certified ICF-ACSTH & EMCC, if credentials matter to you.`,order:['michal-bohac'
     if(next)transitionGuidanceMode(next.dataset.guidanceNext);
   });
 
-  document.querySelectorAll('[data-guidance]').forEach(button=>button.addEventListener('click',()=>open(button.dataset.guidance)));
+  document.querySelectorAll('[data-guidance]').forEach(button=>{
+    if(button.dataset.guidance==='leadership'){
+      button.addEventListener('pointerenter',preloadLeadershipHero,{passive:true});
+      button.addEventListener('focus',preloadLeadershipHero,{passive:true});
+    }
+    button.addEventListener('click',()=>open(button.dataset.guidance));
+  });
   closeButton.addEventListener('click',close);
   let mindsetLayoutResizeTimer=0;
   window.addEventListener('resize',()=>{
